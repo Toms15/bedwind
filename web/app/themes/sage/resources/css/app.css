@@ -1,3 +1,30 @@
 @import "tailwindcss" theme(static);
 @source "../views/";
 @source "../../app/";
+
+@theme {
+  --color-black-100: #E3E3E3;
+  --color-black-200: #C9C9C9;
+  --color-black-300: #ADADAD;
+  --color-black-400: #949494;
+  --color-black-500: #787878;
+  --color-black-600: #5E5E5E;
+  --color-black-700: #424242;
+  --color-black-800: #292929;
+  --color-black-900: #0D0D0D;
+
+  --color-cafe: #CBE0EF;
+  --color-terrace: #F5EB78;
+  --color-bookshop: #F864F8;
+  --color-garden: #78EB78;
+
+  --text-mini: clamp(9.256px, -0.119vi + 9.732px, 8.019px);
+  --text-small: clamp(11.783px, -0.044vi + 11.958px, 11.327px);
+  --text-base: clamp(15px, 0.096vi + 14.615px, 16px);
+  --text-h6: clamp(19.095px, 0.337vi + 17.747px, 22.6px);
+  --text-h5: clamp(24.308px, 0.732vi + 21.379px, 31.923px);
+  --text-h4: clamp(30.944px, 1.36vi + 25.503px, 45.091px);
+  --text-h3: clamp(39.392px, 2.336vi + 30.046px, 63.69px);
+  --text-h2: clamp(50.146px, 3.829vi + 34.831px, 89.963px);
+  --text-h1: clamp(63.835px, 6.08vi + 39.514px, 127.072px);
+}

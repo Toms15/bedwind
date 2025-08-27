@@ -30,16 +30,16 @@ function hero_page()
             'jsx' => true,
             'anchor' => true,
         ],
-        'example' => [
-            'attributes' => [
-                'mode' => 'preview',
-                'data' => [
-                    'title' => 'Benvenuto nel nostro sito',
-                    'subtitle' => 'Scopri tutto quello che abbiamo da offrirti',
-                    'cta_text' => 'Scopri di più',
-                ],
-            ],
-        ],
+//        'example' => [
+//            'attributes' => [
+//                'mode' => 'preview',
+//                'data' => [
+//                    'title' => 'Benvenuto nel nostro sito',
+//                    'subtitle' => 'Scopri tutto quello che abbiamo da offrirti',
+//                    'cta_text' => 'Scopri di più',
+//                ],
+//            ],
+//        ],
         'enqueue_style' => false, // Gli stili sono in Tailwind
         'enqueue_script' => false,
     ]);

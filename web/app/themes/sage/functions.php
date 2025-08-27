@@ -49,7 +49,15 @@ Application::configure()
 |
 */
 
-collect(value: ['setup', 'filters', 'blocks'])
+collect(
+    [
+        'setup',
+        'filters',
+        'blocks',
+        'helpers',
+        'ACFColorPicker',
+    ]
+)
     ->each(function ($file) {
         if (! locate_template($file = "app/{$file}.php", true, true)) {
             wp_die(

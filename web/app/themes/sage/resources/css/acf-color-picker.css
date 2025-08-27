@@ -1,0 +1,83 @@
+/**
+ * ACF Color Picker Restriction Styles
+ * Nasconde il picker principale e mostra solo la palette personalizzata
+ */
+
+/* Nasconde SOLO il gradiente e selettori colore, NON la palette */
+.iris-square,
+.iris-slider,
+.iris-square-handle,
+.iris-slider-offset {
+  display: none !important;
+}
+
+/* Riduce altezza del picker principale mantenendo la palette */
+.iris-picker.iris-border {
+  height: auto !important;
+  padding-bottom: 0 !important;
+  border: 0 !important;
+  width: 100% !important;
+}
+
+/* Nasconde solo il picker interno (gradiente), NON la palette */
+.iris-picker-inner {
+  display: none !important;
+}
+
+/* Container della palette */
+.iris-palette-container {
+  position: static !important;
+  background: #FFFFFF !important;
+  margin-top: 8px !important;
+  font-size: 0;
+  line-height: 1;
+  display: block !important;
+}
+
+/* Singoli colori della palette */
+.iris-palette {
+  margin: 3px !important;
+  border: 1px solid #EBEBEB !important;
+  border-radius: 100% !important;
+  display: inline-block !important;
+  float: none !important;
+  height: 32px !important;
+  width: 32px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  visibility: visible !important;
+  box-shadow: none !important;
+}
+
+.iris-palette:focus {
+  box-shadow: none !important;
+  border: 1px solid #EBEBEB !important;
+  outline: 0 !important;
+}
+
+/* Input color picker readonly */
+.wp-picker-container input[type=text].wp-color-picker {
+  pointer-events: none !important;
+  background: #f9f9f9 !important;
+  border: 1px solid #ddd !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Pulsante clear */
+.wp-picker-clear {
+  display: inline-block !important;
+}
+
+/* Responsive per schermi piccoli */
+@media (max-width: 782px) {
+  .iris-palette {
+    height: 28px !important;
+    width: 28px !important;
+    margin: 2px !important;
+  }
+
+  .iris-palette-container {
+    padding: 8px !important;
+  }
+}

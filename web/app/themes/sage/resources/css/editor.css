@@ -1,1 +1,28 @@
 @import "tailwindcss";
+
+/* CSS per mostrare i colori nel campo radio */
+.acf-field[data-name="prova_colore"] .acf-radio-list li label::after {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-left: 8px;
+  vertical-align: middle;
+  border-radius: 100%;
+}
+
+.acf-field[data-name="prova_colore"] .acf-radio-list li:nth-child(1) label::after {
+  background-color: #FF0000;
+}
+
+.acf-field[data-name="prova_colore"] .acf-radio-list li:nth-child(2) label::after {
+  background-color: #00FF00;
+}
+
+.acf-field[data-name="prova_colore"] .acf-radio-list li:nth-child(3) label::after {
+  background-color: #0000FF;
+}
+
+.acf-field[data-name="prova_colore"] .acf-radio-list li:nth-child(4) label::after {
+  background-color: #FFFF00;
+}

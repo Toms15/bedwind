@@ -14,6 +14,7 @@ web/.htaccess
 
 # Logs
 *.log
+.idea
 
 # Dotenv
 .env
@@ -26,3 +27,4 @@ auth.json
 
 # WP-CLI
 wp-cli.local.yml
+/.idea/vcs.xml

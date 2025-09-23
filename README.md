@@ -1,64 +1,64 @@
-# Progetto WordPress con Bedrock & Sage
+# WordPress Project with Bedrock & Sage
 
-Questo progetto utilizza [Bedrock](https://roots.io/bedrock/) come boilerplate per WordPress e [Sage](https://roots.io/sage/) come starter theme.
+This project uses [Bedrock](https://roots.io/bedrock/) as a WordPress boilerplate and [Sage](https://roots.io/sage/) as a starter theme.
 
-## Requisiti
+## Requirements
 
 - PHP >= 8.0
 - Composer
 - Node.js >= 16.0
 - npm
 
-## Setup Iniziale
+## Initial Setup
 
-### 1. Clona il repository
+### 1. Clone the repository
 
 ```bash
-git clone <url-repository> nome-progetto
-cd nome-progetto
+git clone <repository-url> project-name
+cd project-name
 ```
 
-### 2. Installa le dipendenze PHP
+### 2. Install PHP dependencies
 
 ```bash
 composer install
 ```
 
-### 3. Configura l'ambiente
+### 3. Configure environment
 
-Copia il file di configurazione di esempio e personalizzalo:
+Copy the example configuration file and customize it:
 
 ```bash
 cp .env.example .env
 ```
 
-Modifica il file `.env` con le tue configurazioni:
+Edit the `.env` file with your configurations:
 
 ```env
-DB_NAME='nome_database'
-DB_USER='utente_db'
-DB_PASSWORD='password_db'
+DB_NAME='database_name'
+DB_USER='db_user'
+DB_PASSWORD='db_password'
 DB_HOST='localhost'
 
 WP_ENV='development'
-WP_HOME='https://nome-progetto.test'
+WP_HOME='https://project-name.test'
 WP_SITEURL="${WP_HOME}/wp"
-WP_HOME_DOMAIN='nome-progetto.test'
+WP_HOME_DOMAIN='project-name.test'
 
-# Genera chiavi sicure su https://roots.io/salts.html
-AUTH_KEY='genera-chiave-sicura'
-SECURE_AUTH_KEY='genera-chiave-sicura'
-LOGGED_IN_KEY='genera-chiave-sicura'
-NONCE_KEY='genera-chiave-sicura'
-AUTH_SALT='genera-chiave-sicura'
-SECURE_AUTH_SALT='genera-chiave-sicura'
-LOGGED_IN_SALT='genera-chiave-sicura'
-NONCE_SALT='genera-chiave-sicura'
+# Generate secure keys at https://roots.io/salts.html
+AUTH_KEY='generate-secure-key'
+SECURE_AUTH_KEY='generate-secure-key'
+LOGGED_IN_KEY='generate-secure-key'
+NONCE_KEY='generate-secure-key'
+AUTH_SALT='generate-secure-key'
+SECURE_AUTH_SALT='generate-secure-key'
+LOGGED_IN_SALT='generate-secure-key'
+NONCE_SALT='generate-secure-key'
 ```
 
-### 4. Setup del tema Sage
+### 4. Sage theme setup
 
-Naviga nella cartella del tema e installa le dipendenze Node.js:
+Navigate to the theme folder and install Node.js dependencies:
 
 ```bash
 cd web/app/themes/sage
@@ -66,97 +66,97 @@ composer install
 npm install
 ```
 
-### 5. Sviluppo del tema
+### 5. Theme development
 
-Per avviare la compilazione in modalità sviluppo (con hot reload):
+To start development compilation (with hot reload):
 
 ```bash
 npm run dev
 ```
 
-Per compilare gli asset per la produzione:
+To compile assets for production:
 
 ```bash
 npm run build
 ```
 
-## Struttura del Progetto
+## Project Structure
 
 ```
-nome-progetto/
-├── config/                 # File di configurazione di Bedrock
+project-name/
+├── config/                 # Bedrock configuration files
 ├── web/
 │   ├── app/
 │   │   ├── mu-plugins/     # Must-use plugins
-│   │   ├── plugins/        # Plugin standard
-│   │   ├── themes/         # Temi personalizzati
-│   │   │   └── nome-tema/  # Tema Sage
-│   │   └── uploads/        # File caricati
+│   │   ├── plugins/        # Standard plugins
+│   │   ├── themes/         # Custom themes
+│   │   │   └── sage/       # Sage theme
+│   │   └── uploads/        # Uploaded files
 │   ├── wp-config.php       # WordPress config
 │   └── index.php           # Entry point
-├── vendor/                 # Dipendenze Composer
-├── .env                    # Configurazione ambiente (non committare!)
-└── composer.json           # Dipendenze PHP
+├── vendor/                 # Composer dependencies
+├── .env                    # Environment configuration (do not commit!)
+└── composer.json           # PHP dependencies
 ```
 
-## Comandi Utili
+## Useful Commands
 
 ### Bedrock
 
 ```bash
-# Installa plugin via Composer
+# Install plugin via Composer
 composer require wpackagist-plugin/plugin-name
 
-# Installa tema via Composer  
+# Install theme via Composer  
 composer require wpackagist-theme/theme-name
 
-# Aggiorna WordPress e plugin
+# Update WordPress and plugins
 composer update
 ```
 
 ### Sage
 
 ```bash
-# Compila asset per sviluppo
+# Compile assets for development
 npm run dev
 
-# Compila asset per produzione
+# Compile assets for production
 npm run build
 
-# Watch mode (ricompila automaticamente)
+# Watch mode (automatically recompiles)
 npm run dev:watch
 
-# Linting del codice
+# Code linting
 npm run lint
 
-# Correggi errori di linting automaticamente
+# Auto-fix linting errors
 npm run lint:fix
 ```
 
 ## Database
 
-Assicurati di aver creato il database specificato in `DB_NAME` nel file `.env` prima di accedere al sito.
+Make sure to create the database specified in `DB_NAME` in the `.env` file before accessing the site.
 
-## URL di Accesso
+## Access URLs
 
-- **Frontend**: `https://nome-progetto.test`
-- **Admin**: `https://nome-progetto.test/wp/wp-admin`
+- **Frontend**: `https://project-name.test`
+- **Admin**: `https://project-name.test/wp/wp-admin`
 
 ## Deployment
 
-Per il deployment in produzione:
+For production deployment:
 
-1. Cambia `WP_ENV` da `development` a `production` nel file `.env`
-2. Aggiorna `WP_HOME` con l'URL di produzione
-3. Esegui `npm run build` per compilare gli asset ottimizzati
-4. Carica i file sul server escludendo:
+1. Change `WP_ENV` from `development` to `production` in the `.env` file
+2. Update `WP_HOME` with the production URL
+3. Run `npm run build` to compile optimized assets
+4. Upload files to server excluding:
    - `node_modules/`
-   - `.env` (crea una nuova configurazione sul server)
-   - File di sviluppo (`.git`, `.gitignore`, etc.)
+   - `.env` (create new configuration on server)
+   - Development files (`.git`, `.gitignore`, etc.)
 
-## Note Aggiuntive
+## Additional Notes
 
-- Il file `.env` contiene informazioni sensibili e **non deve essere committato** nel repository
-- Gli asset compilati sono nella cartella `web/app/themes/sage/public/`
-- Le dipendenze sono gestite tramite Composer (PHP) e npm (Node.js)
-- WordPress core è installato nella cartella `web/wp/` e non deve essere modificato direttamente
+- The `.env` file contains sensitive information and **must not be committed** to the repository
+- Compiled assets are in the `web/app/themes/sage/public/` folder
+- Dependencies are managed through Composer (PHP) and npm (Node.js)
+- WordPress core is installed in the `web/wp/` folder and should not be modified directly

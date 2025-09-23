@@ -14,7 +14,7 @@ Questo progetto utilizza [Bedrock](https://roots.io/bedrock/) come boilerplate p
 ### 1. Clona il repository
 
 ```bash
-git clone <url-repository>
+git clone <url-repository> nome-progetto
 cd nome-progetto
 ```
 
@@ -41,8 +41,9 @@ DB_PASSWORD='password_db'
 DB_HOST='localhost'
 
 WP_ENV='development'
-WP_HOME='http://localhost/nome-progetto'
+WP_HOME='https://nome-progetto.test'
 WP_SITEURL="${WP_HOME}/wp"
+WP_HOME_DOMAIN='nome-progetto.test'
 
 # Genera chiavi sicure su https://roots.io/salts.html
 AUTH_KEY='genera-chiave-sicura'
@@ -60,7 +61,7 @@ NONCE_SALT='genera-chiave-sicura'
 Naviga nella cartella del tema e installa le dipendenze Node.js:
 
 ```bash
-cd web/app/themes/nome-tema
+cd web/app/themes/sage
 composer install
 npm install
 ```
@@ -79,29 +80,23 @@ Per compilare gli asset per la produzione:
 npm run build
 ```
 
-Per compilare gli asset in modalità watch (ricompila automaticamente ad ogni modifica):
-
-```bash
-npm run dev:watch
-```
-
 ## Struttura del Progetto
 
 ```
 nome-progetto/
-├── config/             # File di configurazione di Bedrock
+├── config/                 # File di configurazione di Bedrock
 ├── web/
 │   ├── app/
-│   │   ├── mu-plugins/  # Must-use plugins
-│   │   ├── plugins/     # Plugin standard
-│   │   ├── themes/      # Temi personalizzati
+│   │   ├── mu-plugins/     # Must-use plugins
+│   │   ├── plugins/        # Plugin standard
+│   │   ├── themes/         # Temi personalizzati
 │   │   │   └── nome-tema/  # Tema Sage
-│   │   └── uploads/     # File caricati
-│   ├── wp-config.php    # WordPress config
-│   └── index.php        # Entry point
-├── vendor/              # Dipendenze Composer
-├── .env                 # Configurazione ambiente (non committare!)
-└── composer.json        # Dipendenze PHP
+│   │   └── uploads/        # File caricati
+│   ├── wp-config.php       # WordPress config
+│   └── index.php           # Entry point
+├── vendor/                 # Dipendenze Composer
+├── .env                    # Configurazione ambiente (non committare!)
+└── composer.json           # Dipendenze PHP
 ```
 
 ## Comandi Utili
@@ -144,8 +139,8 @@ Assicurati di aver creato il database specificato in `DB_NAME` nel file `.env` p
 
 ## URL di Accesso
 
-- **Frontend**: `http://localhost/nome-progetto`
-- **Admin**: `http://localhost/nome-progetto/wp/wp-admin`
+- **Frontend**: `https://nome-progetto.test`
+- **Admin**: `https://nome-progetto.test/wp/wp-admin`
 
 ## Deployment
 
@@ -162,6 +157,6 @@ Per il deployment in produzione:
 ## Note Aggiuntive
 
 - Il file `.env` contiene informazioni sensibili e **non deve essere committato** nel repository
-- Gli asset compilati sono nella cartella `web/app/themes/nome-tema/public/`
+- Gli asset compilati sono nella cartella `web/app/themes/sage/public/`
 - Le dipendenze sono gestite tramite Composer (PHP) e npm (Node.js)
 - WordPress core è installato nella cartella `web/wp/` e non deve essere modificato direttamente

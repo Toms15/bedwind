@@ -1,61 +1,167 @@
-<p align="center">
-  <a href="https://roots.io/bedrock/">
-    <img alt="Bedrock" src="https://cdn.roots.io/app/uploads/logo-bedrock.svg" height="100">
-  </a>
-</p>
+# Progetto WordPress con Bedrock & Sage
 
-<p align="center">
-  <a href="https://packagist.org/packages/roots/bedrock">
-    <img alt="Packagist Installs" src="https://img.shields.io/packagist/dt/roots/bedrock?label=projects%20created&colorB=2b3072&colorA=525ddc&style=flat-square">
-  </a>
+Questo progetto utilizza [Bedrock](https://roots.io/bedrock/) come boilerplate per WordPress e [Sage](https://roots.io/sage/) come starter theme.
 
-  <a href="https://packagist.org/packages/roots/wordpress">
-    <img alt="roots/wordpress Packagist Downloads" src="https://img.shields.io/packagist/dt/roots/wordpress?label=roots%2Fwordpress%20downloads&logo=roots&logoColor=white&colorB=2b3072&colorA=525ddc&style=flat-square">
-  </a>
+## Requisiti
 
-  <img src="https://img.shields.io/badge/dynamic/json.svg?url=https://raw.githubusercontent.com/roots/bedrock/master/composer.json&label=wordpress&logo=roots&logoColor=white&query=$.require[%22roots/wordpress%22]&colorB=2b3072&colorA=525ddc&style=flat-square">
+- PHP >= 8.0
+- Composer
+- Node.js >= 16.0
+- npm
 
-  <a href="https://github.com/roots/bedrock/actions/workflows/ci.yml">
-    <img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/roots/bedrock/ci.yml?branch=master&logo=github&label=CI&style=flat-square">
-  </a>
+## Setup Iniziale
 
-  <a href="https://twitter.com/rootswp">
-    <img alt="Follow Roots" src="https://img.shields.io/badge/follow%20@rootswp-1da1f2?logo=twitter&logoColor=ffffff&message=&style=flat-square">
-  </a>
-</p>
+### 1. Clona il repository
 
-<p align="center">WordPress boilerplate with Composer, easier configuration, and an improved folder structure</p>
+```bash
+git clone <url-repository>
+cd nome-progetto
+```
 
-<p align="center">
-  <a href="https://roots.io/bedrock/">Website</a> &nbsp;&nbsp; <a href="https://roots.io/bedrock/docs/installation/">Documentation</a> &nbsp;&nbsp; <a href="https://github.com/roots/bedrock/releases">Releases</a> &nbsp;&nbsp; <a href="https://discourse.roots.io/">Community</a>
-</p>
+### 2. Installa le dipendenze PHP
 
-## Sponsors
+```bash
+composer install
+```
 
-Bedrock is an open source project and completely free to use. If you've benefited from our projects and would like to support our future endeavors, please consider [sponsoring Roots](https://github.com/sponsors/roots).
+### 3. Configura l'ambiente
 
-<div align="center">
-<a href="https://carrot.com/"><img src="https://cdn.roots.io/app/uploads/carrot.svg" alt="Carrot" width="120" height="90"></a> <a href="https://wordpress.com/"><img src="https://cdn.roots.io/app/uploads/wordpress.svg" alt="WordPress.com" width="120" height="90"></a> <a href="https://worksitesafety.ca/careers/"><img src="https://cdn.roots.io/app/uploads/worksite-safety.svg" alt="Worksite Safety" width="120" height="90"></a> <a href="https://www.itineris.co.uk/"><img src="https://cdn.roots.io/app/uploads/itineris.svg" alt="Itineris" width="120" height="90"></a> <a href="https://bonsai.so/"><img src="https://cdn.roots.io/app/uploads/bonsai.svg" alt="Bonsai" width="120" height="90"></a>
-</div>
+Copia il file di configurazione di esempio e personalizzalo:
 
-## Overview
+```bash
+cp .env.example .env
+```
 
-Bedrock is a WordPress boilerplate for developers that want to manage their projects with Git and Composer. Much of the philosophy behind Bedrock is inspired by the [Twelve-Factor App](http://12factor.net/) methodology, including the [WordPress specific version](https://roots.io/twelve-factor-wordpress/).
+Modifica il file `.env` con le tue configurazioni:
 
-- Better folder structure
-- Dependency management with [Composer](https://getcomposer.org)
-- Easy WordPress configuration with environment specific files
-- Environment variables with [Dotenv](https://github.com/vlucas/phpdotenv)
-- Autoloader for mu-plugins (use regular plugins as mu-plugins)
+```env
+DB_NAME='nome_database'
+DB_USER='utente_db'
+DB_PASSWORD='password_db'
+DB_HOST='localhost'
 
-## Getting Started
+WP_ENV='development'
+WP_HOME='http://localhost/nome-progetto'
+WP_SITEURL="${WP_HOME}/wp"
 
-See the [Bedrock installation documentation](https://roots.io/bedrock/docs/installation/).
+# Genera chiavi sicure su https://roots.io/salts.html
+AUTH_KEY='genera-chiave-sicura'
+SECURE_AUTH_KEY='genera-chiave-sicura'
+LOGGED_IN_KEY='genera-chiave-sicura'
+NONCE_KEY='genera-chiave-sicura'
+AUTH_SALT='genera-chiave-sicura'
+SECURE_AUTH_SALT='genera-chiave-sicura'
+LOGGED_IN_SALT='genera-chiave-sicura'
+NONCE_SALT='genera-chiave-sicura'
+```
 
-## Stay Connected
+### 4. Setup del tema Sage
 
-- Join us on Discord by [sponsoring us on GitHub](https://github.com/sponsors/roots)
-- Participate on [Roots Discourse](https://discourse.roots.io/)
-- Follow [@rootswp on Twitter](https://twitter.com/rootswp)
-- Read the [Roots Blog](https://roots.io/blog/)
-- Subscribe to the [Roots Newsletter](https://roots.io/newsletter/)
+Naviga nella cartella del tema e installa le dipendenze Node.js:
+
+```bash
+cd web/app/themes/nome-tema
+composer install
+npm install
+```
+
+### 5. Sviluppo del tema
+
+Per avviare la compilazione in modalità sviluppo (con hot reload):
+
+```bash
+npm run dev
+```
+
+Per compilare gli asset per la produzione:
+
+```bash
+npm run build
+```
+
+Per compilare gli asset in modalità watch (ricompila automaticamente ad ogni modifica):
+
+```bash
+npm run dev:watch
+```
+
+## Struttura del Progetto
+
+```
+nome-progetto/
+├── config/             # File di configurazione di Bedrock
+├── web/
+│   ├── app/
+│   │   ├── mu-plugins/  # Must-use plugins
+│   │   ├── plugins/     # Plugin standard
+│   │   ├── themes/      # Temi personalizzati
+│   │   │   └── nome-tema/  # Tema Sage
+│   │   └── uploads/     # File caricati
+│   ├── wp-config.php    # WordPress config
+│   └── index.php        # Entry point
+├── vendor/              # Dipendenze Composer
+├── .env                 # Configurazione ambiente (non committare!)
+└── composer.json        # Dipendenze PHP
+```
+
+## Comandi Utili
+
+### Bedrock
+
+```bash
+# Installa plugin via Composer
+composer require wpackagist-plugin/plugin-name
+
+# Installa tema via Composer  
+composer require wpackagist-theme/theme-name
+
+# Aggiorna WordPress e plugin
+composer update
+```
+
+### Sage
+
+```bash
+# Compila asset per sviluppo
+npm run dev
+
+# Compila asset per produzione
+npm run build
+
+# Watch mode (ricompila automaticamente)
+npm run dev:watch
+
+# Linting del codice
+npm run lint
+
+# Correggi errori di linting automaticamente
+npm run lint:fix
+```
+
+## Database
+
+Assicurati di aver creato il database specificato in `DB_NAME` nel file `.env` prima di accedere al sito.
+
+## URL di Accesso
+
+- **Frontend**: `http://localhost/nome-progetto`
+- **Admin**: `http://localhost/nome-progetto/wp/wp-admin`
+
+## Deployment
+
+Per il deployment in produzione:
+
+1. Cambia `WP_ENV` da `development` a `production` nel file `.env`
+2. Aggiorna `WP_HOME` con l'URL di produzione
+3. Esegui `npm run build` per compilare gli asset ottimizzati
+4. Carica i file sul server escludendo:
+   - `node_modules/`
+   - `.env` (crea una nuova configurazione sul server)
+   - File di sviluppo (`.git`, `.gitignore`, etc.)
+
+## Note Aggiuntive
+
+- Il file `.env` contiene informazioni sensibili e **non deve essere committato** nel repository
+- Gli asset compilati sono nella cartella `web/app/themes/nome-tema/public/`
+- Le dipendenze sono gestite tramite Composer (PHP) e npm (Node.js)
+- WordPress core è installato nella cartella `web/wp/` e non deve essere modificato direttamente

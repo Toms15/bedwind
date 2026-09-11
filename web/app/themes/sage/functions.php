@@ -54,8 +54,13 @@ collect(
         'setup',
         'filters',
         'blocks',
+        'breadcrumbs',
+        'controllers',
+        'customPostTypes',
+        'customTaxonomies',
         'helpers',
-        'ACFColorPicker',
+        'rewrites',
+        'qrCodeGenerator',
     ]
 )
     ->each(function ($file) {

@@ -60,7 +60,6 @@ collect(
         'customTaxonomies',
         'helpers',
         'rewrites',
-        'qrCodeGenerator',
     ]
 )
     ->each(function ($file) {

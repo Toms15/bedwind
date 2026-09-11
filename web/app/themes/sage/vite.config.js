@@ -11,11 +11,8 @@ export default defineConfig({
       input: [
         'resources/css/app.css',
         'resources/css/editor.css',
-        'resources/css/acf-color-picker.css',
         'resources/js/app.js',
         'resources/js/editor.js',
-        'resources/js/blocks/hero-page.js',
-        'resources/js/acf-color-picker.js',
       ],
       refresh: true,
     }),

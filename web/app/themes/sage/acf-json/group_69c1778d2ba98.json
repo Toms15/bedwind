@@ -1,0 +1,290 @@
+{
+    "key": "group_69c1778d2ba98",
+    "title": "Blocco",
+    "fields": [
+        {
+            "key": "field_69c1778de7bfa",
+            "label": "Padding",
+            "name": "padding",
+            "aria-label": "",
+            "type": "button_group",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "no": "Nessuno",
+                "py": "Sopra \/ Sotto",
+                "pt": "Solo sopra",
+                "pb": "Solo sotto"
+            },
+            "default_value": "py",
+            "return_format": "value",
+            "allow_null": 0,
+            "allow_in_bindings": 0,
+            "layout": "horizontal"
+        },
+        {
+            "key": "field_69c177cfe7bfb",
+            "label": "Dimensione padding",
+            "name": "padding_dimension",
+            "aria-label": "",
+            "type": "button_group",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "xl": "XL",
+                "l": "L",
+                "m": "M",
+                "s": "S"
+            },
+            "default_value": "xl",
+            "return_format": "value",
+            "allow_null": 0,
+            "allow_in_bindings": 0,
+            "layout": "horizontal"
+        },
+        {
+            "key": "field_69c177e2e7bfc",
+            "label": "Margine",
+            "name": "margin",
+            "aria-label": "",
+            "type": "button_group",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "no": "Nessuno",
+                "my": "Sopra \/ Sotto",
+                "mt": "Solo sopra",
+                "mb": "Solo sotto"
+            },
+            "default_value": "no",
+            "return_format": "value",
+            "allow_null": 0,
+            "allow_in_bindings": 0,
+            "layout": "horizontal"
+        },
+        {
+            "key": "field_69c177e5e7bfd",
+            "label": "Dimensione margine",
+            "name": "margin_dimension",
+            "aria-label": "",
+            "type": "button_group",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "xl": "XL",
+                "l": "L",
+                "m": "M",
+                "s": "S"
+            },
+            "default_value": "xl",
+            "return_format": "value",
+            "allow_null": 0,
+            "allow_in_bindings": 0,
+            "layout": "horizontal"
+        },
+        {
+            "key": "field_69c17815e7bfe",
+            "label": "Colore background",
+            "name": "background_color",
+            "aria-label": "",
+            "type": "color_picker",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "enable_opacity": 0,
+            "return_format": "string",
+            "allow_in_bindings": 0,
+            "show_custom_palette": 1,
+            "custom_palette_source": "custom",
+            "palette_colors": "#D3FFD1, #9CFF93, #3DEE00, #35D500, #2DB900, #26A100, #1C7E00, #136000, #094100, #032600, #021800, #F3F3F3, #FFFFFF, #000000",
+            "show_color_wheel": 1
+        },
+        {
+            "key": "field_69c17851e7bff",
+            "label": "Colore testi",
+            "name": "text_color",
+            "aria-label": "",
+            "type": "color_picker",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "enable_opacity": 0,
+            "return_format": "string",
+            "allow_in_bindings": 0,
+            "show_custom_palette": 1,
+            "custom_palette_source": "custom",
+            "palette_colors": "#D3FFD1, #9CFF93, #3DEE00, #35D500, #2DB900, #26A100, #1C7E00, #136000, #094100, #032600, #021800, #F3F3F3, #FFFFFF, #000000",
+            "show_color_wheel": 1
+        },
+        {
+            "key": "field_69c1785de7c00",
+            "label": "Titolo",
+            "name": "title",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_69c17875e7c01",
+            "label": "Formattazione",
+            "name": "title_formatting",
+            "aria-label": "",
+            "type": "button_group",
+            "instructions": "Nella pagina deve essere presente solamente un H1 per fini SEO.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "h1": "H1",
+                "h2": "H2",
+                "h3": "H3",
+                "h4": "H4",
+                "h5": "H5",
+                "h6": "H6",
+                "p": "Testo"
+            },
+            "default_value": "h2",
+            "return_format": "value",
+            "allow_null": 0,
+            "allow_in_bindings": 0,
+            "layout": "horizontal"
+        },
+        {
+            "key": "field_69c17897e7c02",
+            "label": "Contenuto",
+            "name": "content",
+            "aria-label": "",
+            "type": "wysiwyg",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "allow_in_bindings": 0,
+            "tabs": "all",
+            "toolbar": "full",
+            "media_upload": 0,
+            "delay": 0
+        },
+        {
+            "key": "field_6aa7ebcb0947d",
+            "label": "Elenchi puntati",
+            "name": "list_style",
+            "aria-label": "",
+            "type": "button_group",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "one": "1 colonna",
+                "two": "2 colonne"
+            },
+            "default_value": "two",
+            "return_format": "value",
+            "allow_null": 0,
+            "allow_in_bindings": 0,
+            "layout": "horizontal"
+        },
+        {
+            "key": "field_69c1796530bbd",
+            "label": "Pulsante",
+            "name": "button",
+            "aria-label": "",
+            "type": "link",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "array",
+            "allow_in_bindings": 0
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "block",
+                "operator": "==",
+                "value": "all"
+            }
+        ]
+    ],
+    "menu_order": -1,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "",
+    "show_in_rest": 0,
+    "display_title": "",
+    "allow_ai_access": false,
+    "ai_description": "",
+    "modified": 1789389821
+}

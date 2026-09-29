@@ -19,15 +19,26 @@ add_action('init', function () {
  */
 function render_acf_block($block, $content = '', $is_preview = false, $post_id = 0, $wp_block = null, $context = [])
 {
-    if ($is_preview) {
-        echo 'acf-block-preview-no-html';
-        return;
-    }
-
     $slug = str_replace('acf/', '', $block['name']);
     $block['slug'] = $slug;
 
+    if ($is_preview) {
+        $title = get_field('title');
+        if ($block['slug'] === 'empty') {
+            echo view('components.acf-block-empty', [
+                'block' => $block,
+            ]);
+        } else {
+            echo view('components.acf-block-placeholder', [
+                'block' => $block,
+                'title' => $title ?? null,
+            ]);
+        }
+        return;
+    }
+
     $view = get_theme_file_path("/resources/views/blocks/{$slug}/{$slug}.blade.php");
+
     if (file_exists($view)) {
         echo view($view, ['block' => $block]);
     }
@@ -98,4 +109,4 @@ function allowed_block_types($allowed_blocks, $editor_context)
     return $allowed_blocks;
 }
 
-add_filter('allowed_block_types_all', __NAMESPACE__ . '\\allowed_block_types', 25, 2);
+add_filter('allowed_block_types_all', __NAMESPACE__.'\\allowed_block_types', 25, 2);

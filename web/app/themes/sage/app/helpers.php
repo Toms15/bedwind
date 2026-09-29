@@ -162,8 +162,6 @@ add_action('init', 'wordpack_performance_optimizations');
  * @return array{
  *     settings: array{
  *         id: string,
- *         border_top: mixed,
- *         border_color: mixed,
  *         background_color: mixed,
  *         text_color: mixed
  *     },
@@ -198,8 +196,6 @@ function get_block_data(array $block): array
     return [
         'settings' => [
             'id' => $block['anchor'] ?? '',
-            'border_top' => get_field('border_top'),
-            'border_color' => get_field('border_color'),
             'background_color' => get_field('background_color'),
             'text_color' => get_field('text_color'),
         ],

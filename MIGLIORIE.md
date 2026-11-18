@@ -18,7 +18,7 @@
 | M05 | ⬜ | Design token in `@theme` condivisi app/editor | Frontend | 🔴 | M | – |
 | M06 | ⬜ | Upload SVG sicuro | Sicurezza | 🔴 | M | – |
 | M07 | ⬜ | Hook `add_attachment` non sicuro | Sicurezza | 🔴 | S | – |
-| M08 | 🔄 | `development.php`: ripristinare `WP_DEBUG` | Config | 🔴 | S | – |
+| M08 | ✅ | `development.php`: ripristinare `WP_DEBUG` | Config | 🔴 | S | – |
 | M09 | ⬜ | `npm update`: chiudere le vulnerabilità | Dipendenze | 🔴 | S | – |
 | M10 | ⬜ | ACF Pro gestito via Composer | Dipendenze | 🔴 | S | – |
 | M11 | ⬜ | `.idea` fuori da git e `.gitignore` completo | Repo | 🟠 | S | – |

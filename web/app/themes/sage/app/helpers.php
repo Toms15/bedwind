@@ -20,23 +20,44 @@ function custom_mime_types($mimes)
 add_filter('upload_mimes', 'custom_mime_types');
 
 /**
- * Automatically add media information at upload time
+ * Automatically set title and alt text of uploaded images from their file name.
+ *
+ * Works for every upload channel (media library, REST/Gutenberg, WP-CLI,
+ * media_sideload_image) because the name comes from the attached file.
+ * Caption (post_excerpt) and description (post_content) are left untouched.
  */
 add_action('add_attachment', 'wordpack_add_image_meta_data');
-function wordpack_add_image_meta_data($attachment_ID)
+function wordpack_add_image_meta_data(int $attachment_id): void
 {
-    $filename = $_REQUEST['name']; // or get_post by ID
-    $withoutExt = preg_replace('/\\.[^.\\s]{3,4}$/', '', $filename);
-    $withoutExt = str_replace(['-'], ' ', $withoutExt);
-    $my_post = [
-        'post_title' => $withoutExt,  // title
-        'ID' => $attachment_ID,
-        'post_excerpt' => $withoutExt,  // caption
-        'post_content' => $withoutExt,  // description
-    ];
-    wp_update_post($my_post);
-    // update alt text for post
-    update_post_meta($attachment_ID, '_wp_attachment_image_alt', $withoutExt);
+    if (! wp_attachment_is_image($attachment_id)) {
+        return;
+    }
+
+    $file = get_attached_file($attachment_id);
+
+    if (! $file) {
+        return;
+    }
+
+    $name = pathinfo($file, PATHINFO_FILENAME);
+    // Drop WordPress generated suffixes (-scaled, -150x150, -150x150-1).
+    $name = preg_replace('/(-scaled|-\d+x\d+)+(-\d+)?$/i', '', $name) ?? $name;
+    $name = str_replace(['-', '_'], ' ', $name);
+    $name = preg_replace('/\s+/', ' ', $name) ?? $name;
+    $name = sanitize_text_field(trim($name));
+
+    if ($name === '') {
+        return;
+    }
+
+    wp_update_post([
+        'ID' => $attachment_id,
+        'post_title' => $name,
+    ]);
+
+    if (get_post_meta($attachment_id, '_wp_attachment_image_alt', true) === '') {
+        update_post_meta($attachment_id, '_wp_attachment_image_alt', $name);
+    }
 }
 
 /**

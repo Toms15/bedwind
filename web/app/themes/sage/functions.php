@@ -59,6 +59,7 @@ collect(
         'customPostTypes',
         'customTaxonomies',
         'helpers',
+        'svg',
         'rewrites',
     ]
 )

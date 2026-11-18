@@ -5,15 +5,14 @@
  */
 
 /**
- * Allow additional file types for media uploads
+ * Allow additional file types for media uploads.
+ *
+ * ico and webp are already allowed by core; SVG is handled in app/svg.php.
  */
-function custom_mime_types($mimes)
+function custom_mime_types(array $mimes): array
 {
-    $mimes['ico'] = 'image/x-icon';
-    $mimes['webp'] = 'image/webp';
     $mimes['manifest'] = 'application/manifest+json';
     $mimes['webmanifest'] = 'application/manifest+json';
-    $mimes['svg'] = 'image/svg+xml';
 
     return $mimes;
 }

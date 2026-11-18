@@ -40,6 +40,7 @@
   },
   "require": {
     "php": ">=8.2",
+    "enshrined/svg-sanitize": "^1.1",
     "roots/acorn": "^5.0"
   },
   "require-dev": {

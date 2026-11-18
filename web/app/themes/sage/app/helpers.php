@@ -24,7 +24,8 @@ add_filter('upload_mimes', 'custom_mime_types');
  *
  * Works for every upload channel (media library, REST/Gutenberg, WP-CLI,
  * media_sideload_image) because the name comes from the attached file.
- * Caption (post_excerpt) and description (post_content) are left untouched.
+ * The title is replaced only when it is WordPress' file-name default, the
+ * alt only when empty. Caption and description are left untouched.
  */
 add_action('add_attachment', 'wordpack_add_image_meta_data');
 function wordpack_add_image_meta_data(int $attachment_id): void
@@ -50,10 +51,31 @@ function wordpack_add_image_meta_data(int $attachment_id): void
         return;
     }
 
-    wp_update_post([
-        'ID' => $attachment_id,
-        'post_title' => $name,
+    // Only replace the title WordPress derives from the file name. A title set
+    // explicitly (REST "title", --title, post_data, IPTC/EXIF) is kept as is.
+    // Inside the hook the original upload name is gone, so compare a
+    // normalized key of the title with the stored file name, which may be
+    // sanitized (accents, spaces, dots) and carry a "-N" uniqueness suffix.
+    $key = static function (string $value): string {
+        $value = mb_strtolower(remove_accents(wp_specialchars_decode($value, ENT_QUOTES)));
+
+        return trim(preg_replace('/[^\p{L}\p{N}]+/u', '-', $value) ?? '', '-');
+    };
+
+    $stored = pathinfo($file, PATHINFO_FILENAME);
+    $title_key = $key((string) get_post_field('post_title', $attachment_id, 'raw'));
+    $defaults = array_unique([
+        $key($stored),
+        $key(preg_replace('/-\d+$/', '', $stored) ?? $stored),
+        $key(preg_replace('/(-scaled|-\d+x\d+)+(-\d+)?$/i', '', $stored) ?? $stored),
     ]);
+
+    if ($title_key === '' || in_array($title_key, $defaults, true)) {
+        wp_update_post([
+            'ID' => $attachment_id,
+            'post_title' => $name,
+        ]);
+    }
 
     if (get_post_meta($attachment_id, '_wp_attachment_image_alt', true) === '') {
         update_post_meta($attachment_id, '_wp_attachment_image_alt', $name);

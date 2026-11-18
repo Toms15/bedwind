@@ -22,17 +22,6 @@
       @include('sections.header')
 
       <main id="main" class="main">
-
-        <x-button
-          :link="'Link here'"
-          :target="'_blank'"
-          :type="'simple'"
-          :label="'Label here'"
-          :disabled="false"
-      >
-          {{ __('Button text here', 'sage') }}
-      </x-button>
-
         @yield('content')
       </main>
 

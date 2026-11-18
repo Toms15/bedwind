@@ -12,7 +12,7 @@
 | ID | Stato | Titolo | Area | Prio | Effort | Dipende da |
 |---|---|---|---|---|---|---|
 | M01 | ⬜ | Blocco `only-text`: view mancante, campi e categoria | Blocchi | 🔴 | S | – |
-| M02 | ⬜ | Rimuovere codice di test da layout, header, editor.css | Frontend | 🔴 | S | – |
+| M02 | ✅ | Rimuovere codice di test da layout, header, editor.css | Frontend | 🔴 | S | – |
 | M03 | ⬜ | Componente `x-button` (variabile undefined, a11y, rel) | Frontend | 🔴 | S | – |
 | M04 | ⬜ | Ripristinare focus visibile e sottolineatura link | A11y | 🔴 | S | – |
 | M05 | ⬜ | Design token in `@theme` condivisi app/editor | Frontend | 🔴 | M | – |
@@ -50,6 +50,7 @@
 | M37 | ⬜ | CI su GitHub Actions + Dependabot | DX | 🟠 | M | M10, M35, M36 |
 | M38 | ⬜ | Ambiente locale riproducibile, deploy, `solo.yml` | DX | 🟠 | M | – |
 | M39 | ⬜ | README e documentazione delle convenzioni | Docs | 🟠 | S | M10, M38 |
+| M40 | ⬜ | Permalink di default nel setup (404 e rewrite non funzionano) | Config | 🟠 | S | – |
 
 **Ordine consigliato.** Fase 0 (M01–M10), poi Fase 1 (M11–M16), Fase 2 (M17–M27), Fase 3 (M28–M34), Fase 4 (M35–M39).
 
@@ -500,6 +501,18 @@
   - "Nuovo blocco: checklist".
 
 ---
+
+### M40 – Permalink di default nel setup 🟠 S
+*Fonte: review di M02 (2026-11-18)*
+- **Problema:** `permalink_structure` è vuoto, cioè i permalink sono impostati su "semplici". In questa modalità WordPress non applica le regole di riscrittura (`class-wp.php:163-165`) e risponde con la home:
+  - un URL inesistente risponde 200 invece di 404;
+  - la regola `news/archivio/YYYY` di `app/rewrites.php:11-17` non funziona.
+
+  Il template 404 del tema è a posto: `/?p=999999` risponde 404.
+- **Soluzione**
+  - Impostare la struttura dei permalink nel setup del progetto: `wp rewrite structure '/%postname%/' --hard` nel README, oppure su `after_switch_theme` solo se `permalink_structure` è vuoto, seguito da `flush_rewrite_rules()`.
+  - Documentarlo in M39.
+  - Poi verificare il 404 e le rewrite di M18.
 
 ## Già a posto (verificato)
 - I salt vengono da env.

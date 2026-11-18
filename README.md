@@ -24,6 +24,21 @@ cd project-name
 composer install
 ```
 
+#### Premium credentials (ACF Pro)
+
+ACF Pro is installed from `https://connect.advancedcustomfields.com`, which requires a license. Before running `composer install`, create a local `auth.json` (gitignored, never commit it):
+
+```bash
+# username = ACF Pro license key, password = the site URL the license is activated for
+composer config --auth http-basic.connect.advancedcustomfields.com <license_key> <site_url>
+```
+
+In CI, pass the same credentials through the `COMPOSER_AUTH` environment variable (stored as a secret):
+
+```bash
+COMPOSER_AUTH='{"http-basic":{"connect.advancedcustomfields.com":{"username":"<license_key>","password":"<site_url>"}}}'
+```
+
 ### 3. Configure environment
 
 Copy the example configuration file and customize it:

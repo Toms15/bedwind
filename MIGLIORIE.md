@@ -20,7 +20,7 @@
 | M07 | ⬜ | Hook `add_attachment` non sicuro | Sicurezza | 🔴 | S | – |
 | M08 | ✅ | `development.php`: ripristinare `WP_DEBUG` | Config | 🔴 | S | – |
 | M09 | ⬜ | `npm update`: chiudere le vulnerabilità | Dipendenze | 🔴 | S | – |
-| M10 | ⬜ | ACF Pro gestito via Composer | Dipendenze | 🔴 | S | – |
+| M10 | ✅ | ACF Pro gestito via Composer | Dipendenze | 🔴 | S | – |
 | M11 | ⬜ | `.idea` fuori da git e `.gitignore` completo | Repo | 🟠 | S | – |
 | M12 | ⬜ | `debug.log` fuori dalla webroot, `WP_DEBUG` esplicito in prod | Sicurezza | 🟠 | S | M08 |
 | M13 | ⬜ | Aggiornare le dipendenze Composer e WP 7.x | Dipendenze | 🟠 | M | M10 |

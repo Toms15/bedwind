@@ -79,34 +79,47 @@ add_filter('block_categories_all', function ($categories) {
     return array_merge($new_categories, $categories);
 });
 
-function allowed_block_types($allowed_blocks, $editor_context)
+/**
+ * Restrict the blocks available in the editor.
+ *
+ * ACF blocks are always allowed. Core blocks are allowed only in the post
+ * types returned by the `sage/core_blocks_post_types` filter and in the
+ * non-content editors (widgets, Customizer widgets, site editor). Every other
+ * post type (e.g. pages) gets ACF blocks only.
+ *
+ * Synced patterns (`core/block`) are a core block and follow the same rule:
+ * they are not allowed where only ACF blocks are, because a synced pattern can
+ * contain core blocks and would bypass the restriction.
+ *
+ * The site editor gets core blocks too: the theme removes `block-templates`
+ * support, so it is normally unreachable, but if it is ever opened (e.g. for
+ * template parts) it cannot work without core blocks.
+ *
+ * The incoming value is respected: `false` stays `false`, and an array coming
+ * from earlier filters is only narrowed, never widened.
+ */
+function allowed_block_types(bool|array $allowed_blocks, \WP_Block_Editor_Context $editor_context): bool|array
 {
-    $registered_block_slugs = array_keys(\WP_Block_Type_Registry::get_instance()->get_all_registered());
-    $allowed_blocks = [];
-
-    // Controlla se siamo nell'editor dei widget
-    $is_widget_editor = isset($editor_context->name) &&
-        (strpos($editor_context->name, 'core/widget-area') !== false ||
-            strpos($editor_context->name, 'widget') !== false);
-
-    $is_post_editor = isset($editor_context->post) &&
-        in_array($editor_context->post->post_type, ['post']);
-
-    $allow_core = $is_widget_editor || $is_post_editor;
-
-    if ($registered_block_slugs != null) {
-        foreach ($registered_block_slugs as $singleCustomBlock) {
-            // Sempre abilitare i blocchi ACF
-            if (str_starts_with($singleCustomBlock, 'acf')) {
-                array_push($allowed_blocks, $singleCustomBlock);
-            } // Abilitare i blocchi core SOLO se siamo nell'editor dei widget
-            elseif ($allow_core && str_starts_with($singleCustomBlock, 'core/')) {
-                array_push($allowed_blocks, $singleCustomBlock);
-            }
-        }
+    if ($allowed_blocks === false) {
+        return false;
     }
 
-    return $allowed_blocks;
+    $candidates = is_array($allowed_blocks)
+        ? $allowed_blocks
+        : array_keys(\WP_Block_Type_Registry::get_instance()->get_all_registered());
+
+    $core_contexts = ['core/edit-widgets', 'core/customize-widgets', 'core/edit-site'];
+    $core_post_types = (array) apply_filters('sage/core_blocks_post_types', ['post', 'faq']);
+
+    $allow_core = in_array($editor_context->name, $core_contexts, true)
+        || ($editor_context->post instanceof \WP_Post
+            && in_array($editor_context->post->post_type, $core_post_types, true));
+
+    return array_values(array_filter(
+        $candidates,
+        fn ($name) => is_string($name)
+            && (str_starts_with($name, 'acf/') || ($allow_core && str_starts_with($name, 'core/')))
+    ));
 }
 
 add_filter('allowed_block_types_all', __NAMESPACE__.'\\allowed_block_types', 25, 2);

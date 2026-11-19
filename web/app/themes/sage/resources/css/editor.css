@@ -2,3 +2,10 @@
 @import "./theme.css";
 @source "../views/";
 @source "../../app/";
+
+/* Stessa sottolineatura di app.css: la regola di core è rimossa da app/filters.php */
+@layer base {
+  a {
+    text-decoration-line: underline;
+  }
+}

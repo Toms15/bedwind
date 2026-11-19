@@ -4,11 +4,23 @@
 @source "../../app/";
 
 /**
+ * Focus visibile (WCAG 2.4.7): niente reset globale di outline/underline
+ */
+@layer base {
+  :focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  /* Sottolineatura link (WCAG 1.4.1) nel layer base: le utility no-underline la annullano senza ! */
+  a {
+    text-decoration-line: underline;
+  }
+}
+
+/**
  * Utils
  */
-* {
-  @apply !no-underline focus-visible:!ring-0 focus-visible:!shadow-none focus-visible:outline-0
-}
 
 body {
   -webkit-font-smoothing: antialiased;

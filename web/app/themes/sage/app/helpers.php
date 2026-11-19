@@ -128,11 +128,22 @@ function random_string_for_id(int $length = 5): string
 }
 
 /**
- * Get fallback image
+ * Get the URL of the local fallback image (resources/images/fallback.svg).
+ *
+ * The image is a 16:9 SVG compiled by Vite, so it scales to any size and no
+ * external service is involved.
+ *
+ * @param  int  $width  Ignored, kept for backward compatibility (the SVG is resolution independent).
+ * @param  int  $height  Ignored, kept for backward compatibility.
+ * @return string The asset URL, or '' when the asset is missing from the Vite manifest.
  */
-function get_fallback_image_url($width = 1920, $height = 1080): string
+function get_fallback_image_url(int $width = 1920, int $height = 1080): string
 {
-    return "https://placehold.co/{$width}x{$height}/webp";
+    try {
+        return \Illuminate\Support\Facades\Vite::asset('resources/images/fallback.svg');
+    } catch (\Throwable) {
+        return '';
+    }
 }
 
 /**

@@ -42,7 +42,7 @@
 | M29 | ⬜ | Registrazione dei blocchi via manifest, asset JS/CSS per blocco | Blocchi | 🟢 | M | M28, M22 |
 | M30 | ⬜ | Separare i field group ACF comuni da quelli specifici | Blocchi | 🟢 | M | M01 |
 | M31 | ⬜ | Struttura cartelle dei componenti e styleguide di sviluppo | Frontend | 🟢 | M | M24 |
-| M32 | 🔄 | `base` di Vite indipendente dal nome del tema | DX | 🟠 | S | – |
+| M32 | ✅ | `base` di Vite indipendente dal nome del tema | DX | 🟠 | S | – |
 | M33 | ⬜ | Strategia per font e immagini responsive | Performance | 🟠 | M | M05 |
 | M34 | ⬜ | `editor.js`: meno fragile, meno costoso | Editor | 🟢 | S | – |
 | M35 | ⬜ | PHPStan/Larastan + Pest + script Composer | Qualità | 🟠 | M | – |
@@ -416,7 +416,7 @@
 ### M32 – `base` di Vite 🟠 S
 *Fonte: FE-15*
 - **Problema:** `vite.config.js:7` contiene `/app/themes/sage/public/build/`, che si rompe se il tema viene rinominato.
-- **Soluzione:** ``base: `/app/themes/${path.basename(process.cwd())}/public/build/` ``, oppure una variabile `VITE_THEME_SLUG`.
+- **Soluzione (applicata):** lo slug del tema viene ricavato dal percorso di `vite.config.js` tramite `import.meta.url`, quindi `base` diventa `/app/themes/<slug>/public/build/`. Si può forzare con la variabile d'ambiente `VITE_THEME_SLUG`, solo da riga di comando o dall'ambiente: in `.env` non viene letta. Se il tema è un symlink, impostare `VITE_THEME_SLUG`.
 
 ### M33 – Font e immagini 🟠 M
 *Fonte: FE-17*

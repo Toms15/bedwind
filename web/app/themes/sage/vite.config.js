@@ -1,10 +1,17 @@
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 import tailwindcss from '@tailwindcss/vite';
 import laravel from 'laravel-vite-plugin'
 import { wordpressPlugin, wordpressThemeJson } from '@roots/vite-plugin';
 
+// Derive the theme slug from this config's folder so a renamed theme keeps
+// working; set VITE_THEME_SLUG to override it.
+const themeSlug =
+  process.env.VITE_THEME_SLUG || path.basename(path.dirname(fileURLToPath(import.meta.url)))
+
 export default defineConfig({
-  base: '/app/themes/sage/public/build/',
+  base: `/app/themes/${themeSlug}/public/build/`,
   plugins: [
     tailwindcss(),
     laravel({

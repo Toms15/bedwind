@@ -5,20 +5,6 @@
  */
 
 /**
- * Allow additional file types for media uploads.
- *
- * ico and webp are already allowed by core; SVG is handled in app/svg.php.
- */
-function custom_mime_types(array $mimes): array
-{
-    $mimes['manifest'] = 'application/manifest+json';
-    $mimes['webmanifest'] = 'application/manifest+json';
-
-    return $mimes;
-}
-add_filter('upload_mimes', 'custom_mime_types');
-
-/**
  * Automatically set title and alt text of uploaded images from their file name.
  *
  * Works for every upload channel (media library, REST/Gutenberg, WP-CLI,

@@ -195,10 +195,9 @@ add_action('after_setup_theme', function () {
  * Removes the emoji detection script and inline styles from the frontend
  * <head>, and the static emoji images from feeds and emails.
  *
- * Admin: the core admin emoji hooks (admin_print_scripts/admin_print_styles)
- * are registered by wp-admin/includes/admin-filters.php, which is loaded
- * after "init", so removing them here would be a no-op. They are left alone
- * on purpose: the admin keeps the core emoji support.
+ * The admin emoji assets are handled by wordpack_disable_admin_emoji() and
+ * wordpack_disable_tinymce_emoji(): the admin hooks are registered after
+ * "init", so they cannot be removed from here.
  *
  * wp-embed is intentionally NOT touched. Since WP 5.9 core enqueues it only
  * when the rendered content contains a WordPress post embed
@@ -219,6 +218,42 @@ function wordpack_performance_optimizations(): void
     remove_filter('wp_mail', 'wp_staticize_emoji_for_email');
 }
 add_action('init', 'wordpack_performance_optimizations');
+
+/**
+ * Disable the WordPress emoji assets in the admin.
+ *
+ * Core registers the admin emoji hooks in wp-admin/includes/admin-filters.php
+ * (print_emoji_detection_script on "admin_print_scripts", print_emoji_styles
+ * on "admin_print_styles", both at the default priority 10). That file is
+ * loaded after "init", so the removal runs on "admin_init" instead.
+ *
+ * Removing print_emoji_styles is enough for the CSS as well:
+ * wp_enqueue_emoji_styles() (on "admin_enqueue_scripts") bails out when
+ * print_emoji_styles is no longer hooked to "admin_print_styles".
+ * The block editor already unhooks the detection script itself
+ * (wp-admin/edit-form-blocks.php).
+ */
+function wordpack_disable_admin_emoji(): void
+{
+    remove_action('admin_print_scripts', 'print_emoji_detection_script');
+    remove_action('admin_print_styles', 'print_emoji_styles');
+}
+add_action('admin_init', 'wordpack_disable_admin_emoji');
+
+/**
+ * Remove the "wpemoji" TinyMCE plugin.
+ *
+ * Applies to the classic editor and to the Classic block of the block
+ * editor, which both pass their plugin list through "tiny_mce_plugins".
+ *
+ * @param  array<int, string>  $plugins  TinyMCE plugin names.
+ * @return array<int, string>
+ */
+function wordpack_disable_tinymce_emoji(array $plugins): array
+{
+    return array_values(array_diff($plugins, ['wpemoji']));
+}
+add_filter('tiny_mce_plugins', 'wordpack_disable_tinymce_emoji');
 
 /**
  * Retrieves and prepares the common data for a block.

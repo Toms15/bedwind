@@ -137,6 +137,7 @@ Config::define('CONCATENATE_SCRIPTS', false);
 /**
  * Debugging Settings
  */
+Config::define('WP_DEBUG', false);
 Config::define('WP_DEBUG_DISPLAY', false);
 Config::define('WP_DEBUG_LOG', false);
 Config::define('SCRIPT_DEBUG', false);

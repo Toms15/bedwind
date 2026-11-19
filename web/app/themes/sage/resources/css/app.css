@@ -6,6 +6,9 @@
   /**
    * Custom Variables
    */
+
+  /* Breakpoint 3xl (1920px): not in Tailwind v4 defaults */
+  --breakpoint-3xl: 120rem;
 }
 
 /**

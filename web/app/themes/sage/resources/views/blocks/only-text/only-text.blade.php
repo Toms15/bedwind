@@ -5,42 +5,61 @@
    * This is the template that displays the Only text block.
    */
 
-  $blockId = $block['anchor'] ?? '';
-  $padding = get_field('padding');
-  $padding_dimension = get_field('padding_dimension');
-  $margin = get_field('margin');
-  $margin_dimension = get_field('margin_dimension');
-  $background_color = get_field('background_color');
-  $text_color = get_field('text_color');
-  $title = get_field('title');
-  $title_formatting = get_field('title_formatting');
-  $content = get_field('content');
-  $button = get_field('button');
+  $data = get_block_data($block);
+  $settings = $data['settings'];
+  $contents = $data['contents'];
+  $spacings = $data['spacings'];
 
-  if($padding !== 'no') {
-      $custom_padding = 'custom-' . $padding . '-' . $padding_dimension;
-  } else {
-      $custom_padding = 'no-padding';
+  $title_tag = in_array($contents['title_formatting'], ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p'], true)
+    ? $contents['title_formatting']
+    : 'h2';
+
+  $section_style = implode(' ', array_filter([
+    $settings['background_color'] ? 'background-color: '.$settings['background_color'].';' : null,
+    $settings['text_color'] ? 'color: '.$settings['text_color'].';' : null,
+  ]));
+
+  $buttons = [];
+  foreach ($contents['buttons'] as $row) {
+    $link = $row['button'] ?? null;
+    $url = is_array($link) && ! empty($link['url']) ? sanitize_url($link['url']) : '';
+
+    if (! $url) {
+      continue;
+    }
+
+    $buttons[] = [
+      'url' => $url,
+      'target' => in_array($link['target'] ?? '', ['_self', '_blank'], true) ? $link['target'] : '_self',
+      'label' => ! empty($link['title']) ? $link['title'] : $link['url'],
+    ];
   }
-  if($margin !== 'no') {
-      $custom_margin = 'custom-' . $margin . '-' . $margin_dimension;
-  } else {
-      $custom_margin = 'no-margin';
-  }
-
-  $padding = get_custom_padding($custom_padding);
-  $margin = get_custom_margin($custom_margin);
-
 @endphp
 
-@include('modules.contents.only-text', [
-  'id' => $blockId,
-  'padding' => $padding,
-  'margin' => $margin,
-  'background_color' => $background_color,
-  'text_color' => $text_color,
-  'title' => $title,
-  'title_formatting' => $title_formatting,
-  'content' => $content,
-  'button' => $button,
-])
+<section
+  id="{{ $settings['id'] }}"
+  @class(array_filter(['w-full overflow-x-clip', $spacings['padding'], $spacings['margin']]))
+  @if ($section_style)style="{{ $section_style }}"@endif
+>
+  <div class="container mx-auto px-6 3xl:px-0">
+    @if ($contents['title'])
+      <x-title :tag="$title_tag" class="mb-6">{{ $contents['title'] }}</x-title>
+    @endif
+
+    @if ($contents['content'])
+      <div>
+        {!! $contents['content'] !!}
+      </div>
+    @endif
+
+    @if ($buttons)
+      <div class="mt-8 flex flex-wrap gap-4">
+        @foreach ($buttons as $button)
+          <x-button :link="$button['url']" :target="$button['target']" :label="$button['label']">
+            {{ $button['label'] }}
+          </x-button>
+        @endforeach
+      </div>
+    @endif
+  </div>
+</section>

@@ -11,7 +11,7 @@
 
 | ID | Stato | Titolo | Area | Prio | Effort | Dipende da |
 |---|---|---|---|---|---|---|
-| M01 | ⬜ | Blocco `only-text`: view mancante, campi e categoria | Blocchi | 🔴 | S | – |
+| M01 | ✅ | Blocco `only-text`: view mancante, campi e categoria | Blocchi | 🔴 | S | – |
 | M02 | ✅ | Rimuovere codice di test da layout, header, editor.css | Frontend | 🔴 | S | – |
 | M03 | ⬜ | Componente `x-button` (variabile undefined, a11y, rel) | Frontend | 🔴 | S | – |
 | M04 | ⬜ | Ripristinare focus visibile e sottolineatura link | A11y | 🔴 | S | – |
@@ -63,11 +63,12 @@
 - **Problema**
   - `resources/views/blocks/only-text/only-text.blade.php:36` fa `@include('modules.contents.only-text')`, ma `resources/views/modules/` non esiste. Sul frontend il blocco genera `View [modules.contents.only-text] not found`. Nell'editor l'errore non si vede, perché lì viene mostrato solo il placeholder.
   - Le righe 8–31 della view duplicano a mano la logica di `get_block_data()` (`app/helpers.php:180`).
-  - L'helper legge il campo `buttons`, mentre il campo ACF si chiama `button`. Il campo `list_style` non viene mai letto.
+  - Il field group dei blocchi ha un singolo campo Link `button`, mentre l'helper legge `buttons`. Il riferimento giusto è `buttons` (decisione del 2026-11-19): va aggiornato il field group. Il campo `list_style` non viene mai letto: va rimosso perché non più utilizzato.
   - `block.json:7` dichiara la categoria `"contents"`, che non è registrata. Quelle esistenti sono `carousels`, `dynamic-content`, `static-content`, `commons`, `heroes`, `dividers`. Manca anche `"textdomain"`.
 - **Soluzione**
   - Mettere il markup direttamente nella view del blocco e usare `get_block_data($block)`.
-  - Correggere `buttons` in `button` e gestire `list_style`.
+  - Nel field group `group_69c1778d2ba98` sostituire il campo Link `button` con un Repeater `buttons` che contiene un sotto-campo Link `button`. La view renderizza tutti i bottoni con `<x-button>`. Etichette in italiano. Rimuovere `list_style`.
+  - Applicare la convenzione dei blocchi: `<section id class="w-full overflow-x-clip {padding} {margin}">` con dentro `<div class="container mx-auto px-6 3xl:px-0">`. L'id è sempre presente: anchor, altrimenti l'id del blocco ACF. Definire il breakpoint `3xl` in `@theme`.
   - Impostare `"category": "static-content"` e `"textdomain": "sage"`.
 
 ### M02 – Rimuovere codice di test 🔴 S

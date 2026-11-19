@@ -199,19 +199,23 @@ add_action('init', 'wordpack_performance_optimizations');
  * custom classes using the get_custom_padding() and get_custom_margin()
  * helper functions.
  *
+ * settings.id is the block anchor when set, otherwise the ACF block id
+ * (e.g. "block_abc123"), so every block section always has an id.
+ * Colors are validated with sanitize_hex_color(): invalid values become ''.
+ *
  * @param array $block The ACF block data.
  *
  * @return array{
  *     settings: array{
  *         id: string,
- *         background_color: mixed,
- *         text_color: mixed
+ *         background_color: string,
+ *         text_color: string
  *     },
  *     contents: array{
  *         title: mixed,
  *         title_formatting: mixed,
  *         content: mixed,
- *         buttons: mixed
+ *         buttons: list<array{button: array{url?: string, title?: string, target?: string}|mixed}>
  *     },
  *     spacings: array{
  *         padding: mixed,
@@ -235,18 +239,22 @@ function get_block_data(array $block): array
         ? 'custom-' . $margin . '-' . $margin_dimension
         : 'no-margin';
 
+    // Repeater: false/null when there are no rows.
+    $buttons = get_field('buttons');
+    $buttons = is_array($buttons) ? array_values($buttons) : [];
+
     return [
         'settings' => [
-            'id' => $block['anchor'] ?? '',
-            'background_color' => get_field('background_color'),
-            'text_color' => get_field('text_color'),
+            'id' => ! empty($block['anchor']) ? $block['anchor'] : ($block['id'] ?? ''),
+            'background_color' => sanitize_hex_color((string) get_field('background_color')) ?: '',
+            'text_color' => sanitize_hex_color((string) get_field('text_color')) ?: '',
         ],
 
         'contents' => [
             'title' => get_field('title'),
             'title_formatting' => get_field('title_formatting'),
             'content' => get_field('content'),
-            'buttons' => get_field('buttons'),
+            'buttons' => $buttons,
         ],
 
         'spacings' => [

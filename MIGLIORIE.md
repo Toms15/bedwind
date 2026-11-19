@@ -50,7 +50,7 @@
 | M37 | ⬜ | CI su GitHub Actions + Dependabot | DX | 🟠 | M | M10, M35, M36 |
 | M38 | ⬜ | Ambiente locale riproducibile, deploy, `solo.yml` | DX | 🟠 | M | – |
 | M39 | ⬜ | README e documentazione delle convenzioni | Docs | 🟠 | S | M10, M38 |
-| M40 | 🔄 | Permalink di default nel setup (404 e rewrite non funzionano) | Config | 🟠 | S | – |
+| M40 | ✅ | Permalink di default nel setup (404 e rewrite non funzionano) | Config | 🟠 | S | – |
 
 **Ordine consigliato.** Fase 0 (M01–M10), poi Fase 1 (M11–M16), Fase 2 (M17–M27), Fase 3 (M28–M34), Fase 4 (M35–M39).
 

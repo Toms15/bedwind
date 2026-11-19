@@ -167,3 +167,25 @@ add_filter('acf/settings/load_json', function ($paths) {
 
     return $paths;
 });
+
+/**
+ * Set a default permalink structure on theme activation.
+ *
+ * With "plain" permalinks WordPress skips rewrite rule matching, so
+ * unknown URLs fall back to the front page with a 200 status and the
+ * theme's custom rewrites never match. Only applies when no structure
+ * is set, so an existing configuration is never overwritten.
+ *
+ * @return void
+ */
+add_action('after_switch_theme', function () {
+    if (get_option('permalink_structure')) {
+        return;
+    }
+
+    global $wp_rewrite;
+
+    $wp_rewrite->set_permalink_structure('/%postname%/');
+
+    flush_rewrite_rules();
+});

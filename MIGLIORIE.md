@@ -21,8 +21,8 @@
 | M08 | ✅ | `development.php`: ripristinare `WP_DEBUG` | Config | 🔴 | S | – |
 | M09 | ✅ | `npm update`: chiudere le vulnerabilità | Dipendenze | 🔴 | S | – |
 | M10 | ✅ | ACF Pro gestito via Composer | Dipendenze | 🔴 | S | – |
-| M11 | ⬜ | `.idea` fuori da git e `.gitignore` completo | Repo | 🟠 | S | – |
-| M12 | ⬜ | `debug.log` fuori dalla webroot, `WP_DEBUG` esplicito in prod | Sicurezza | 🟠 | S | M08 |
+| M11 | ✅ | `.idea` fuori da git e `.gitignore` completo | Repo | 🟠 | S | – |
+| M12 | 🔄 | `debug.log` fuori dalla webroot, `WP_DEBUG` esplicito in prod | Sicurezza | 🟠 | S | M08 |
 | M13 | ⬜ | Aggiornare le dipendenze Composer e WP 7.x | Dipendenze | 🟠 | M | M10 |
 | M14 | ⬜ | Upgrade major di Vite / `@roots/vite-plugin` | Dipendenze | 🟠 | M | M09 |
 | M15 | ⬜ | Traduzioni core via Composer, rimozione di twentytwentyfive | Dipendenze | 🟢 | M | M13 |
@@ -42,7 +42,7 @@
 | M29 | ⬜ | Registrazione dei blocchi via manifest, asset JS/CSS per blocco | Blocchi | 🟢 | M | M28, M22 |
 | M30 | ⬜ | Separare i field group ACF comuni da quelli specifici | Blocchi | 🟢 | M | M01 |
 | M31 | ⬜ | Struttura cartelle dei componenti e styleguide di sviluppo | Frontend | 🟢 | M | M24 |
-| M32 | ⬜ | `base` di Vite indipendente dal nome del tema | DX | 🟠 | S | – |
+| M32 | 🔄 | `base` di Vite indipendente dal nome del tema | DX | 🟠 | S | – |
 | M33 | ⬜ | Strategia per font e immagini responsive | Performance | 🟠 | M | M05 |
 | M34 | ⬜ | `editor.js`: meno fragile, meno costoso | Editor | 🟢 | S | – |
 | M35 | ⬜ | PHPStan/Larastan + Pest + script Composer | Qualità | 🟠 | M | – |
@@ -50,7 +50,7 @@
 | M37 | ⬜ | CI su GitHub Actions + Dependabot | DX | 🟠 | M | M10, M35, M36 |
 | M38 | ⬜ | Ambiente locale riproducibile, deploy, `solo.yml` | DX | 🟠 | M | – |
 | M39 | ⬜ | README e documentazione delle convenzioni | Docs | 🟠 | S | M10, M38 |
-| M40 | ⬜ | Permalink di default nel setup (404 e rewrite non funzionano) | Config | 🟠 | S | – |
+| M40 | 🔄 | Permalink di default nel setup (404 e rewrite non funzionano) | Config | 🟠 | S | – |
 
 **Ordine consigliato.** Fase 0 (M01–M10), poi Fase 1 (M11–M16), Fase 2 (M17–M27), Fase 3 (M28–M34), Fase 4 (M35–M39).
 

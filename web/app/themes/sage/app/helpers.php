@@ -74,14 +74,14 @@ function wordpack_add_image_meta_data(int $attachment_id): void
  * the block title uses $current_heading, its children the returned tag.
  * Examples: h2 → h3, h5 → h6, h6 → p, p → p, h5 with increment 2 → p.
  *
- * Any value that is not one of h1..h6 or p (e.g. '', 'h', 'h9', 'div')
+ * Any value that is not one of h1..h6 or p (e.g. null, '', 'h', 'h9', 'div')
  * is treated as 'h2' (the default block title tag) before calculating.
  *
- * @param  string  $current_heading  The current tag: h1..h6 or p.
+ * @param  string|null  $current_heading  The current tag: h1..h6 or p (null → 'h2').
  * @param  int  $increment  How many levels to go down (minimum 1).
  * @return string The next tag: h2..h6, or p when the level goes past h6.
  */
-function get_next_heading_level(string $current_heading, int $increment = 1): string
+function get_next_heading_level(?string $current_heading, int $increment = 1): string
 {
     if (! in_array($current_heading, ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p'], true)) {
         $current_heading = 'h2';
@@ -104,18 +104,27 @@ function get_next_heading_level(string $current_heading, int $increment = 1): st
 }
 
 /**
- * Generate Random String
+ * Generate a random lowercase string, e.g. for HTML ids.
+ *
+ * Only letters a-z are used, so the result is always a valid id start
+ * (HTML ids used in CSS selectors cannot start with a digit).
+ * Uses random_int(), a cryptographically secure generator.
+ *
+ * @param  int  $length  Number of characters (minimum 1).
+ * @return string The random string.
  */
-function random_string_for_id($length = 5): string
+function random_string_for_id(int $length = 5): string
 {
     $characters = 'abcdefghijklmnopqrstuvwxyz';
-    $charactersLength = strlen($characters);
-    $randomString = '';
+    $max = strlen($characters) - 1;
+    $length = max(1, $length);
+    $random_string = '';
+
     for ($i = 0; $i < $length; $i++) {
-        $randomString .= $characters[rand(0, $charactersLength - 1)];
+        $random_string .= $characters[random_int(0, $max)];
     }
 
-    return $randomString;
+    return $random_string;
 }
 
 /**
@@ -127,43 +136,50 @@ function get_fallback_image_url($width = 1920, $height = 1080): string
 }
 
 /**
- * Excerpt functions
+ * Get a trimmed excerpt of a post.
+ *
+ * Source text, in order: the ACF 'excerpt' field (when ACF is active),
+ * the manual post excerpt, the post content without shortcodes and tags.
+ * The text is trimmed with wp_trim_words() and '…' is appended when cut.
+ *
+ * @param  int  $num  Maximum number of words.
+ * @param  int|\WP_Post|null  $post  Post ID or object, current post when null.
+ * @return string The excerpt, or '' when the post does not exist.
  */
-function wordpack_excerpt($num, $post_id = null)
+function wordpack_excerpt(int $num, int|\WP_Post|null $post = null): string
 {
-    if ($post_id) {
-        $post = get_post($post_id);
-        $excerpt_text = get_field('excerpt', $post_id);
+    $post = get_post($post);
 
-        if (empty($excerpt_text)) {
-            $excerpt_text = wp_strip_all_tags($post->post_content);
-        }
-    } else {
-        $excerpt_text = get_the_excerpt();
+    if (! $post instanceof \WP_Post) {
+        return '';
     }
 
-    $limit = $num + 1;
-    $excerpt = explode(' ', $excerpt_text, $limit);
+    $text = function_exists('get_field') ? get_field('excerpt', $post->ID) : '';
+    $text = is_string($text) ? $text : '';
 
-    if (count($excerpt) >= $limit) {
-        array_pop($excerpt);
-        $excerpt = implode(' ', $excerpt).'...';
-    } else {
-        $excerpt = implode(' ', $excerpt);
+    if (trim($text) === '') {
+        $text = $post->post_excerpt;
     }
 
-    return $excerpt;
+    if (trim($text) === '') {
+        $text = wp_strip_all_tags(strip_shortcodes($post->post_content));
+    }
+
+    return wp_trim_words($text, $num, '…');
 }
+
+/**
+ * Set the length of automatic excerpts (the_excerpt()) to 20 words.
+ *
+ * Priority 999 so it wins over plugins setting their own length.
+ * The "Continue reading" link is added by the excerpt_more filter in
+ * app/filters.php.
+ */
 function wordpack_excerpt_length($length)
 {
     return 20;
 }
 add_filter('excerpt_length', 'wordpack_excerpt_length', 999);
-function wordpack_excerpt_more($more)
-{
-    return '...';
-}
-add_filter('excerpt_more', 'wordpack_excerpt_more');
 
 /**
  * Make theme available for translation

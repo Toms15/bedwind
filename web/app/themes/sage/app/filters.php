@@ -7,12 +7,20 @@
 namespace App;
 
 /**
- * Add "… Continued" to the excerpt.
+ * Append "… Continue reading" to automatic excerpts (the_excerpt()).
+ *
+ * The post title is added for screen readers only, so every link has a
+ * unique, descriptive name. The excerpt length is set in app/helpers.php.
  *
  * @return string
  */
 add_filter('excerpt_more', function () {
-    return sprintf(' &hellip; <a href="%s">%s</a>', get_permalink(), __('Continued', 'sage'));
+    return sprintf(
+        ' &hellip; <a href="%s" class="more-link">%s<span class="sr-only">: %s</span></a>',
+        esc_url(get_permalink()),
+        esc_html__('Continue reading', 'sage'),
+        esc_html(wp_strip_all_tags(get_the_title()))
+    );
 });
 
 /**

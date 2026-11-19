@@ -27,7 +27,7 @@
 | M14 | ⬜ | Upgrade major di Vite / `@roots/vite-plugin` | Dipendenze | 🟠 | M | M09 |
 | M15 | ⬜ | Traduzioni core via Composer, rimozione di twentytwentyfive | Dipendenze | 🟢 | M | M13 |
 | M16 | ⬜ | Metadati e branding (composer, style.css, LICENSE, vincoli PHP) | Repo | 🟢 | S | – |
-| M17 | ⬜ | `excerpt_more` duplicato e helper deboli | PHP | 🟠 | S | – |
+| M17 | ✅ | `excerpt_more` duplicato e helper deboli | PHP | 🟠 | S | – |
 | M18 | ⬜ | Rewrite degli archivi (mensili, paginazione, flush) | PHP | 🟠 | M | – |
 | M19 | ⬜ | CPT `faq`: configurazione coerente | PHP | 🟠 | S | – |
 | M20 | ⬜ | `wp-embed` deregistrato male | PHP | 🟠 | S | – |

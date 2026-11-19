@@ -190,21 +190,33 @@ add_action('after_setup_theme', function () {
 });
 
 /**
- * Performance optimizations
+ * Performance optimizations: disable the WordPress emoji assets.
+ *
+ * Removes the emoji detection script and inline styles from the frontend
+ * <head>, and the static emoji images from feeds and emails.
+ *
+ * Admin: the core admin emoji hooks (admin_print_scripts/admin_print_styles)
+ * are registered by wp-admin/includes/admin-filters.php, which is loaded
+ * after "init", so removing them here would be a no-op. They are left alone
+ * on purpose: the admin keeps the core emoji support.
+ *
+ * wp-embed is intentionally NOT touched. Since WP 5.9 core enqueues it only
+ * when the rendered content contains a WordPress post embed
+ * (wp_maybe_enqueue_oembed_host_js() on "embed_oembed_html"), so there is
+ * nothing to save on pages without embeds. Deregistering it broke the
+ * auto-resize of post embeds and the TinyMCE preview in the admin, and
+ * unhooking wp_oembed_add_host_js would only add that breakage back.
  */
-function wordpack_performance_optimizations()
+function wordpack_performance_optimizations(): void
 {
-    // Disable emojis
+    // Frontend emoji script and styles.
     remove_action('wp_head', 'print_emoji_detection_script', 7);
-    remove_action('admin_print_scripts', 'print_emoji_detection_script');
     remove_action('wp_print_styles', 'print_emoji_styles');
-    remove_action('admin_print_styles', 'print_emoji_styles');
+
+    // Static emoji images in feeds and emails.
     remove_filter('the_content_feed', 'wp_staticize_emoji');
     remove_filter('comment_text_rss', 'wp_staticize_emoji');
     remove_filter('wp_mail', 'wp_staticize_emoji_for_email');
-
-    // Disable wp-embed
-    wp_deregister_script('wp-embed');
 }
 add_action('init', 'wordpack_performance_optimizations');
 

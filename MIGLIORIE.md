@@ -13,9 +13,9 @@
 |---|---|---|---|---|---|---|
 | M01 | ✅ | Blocco `only-text`: view mancante, campi e categoria | Blocchi | 🔴 | S | – |
 | M02 | ✅ | Rimuovere codice di test da layout, header, editor.css | Frontend | 🔴 | S | – |
-| M03 | ⬜ | Componente `x-button` (variabile undefined, a11y, rel) | Frontend | 🔴 | S | – |
-| M04 | ⬜ | Ripristinare focus visibile e sottolineatura link | A11y | 🔴 | S | – |
-| M05 | ⬜ | Design token in `@theme` condivisi app/editor | Frontend | 🔴 | M | – |
+| M03 | 🔄 | Componente `x-button` (variabile undefined, a11y, rel) | Frontend | 🔴 | S | – |
+| M04 | 🔄 | Ripristinare focus visibile e sottolineatura link | A11y | 🔴 | S | – |
+| M05 | ✅ | Design token in `@theme` condivisi app/editor | Frontend | 🔴 | M | – |
 | M06 | ✅ | Upload SVG sicuro | Sicurezza | 🔴 | M | – |
 | M07 | ✅ | Hook `add_attachment` non sicuro | Sicurezza | 🔴 | S | – |
 | M08 | ✅ | `development.php`: ripristinare `WP_DEBUG` | Config | 🔴 | S | – |

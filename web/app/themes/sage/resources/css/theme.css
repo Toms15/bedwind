@@ -1,0 +1,56 @@
+/**
+ * Design tokens del tema.
+ *
+ * Importato da app.css (frontend) ed editor.css (block editor), così entrambi
+ * condividono gli stessi token. `static` forza l'emissione di tutte le
+ * variabili: @roots/vite-plugin le legge dal CSS compilato per generare
+ * public/build/assets/theme.json (palette, fontFamilies, fontSizes).
+ */
+@theme static {
+  /* Breakpoint 3xl (1920px): non presente nei default di Tailwind v4 */
+  --breakpoint-3xl: 120rem;
+
+  /* Font — placeholder: stack di sistema neutro (webfont in M33) */
+  --font-body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* Font size */
+  --text-small: 0.875rem;
+  --text-small--line-height: calc(1.25 / 0.875);
+
+  /* Colori: si azzera la palette di Tailwind e si dichiarano solo quelli usati */
+  --color-*: initial;
+
+  --color-black: #000;
+  --color-white: #fff;
+
+  /* placeholder: sostituire con il brand */
+  --color-black-700: oklch(37% 0 0);
+  --color-black-950: oklch(14.5% 0 0);
+
+  /* placeholder: sostituire con il brand */
+  --color-primary-50: oklch(97% 0.014 254.604);
+  --color-primary-100: oklch(93.2% 0.032 255.585);
+  --color-primary-200: oklch(88.2% 0.059 254.128);
+  --color-primary-300: oklch(80.9% 0.105 251.813);
+  --color-primary-400: oklch(70.7% 0.165 254.624);
+  --color-primary-500: oklch(62.3% 0.214 259.815);
+  --color-primary-600: oklch(54.6% 0.245 262.881);
+  --color-primary-700: oklch(48.8% 0.243 264.376);
+  --color-primary-800: oklch(42.4% 0.199 265.638);
+  --color-primary-900: oklch(37.9% 0.146 265.522);
+  --color-primary-950: oklch(28.2% 0.091 267.935);
+
+  /* Default Tailwind v4 (node_modules/tailwindcss/theme.css) */
+  --color-slate-400: oklch(70.4% 0.04 256.788);
+  --color-slate-500: oklch(55.4% 0.046 257.417);
+
+  /* Default Tailwind v4 — usati da components/alert (da rivedere in M24) */
+  --color-red-50: oklch(97.1% 0.013 17.38);
+  --color-red-400: oklch(70.4% 0.191 22.216);
+  --color-yellow-50: oklch(98.7% 0.026 102.212);
+  --color-yellow-400: oklch(85.2% 0.199 91.936);
+  --color-green-50: oklch(98.2% 0.018 155.826);
+  --color-green-400: oklch(79.2% 0.209 151.711);
+  --color-indigo-50: oklch(96.2% 0.018 272.314);
+  --color-indigo-400: oklch(67.3% 0.182 276.935);
+}

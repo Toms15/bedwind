@@ -1,15 +1,7 @@
 @import "tailwindcss" theme(static);
+@import "./theme.css";
 @source "../views/";
 @source "../../app/";
-
-@theme {
-  /**
-   * Custom Variables
-   */
-
-  /* Breakpoint 3xl (1920px): not in Tailwind v4 defaults */
-  --breakpoint-3xl: 120rem;
-}
 
 /**
  * Utils

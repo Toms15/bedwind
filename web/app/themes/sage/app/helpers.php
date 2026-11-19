@@ -68,15 +68,30 @@ function wordpack_add_image_meta_data(int $attachment_id): void
 }
 
 /**
- * Get Next Heading Leve
+ * Get the heading tag that follows a given heading level.
+ *
+ * Used for the child headings of a block (subtitles, card titles, ...):
+ * the block title uses $current_heading, its children the returned tag.
+ * Examples: h2 → h3, h5 → h6, h6 → p, p → p, h5 with increment 2 → p.
+ *
+ * Any value that is not one of h1..h6 or p (e.g. '', 'h', 'h9', 'div')
+ * is treated as 'h2' (the default block title tag) before calculating.
+ *
+ * @param  string  $current_heading  The current tag: h1..h6 or p.
+ * @param  int  $increment  How many levels to go down (minimum 1).
+ * @return string The next tag: h2..h6, or p when the level goes past h6.
  */
-function get_next_heading_level($current_heading, $increment = 1)
+function get_next_heading_level(string $current_heading, int $increment = 1): string
 {
+    if (! in_array($current_heading, ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p'], true)) {
+        $current_heading = 'h2';
+    }
+
     if ($current_heading === 'h6' || $current_heading === 'p') {
         return 'p';
     }
 
-    $increment = max(1, (int) $increment);
+    $increment = max(1, $increment);
 
     $current_level = (int) substr($current_heading, 1, 1);
     $next_level = $current_level + $increment;
@@ -189,8 +204,13 @@ add_action('init', 'wordpack_performance_optimizations');
  * (e.g. "block_abc123"), so every block section always has an id.
  * Colors are validated with sanitize_hex_color(): invalid values become ''.
  *
- * @param array $block The ACF block data.
+ * Heading convention for every block:
+ * - contents.title_tag is the tag of the block title (ACF title_formatting,
+ *   whitelisted to h1..h6/p, default 'h2'): <x-title :tag="$contents['title_tag']">.
+ * - contents.next_heading is the tag for the block's child headings
+ *   (subtitles, card titles, ...), from get_next_heading_level(title_tag).
  *
+ * @param  array  $block  The ACF block data.
  * @return array{
  *     settings: array{
  *         id: string,
@@ -200,6 +220,8 @@ add_action('init', 'wordpack_performance_optimizations');
  *     contents: array{
  *         title: mixed,
  *         title_formatting: mixed,
+ *         title_tag: 'h1'|'h2'|'h3'|'h4'|'h5'|'h6'|'p',
+ *         next_heading: 'h2'|'h3'|'h4'|'h5'|'h6'|'p',
  *         content: mixed,
  *         buttons: list<array{button: array{url?: string, title?: string, target?: string}|mixed}>
  *     },
@@ -218,16 +240,21 @@ function get_block_data(array $block): array
     $margin_dimension = get_field('margin_dimension');
 
     $custom_padding = $padding !== 'no'
-        ? 'custom-' . $padding . '-' . $padding_dimension
+        ? 'custom-'.$padding.'-'.$padding_dimension
         : 'no-padding';
 
     $custom_margin = $margin !== 'no'
-        ? 'custom-' . $margin . '-' . $margin_dimension
+        ? 'custom-'.$margin.'-'.$margin_dimension
         : 'no-margin';
 
     // Repeater: false/null when there are no rows.
     $buttons = get_field('buttons');
     $buttons = is_array($buttons) ? array_values($buttons) : [];
+
+    $title_formatting = get_field('title_formatting');
+    $title_tag = in_array($title_formatting, ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p'], true)
+        ? $title_formatting
+        : 'h2';
 
     return [
         'settings' => [
@@ -238,7 +265,9 @@ function get_block_data(array $block): array
 
         'contents' => [
             'title' => get_field('title'),
-            'title_formatting' => get_field('title_formatting'),
+            'title_formatting' => $title_formatting,
+            'title_tag' => $title_tag,
+            'next_heading' => get_next_heading_level($title_tag),
             'content' => get_field('content'),
             'buttons' => $buttons,
         ],

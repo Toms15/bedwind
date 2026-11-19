@@ -66,7 +66,7 @@
   - Il field group dei blocchi ha un singolo campo Link `button`, mentre l'helper legge `buttons`. Il riferimento giusto è `buttons` (decisione del 2026-11-19): va aggiornato il field group. Il campo `list_style` non viene mai letto: va rimosso perché non più utilizzato.
   - `block.json:7` dichiara la categoria `"contents"`, che non è registrata. Quelle esistenti sono `carousels`, `dynamic-content`, `static-content`, `commons`, `heroes`, `dividers`. Manca anche `"textdomain"`.
 - **Soluzione**
-  - Mettere il markup direttamente nella view del blocco e usare `get_block_data($block)`.
+  - La view del blocco resta snella: usa `get_block_data($block)` e fa `@include("modules.<slug>")`. Il markup sta in `resources/views/modules/<slug>.blade.php` (decisione del 2026-11-19).
   - Nel field group `group_69c1778d2ba98` sostituire il campo Link `button` con un Repeater `buttons` che contiene un sotto-campo Link `button`. La view renderizza tutti i bottoni con `<x-button>`. Etichette in italiano. Rimuovere `list_style`.
   - Applicare la convenzione dei blocchi: `<section id class="w-full overflow-x-clip {padding} {margin}">` con dentro `<div class="container mx-auto px-6 3xl:px-0">`. L'id è sempre presente: anchor, altrimenti l'id del blocco ACF. Definire il breakpoint `3xl` in `@theme`.
   - Impostare `"category": "static-content"` e `"textdomain": "sage"`.

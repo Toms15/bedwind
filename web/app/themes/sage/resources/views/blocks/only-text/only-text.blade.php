@@ -2,17 +2,13 @@
   /**
    * Block Name: Only text
    *
-   * This is the template that displays the Only text block.
+   * Prepares the Only text block data; the markup is in modules/only-text.
    */
 
   $data = get_block_data($block);
   $settings = $data['settings'];
   $contents = $data['contents'];
   $spacings = $data['spacings'];
-
-  $title_tag = in_array($contents['title_formatting'], ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p'], true)
-    ? $contents['title_formatting']
-    : 'h2';
 
   $section_style = implode(' ', array_filter([
     $settings['background_color'] ? 'background-color: '.$settings['background_color'].';' : null,
@@ -36,30 +32,10 @@
   }
 @endphp
 
-<section
-  id="{{ $settings['id'] }}"
-  @class(array_filter(['w-full overflow-x-clip', $spacings['padding'], $spacings['margin']]))
-  @if ($section_style)style="{{ $section_style }}"@endif
->
-  <div class="container mx-auto px-6 3xl:px-0">
-    @if ($contents['title'])
-      <x-title :tag="$title_tag" class="mb-6">{{ $contents['title'] }}</x-title>
-    @endif
-
-    @if ($contents['content'])
-      <div>
-        {!! $contents['content'] !!}
-      </div>
-    @endif
-
-    @if ($buttons)
-      <div class="mt-8 flex flex-wrap gap-4">
-        @foreach ($buttons as $button)
-          <x-button :link="$button['url']" :target="$button['target']" :label="$button['label']">
-            {{ $button['label'] }}
-          </x-button>
-        @endforeach
-      </div>
-    @endif
-  </div>
-</section>
+@include('modules.only-text', [
+  'settings' => $settings,
+  'contents' => $contents,
+  'spacings' => $spacings,
+  'section_style' => $section_style,
+  'buttons' => $buttons,
+])

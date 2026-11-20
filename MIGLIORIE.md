@@ -24,7 +24,7 @@
 | M11 | ✅ | `.idea` fuori da git e `.gitignore` completo | Repo | 🟠 | S | – |
 | M12 | ✅ | `debug.log` fuori dalla webroot, `WP_DEBUG` esplicito in prod | Sicurezza | 🟠 | S | M08 |
 | M13 | ✅ | Aggiornare le dipendenze Composer e WP 7.x | Dipendenze | 🟠 | M | M10 |
-| M14 | ⬜ | Upgrade major di Vite / `@roots/vite-plugin` | Dipendenze | 🟠 | M | M09 |
+| M14 | ✅ | Upgrade major di Vite / `@roots/vite-plugin` | Dipendenze | 🟠 | M | M09 |
 | M15 | ⬜ | Traduzioni core via Composer, rimozione di twentytwentyfive | Dipendenze | 🟢 | M | M13 |
 | M16 | ⬜ | Metadati e branding (composer, style.css, LICENSE, vincoli PHP) | Repo | 🟢 | S | – |
 | M17 | ✅ | `excerpt_more` duplicato e helper deboli | PHP | 🟠 | S | – |

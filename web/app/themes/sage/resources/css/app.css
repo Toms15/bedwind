@@ -1,8 +1,9 @@
-@import "tailwindcss" theme(static);
-@import "./theme.css";
-@import "./fonts.css";
-@source "../views/";
-@source "../../app/";
+@import 'tailwindcss' theme(static);
+@import './theme.css';
+@import './fonts.css';
+
+@source '../views/';
+@source '../../app/';
 
 /**
  * Focus visibile (WCAG 2.4.7): niente reset globale di outline/underline
@@ -28,6 +29,6 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-input[type="search"]::-webkit-search-cancel-button {
-  @apply !hidden
+input[type='search']::-webkit-search-cancel-button {
+  @apply hidden!;
 }

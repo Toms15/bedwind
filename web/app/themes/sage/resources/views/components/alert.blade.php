@@ -14,6 +14,7 @@
   Colori: testo black-950 su sfondo *-400, contrasto ≥ 6.3:1 su tutte le varianti.
   Gli attributi extra (class, id, ...) vengono uniti al contenitore.
 --}}
+{{-- blade-formatter-disable --}}
 @props([
   'type' => null,
   'message' => null,
@@ -36,6 +37,7 @@
     ->class(['px-2 py-1 text-black-950', $variant])
     ->merge(['role' => $role]);
 @endphp
+{{-- blade-formatter-enable --}}
 
 @if (filled(trim((string) $content)))
   <div {{ $attributes }}>

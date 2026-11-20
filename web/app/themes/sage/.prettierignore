@@ -1,0 +1,15 @@
+# Output e dipendenze
+public/
+vendor/
+node_modules/
+
+# Generati da strumenti esterni: formattarli crea solo rumore nei diff
+acf-json/
+resources/lang/
+package-lock.json
+composer.json
+composer.lock
+pint.json
+
+# Blade: li formatta blade-formatter (npm run format:blade)
+*.blade.php

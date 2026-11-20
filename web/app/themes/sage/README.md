@@ -22,6 +22,28 @@ Sage brings proper PHP templating and modern JavaScript tooling to WordPress the
 
 [Read the docs to get started](https://roots.io/sage/docs/installation/)
 
+## Lint e formattazione
+
+Node 22 (`.nvmrc` in questa cartella, dove si eseguono gli script npm: `nvm use`). `engines`: `^22.13.0 || >=24`, cioè l'intersezione di ESLint 10 (`^20.19.0 || ^22.13.0 || >=24`), Vite 8 (`^20.19.0 || >=22.12.0`) ed `editorconfig` 4 (`>=22`, vedi override sotto).
+
+| Script                 | Cosa fa                                                                                     |
+| ---------------------- | ------------------------------------------------------------------------------------------- |
+| `npm run lint`         | Tutti i controlli sotto, in sequenza (da usare in CI)                                       |
+| `npm run lint:js`      | ESLint 10, flat config in `eslint.config.js`                                                |
+| `npm run lint:css`     | Stylelint con `stylelint-config-standard` e le at-rule di Tailwind v4 (`.stylelintrc.json`) |
+| `npm run lint:blade`   | `blade-formatter --check-formatted` sulle viste                                             |
+| `npm run format:check` | `prettier --check .`                                                                        |
+| `npm run format`       | Scrive: Prettier (JS, CSS, JSON, Markdown) + blade-formatter                                |
+| `npm run format:blade` | Solo blade-formatter                                                                        |
+
+- Prettier usa `prettier-plugin-tailwindcss` con `tailwindStylesheet: ./resources/css/app.css`: ordina le classi in JS e negli `@apply`.
+- Nelle Blade l'ordinamento delle classi è **disattivato**: blade-formatter usa internamente Tailwind 3 e con v4 darebbe un ordine sbagliato.
+- blade-formatter riformatterebbe il PHP di `@props`/`@php` a 4 spazi (non configurabile): i preamboli PHP dei componenti sono racchiusi tra `{{-- blade-formatter-disable --}}` e `{{-- blade-formatter-enable --}}`.
+- Lo stesso vale per gli array multilinea di `@class(...)`: blade-formatter li reindenta con il proprio stile. Si racchiude il solo `@class` tra i due commenti, dentro il tag (vedi `components/share.blade.php` e `modules/only-text.blade.php`), con l'array a 2 spazi.
+- Lo stile del PHP inline nelle Blade (`!$x`) differisce da quello di Pint in `app/` (`! $x`): blade-formatter non è configurabile su questo.
+- `overrides` in `package.json` (`blade-formatter` → `glob ^14.0.6`, `editorconfig ^4.0.1`): portano `npm audit` a 0 vulnerabilità (ReDoS di `minimatch` e `glob` nelle dipendenze di blade-formatter/js-beautify). Rimuoverli quando blade-formatter aggiornerà le proprie dipendenze; `editorconfig` 4 richiede Node >= 22.
+- Esclusi dalla formattazione: `acf-json/` (lo riscrive ACF), `resources/lang/`, lock file, `composer.json`, `pint.json`, `public/`, `vendor/`. Il PHP di `app/` resta a Pint (`vendor/bin/pint`).
+
 ## Breadcrumb
 
 Componente pronto, non incluso in nessun template: aggiungerlo dove serve.

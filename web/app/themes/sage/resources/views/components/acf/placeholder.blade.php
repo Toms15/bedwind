@@ -12,6 +12,7 @@
 
   Il pulsante con data-acf-expanded-editor apre l'editor espanso (resources/js/editor.js).
 --}}
+{{-- blade-formatter-disable --}}
 @props([
   'block' => [],
   'title' => null,
@@ -24,21 +25,22 @@
   $title = is_string($title) ? trim(wp_strip_all_tags($title)) : '';
   $message ??= __('Nessun titolo impostato per questa sezione.', 'sage');
 @endphp
+{{-- blade-formatter-enable --}}
 
 <div
   {{ $attributes->class([
-    'acf-block-placeholder border border-slate-400 p-6 flex items-start justify-start gap-3 flex-col',
-    'bg-[repeating-linear-gradient(-45deg,_rgb(144_161_185_/_50%)_0,_rgb(144_161_185_/_50%)_4px,_transparent_0,_transparent_50%)] bg-[size:12px_12px]' => $isEmpty,
-  ]) }}
->
-  @if (! empty($block['title']))
-    <span class="bg-slate-400 w-auto inline-flex items-center justify-center h-6 px-2 rounded text-small text-black font-body font-medium">
+      'acf-block-placeholder border border-slate-400 p-6 flex items-start justify-start gap-3 flex-col',
+      'bg-[repeating-linear-gradient(-45deg,_rgb(144_161_185_/_50%)_0,_rgb(144_161_185_/_50%)_4px,_transparent_0,_transparent_50%)] bg-[size:12px_12px]' => $isEmpty,
+  ]) }}>
+  @if (!empty($block['title']))
+    <span
+      class="bg-slate-400 w-auto inline-flex items-center justify-center h-6 px-2 rounded text-small text-black font-body font-medium">
       {{ $block['title'] }}
     </span>
   @endif
 
   @unless ($isEmpty)
-    @if (! empty($block['description']))
+    @if (!empty($block['description']))
       <span class="text-small text-black font-body font-medium">
         {{ $block['description'] }}
       </span>
@@ -54,8 +56,7 @@
   <button
     type="button"
     class="components-button is-primary"
-    data-acf-expanded-editor
-  >
+    data-acf-expanded-editor>
     {{ __('Modifica blocco', 'sage') }}
   </button>
 </div>

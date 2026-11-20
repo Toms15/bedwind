@@ -1,3 +1,4 @@
+{{-- blade-formatter-disable --}}
 @php
   /**
    * Block Name: Only text
@@ -31,6 +32,7 @@
     ];
   }
 @endphp
+{{-- blade-formatter-enable --}}
 
 @include('modules.only-text', [
   'settings' => $settings,

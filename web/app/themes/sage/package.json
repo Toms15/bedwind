@@ -2,12 +2,19 @@
   "name": "sage",
   "private": true,
   "engines": {
-    "node": "^20.19.0 || >=22.12.0"
+    "node": "^22.13.0 || >=24"
   },
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "lint": "npm run lint:js && npm run lint:css && npm run lint:blade && npm run format:check",
+    "lint:js": "eslint .",
+    "lint:css": "stylelint \"resources/css/**/*.css\"",
+    "lint:blade": "blade-formatter \"resources/views/**/*.blade.php\" --check-formatted",
+    "format": "prettier --write . && npm run format:blade",
+    "format:blade": "blade-formatter \"resources/views/**/*.blade.php\" --write",
+    "format:check": "prettier --check .",
     "translate": "npm run translate:pot && npm run translate:update",
     "translate:acf": "node resources/scripts/acf-strings.js",
     "translate:pot": "npm run translate:acf && wp i18n make-pot . ./resources/lang/sage.pot --include=\"app,resources/views,resources/lang/acf-json.php,theme.json,style.css\" --headers='{\"Report-Msgid-Bugs-To\":\"\",\"Language-Team\":\"\"}'",
@@ -18,10 +25,24 @@
     "translate:js": "wp i18n make-json ./resources/lang --no-purge --pretty-print"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@roots/vite-plugin": "^2.2.0",
     "@tailwindcss/vite": "^4.3.5",
+    "blade-formatter": "^1.44.6",
+    "eslint": "^10.15.0",
+    "globals": "^17.14.0",
     "laravel-vite-plugin": "^3.2.1",
+    "prettier": "^3.10.1",
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "stylelint": "^17.16.0",
+    "stylelint-config-standard": "^40.0.0",
     "tailwindcss": "^4.3.5",
     "vite": "^8.3.8"
+  },
+  "overrides": {
+    "blade-formatter": {
+      "glob": "^14.0.6"
+    },
+    "editorconfig": "^4.0.1"
   }
 }

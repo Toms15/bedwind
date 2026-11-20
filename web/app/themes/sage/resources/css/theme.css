@@ -11,7 +11,8 @@
   --breakpoint-3xl: 120rem;
 
   /* Font — stack di sistema; per un webfont vedi fonts.css */
-  --font-body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-body:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 
   /* Font size */
   --text-small: 0.875rem;

@@ -27,6 +27,7 @@
   - Con loading="lazy" WP antepone "auto, " a sizes (filtro wp_img_tag_add_auto_sizes),
     anche a un sizes personalizzato: il browser usa la larghezza reale del layout.
 --}}
+{{-- blade-formatter-disable --}}
 @props([
   'id' => null,
   'size' => 'large',
@@ -74,6 +75,7 @@
 
   $fallbackUrl = ! $html && $fallback ? \App\get_fallback_image_url() : '';
 @endphp
+{{-- blade-formatter-enable --}}
 
 @if ($html)
   {!! $html !!}
@@ -87,6 +89,5 @@
     decoding="async"
     @if ($eager) fetchpriority="high" @endif
     @if ($imgId) id="{{ $imgId }}" @endif
-    {{ $attributes->except(['alt', 'src', 'width', 'height', 'loading', 'decoding', 'sizes', 'srcset']) }}
-  >
+    {{ $attributes->except(['alt', 'src', 'width', 'height', 'loading', 'decoding', 'sizes', 'srcset']) }}>
 @endif

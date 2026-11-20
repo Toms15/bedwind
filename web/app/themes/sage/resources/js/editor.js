@@ -1,10 +1,8 @@
 import domReady from '@wordpress/dom-ready';
 
-const PANEL =
-  '.block-editor-block-inspector .acf-block-component.acf-block-panel';
+const PANEL = '.block-editor-block-inspector .acf-block-component.acf-block-panel';
 
-const INSPECTOR_BTN =
-  '.block-editor-block-inspector .acf-blocks-open-expanded-editor-btn';
+const INSPECTOR_BTN = '.block-editor-block-inspector .acf-blocks-open-expanded-editor-btn';
 
 const TRIGGER = '[data-acf-expanded-editor]';
 
@@ -66,10 +64,8 @@ const waitFor = (selector, timeout = 2000) =>
  */
 const openBlockSidebar = () => {
   try {
-    window.wp?.data
-      ?.dispatch('core/edit-post')
-      ?.openGeneralSidebar('edit-post/block');
-  } catch (e) {
+    window.wp?.data?.dispatch('core/edit-post')?.openGeneralSidebar('edit-post/block');
+  } catch {
     // Store non disponibile (es. site editor): ignora
   }
 };

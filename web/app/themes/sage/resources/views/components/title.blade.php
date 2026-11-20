@@ -9,6 +9,7 @@
   Gli attributi extra (class, id, ...) vengono uniti all'elemento: le classi
   passate si sommano, lo style passato viene unito a quello del colore.
 --}}
+{{-- blade-formatter-disable --}}
 @props([
   'tag' => 'h2',
   'textColor' => null,
@@ -24,7 +25,6 @@
     $attributes = $attributes->merge(['style' => "color: {$color};"]);
   }
 @endphp
+{{-- blade-formatter-enable --}}
 
-<{{ $tag }} {{ $attributes }}>
-  {{ $slot }}
-</{{ $tag }}>
+<{{ $tag }} {{ $attributes }}>{{ $slot }}</{{ $tag }}>

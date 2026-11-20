@@ -8,8 +8,7 @@
       type="search"
       placeholder="{!! esc_attr_x('Cerca &hellip;', 'placeholder', 'sage') !!}"
       value="{{ get_search_query() }}"
-      name="s"
-    >
+      name="s">
   </label>
 
   <button>{{ _x('Cerca', 'submit button', 'sage') }}</button>

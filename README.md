@@ -6,7 +6,7 @@ This project uses [Bedrock](https://roots.io/bedrock/) as a WordPress boilerplat
 
 - PHP >= 8.0
 - Composer
-- Node.js >= 16.0
+- Node.js 22 (see `web/app/themes/sage/.nvmrc`; `engines`: `^22.13.0 || >=24`)
 - npm
 
 ## Initial Setup
@@ -73,10 +73,11 @@ NONCE_SALT='generate-secure-key'
 
 ### 4. Sage theme setup
 
-Navigate to the theme folder and install Node.js dependencies:
+Navigate to the theme folder and install Node.js dependencies (`nvm use` picks the Node version from the theme's `.nvmrc`):
 
 ```bash
 cd web/app/themes/sage
+nvm use
 composer install
 npm install
 ```
@@ -202,15 +203,14 @@ npm run dev
 # Compile assets for production
 npm run build
 
-# Watch mode (automatically recompiles)
-npm run dev:watch
-
-# Code linting
+# Lint: ESLint (JS), Stylelint (CSS), blade-formatter --check-formatted (Blade), prettier --check
 npm run lint
 
-# Auto-fix linting errors
-npm run lint:fix
+# Format: Prettier (JS/CSS/JSON/Markdown) + blade-formatter (Blade)
+npm run format
 ```
+
+See the theme README for the single `lint:*` / `format:*` scripts and the formatter settings.
 
 ## Database
 

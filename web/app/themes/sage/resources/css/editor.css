@@ -1,8 +1,9 @@
-@import "tailwindcss";
-@import "./theme.css";
-@import "./fonts.css";
-@source "../views/";
-@source "../../app/";
+@import 'tailwindcss';
+@import './theme.css';
+@import './fonts.css';
+
+@source '../views/';
+@source '../../app/';
 
 /* Stessa sottolineatura di app.css (WP 7.1 non stampa più la regola di core sui link) */
 @layer base {

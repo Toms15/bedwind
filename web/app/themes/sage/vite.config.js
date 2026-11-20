@@ -1,20 +1,20 @@
-import fs from 'node:fs'
-import os from 'node:os'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { defineConfig, loadEnv } from 'vite'
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { defineConfig, loadEnv } from 'vite';
 import tailwindcss from '@tailwindcss/vite';
-import laravel from 'laravel-vite-plugin'
+import laravel from 'laravel-vite-plugin';
 import { wordpressPlugin, wordpressThemeJson } from '@roots/vite-plugin';
 
-const themeDir = path.dirname(fileURLToPath(import.meta.url))
+const themeDir = path.dirname(fileURLToPath(import.meta.url));
 
 // Bedrock root (web/app/themes/<theme> -> ../../../..), where the project .env lives.
-const bedrockRoot = path.resolve(themeDir, '../../../..')
+const bedrockRoot = path.resolve(themeDir, '../../../..');
 
 // Derive the theme slug from this config's folder so a renamed theme keeps
 // working; set VITE_THEME_SLUG to override it.
-const themeSlug = process.env.VITE_THEME_SLUG || path.basename(themeDir)
+const themeSlug = process.env.VITE_THEME_SLUG || path.basename(themeDir);
 
 // Herd/Valet certificate folders checked by laravel-vite-plugin.
 const tlsConfigPaths = [
@@ -22,33 +22,34 @@ const tlsConfigPaths = [
   path.resolve(os.homedir(), '.config', 'herd', 'config', 'valet'),
   path.resolve(os.homedir(), '.config', 'valet'),
   path.resolve(os.homedir(), '.valet'),
-]
+];
 
 // laravel-vite-plugin's default TLS detection looks for "<cwd folder>.<tld>",
 // i.e. the theme folder name, so a renamed theme would silently fall back to
 // http. Use the site host instead, but only when a Herd/Valet certificate
 // exists for it: a string value makes the plugin throw if it is missing.
 function resolveDetectTls(appUrl) {
-  let host
+  let host;
   try {
-    host = new URL(appUrl).hostname
+    host = new URL(appUrl).hostname;
   } catch {
-    return null
+    return null;
   }
 
-  if (! host || host === 'localhost' || host === '127.0.0.1') {
-    return null
+  if (!host || host === 'localhost' || host === '127.0.0.1') {
+    return null;
   }
 
   // Like the plugin, only look in the first existing Herd/Valet config folder.
-  const configPath = tlsConfigPaths.find((dir) => fs.existsSync(dir))
+  const configPath = tlsConfigPaths.find((dir) => fs.existsSync(dir));
 
-  const hasCertificate = Boolean(configPath)
-    && fs.existsSync(path.join(configPath, 'Certificates', `${host}.crt`))
-    && fs.existsSync(path.join(configPath, 'Certificates', `${host}.key`))
+  const hasCertificate =
+    Boolean(configPath) &&
+    fs.existsSync(path.join(configPath, 'Certificates', `${host}.crt`)) &&
+    fs.existsSync(path.join(configPath, 'Certificates', `${host}.key`));
 
   // null keeps the plugin's default detection.
-  return hasCertificate ? host : null
+  return hasCertificate ? host : null;
 }
 
 export default defineConfig(({ mode }) => {
@@ -56,9 +57,9 @@ export default defineConfig(({ mode }) => {
   // CORS allowlist, the TLS host with VITE_DEV_SERVER_KEY/CERT, its fallback
   // page and the console banner. Default it to Bedrock's WP_HOME; only these
   // keys are loaded, so no other .env value reaches the build.
-  const env = loadEnv(mode, bedrockRoot, ['WP_HOME', 'APP_URL'])
-  const appUrl = process.env.APP_URL || env.APP_URL || env.WP_HOME || 'http://localhost'
-  process.env.APP_URL = appUrl
+  const env = loadEnv(mode, bedrockRoot, ['WP_HOME', 'APP_URL']);
+  const appUrl = process.env.APP_URL || env.APP_URL || env.WP_HOME || 'http://localhost';
+  process.env.APP_URL = appUrl;
 
   return {
     base: `/app/themes/${themeSlug}/public/build/`,
@@ -95,5 +96,5 @@ export default defineConfig(({ mode }) => {
         '@images': '/resources/images',
       },
     },
-  }
-})
+  };
+});

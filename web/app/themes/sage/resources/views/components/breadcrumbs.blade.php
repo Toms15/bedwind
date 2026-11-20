@@ -29,6 +29,7 @@
 
   Nessun output se non ci sono voci (es. front page).
 --}}
+{{-- blade-formatter-disable --}}
 @props([
   'items' => null,
   'jsonld' => true,
@@ -77,16 +78,19 @@
     ];
   }
 @endphp
+{{-- blade-formatter-enable --}}
 
 @if ($items)
-  <nav {{ $attributes->class('text-small font-body text-black-700') }} aria-label="{{ __('Percorso di navigazione', 'sage') }}">
+  <nav {{ $attributes->class('text-small font-body text-black-700') }}
+    aria-label="{{ __('Percorso di navigazione', 'sage') }}">
     <ol class="flex flex-wrap items-center gap-x-2 gap-y-1" role="list">
       @foreach ($items as $index => $item)
         <li class="inline-flex items-center gap-x-2 min-w-0">
           @if ($index === $last)
             <span class="text-black-950 font-medium truncate" aria-current="page">{{ $item['label'] }}</span>
           @elseif ($item['url'])
-            <a class="text-black-950 underline-offset-2 hover:text-primary-500 hover:underline-offset-4" href="{{ $item['url'] }}">{{ $item['label'] }}</a>
+            <a class="text-black-950 underline-offset-2 hover:text-primary-500 hover:underline-offset-4"
+              href="{{ $item['url'] }}">{{ $item['label'] }}</a>
           @else
             <span>{{ $item['label'] }}</span>
           @endif

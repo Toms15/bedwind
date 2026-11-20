@@ -12,9 +12,14 @@
 
 <section
   id="{{ $settings['id'] }}"
-  @class(array_filter(['w-full overflow-x-clip', $spacings['padding'], $spacings['margin']]))
-  @if ($section_style)style="{{ $section_style }}"@endif
->
+  {{-- blade-formatter-disable --}}
+  @class(array_filter([
+    'w-full overflow-x-clip',
+    $spacings['padding'],
+    $spacings['margin'],
+  ]))
+  {{-- blade-formatter-enable --}}
+  @if ($section_style) style="{{ $section_style }}" @endif>
   <div class="container mx-auto px-6 3xl:px-0">
     @if ($contents['title'])
       <x-title :tag="$contents['title_tag']" class="mb-6">{{ $contents['title'] }}</x-title>

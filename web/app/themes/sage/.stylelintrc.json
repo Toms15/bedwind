@@ -1,0 +1,67 @@
+{
+  "extends": ["stylelint-config-standard"],
+  "rules": {
+    "at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": [
+          "theme",
+          "source",
+          "utility",
+          "variant",
+          "custom-variant",
+          "apply",
+          "reference",
+          "plugin",
+          "config",
+          "tailwind"
+        ]
+      }
+    ],
+    "at-rule-no-deprecated": [
+      true,
+      {
+        "ignoreAtRules": ["apply"]
+      }
+    ],
+    "at-rule-prelude-no-invalid": [
+      true,
+      {
+        "ignoreAtRules": [
+          "theme",
+          "source",
+          "utility",
+          "variant",
+          "custom-variant",
+          "apply",
+          "reference",
+          "plugin",
+          "config",
+          "tailwind"
+        ]
+      }
+    ],
+    "function-no-unknown": [
+      true,
+      {
+        "ignoreFunctions": ["theme", "--alpha", "--spacing"]
+      }
+    ],
+    "import-notation": "string",
+    "custom-property-pattern": [
+      "^[a-z][a-z0-9]*(-{1,2}[a-z0-9]+)*(-\\*)?$",
+      {
+        "message": "Le custom property seguono i namespace di Tailwind: kebab-case, \"--\" per le sotto-chiavi (--text-small--line-height) e \"-*\" per il reset (--color-*)"
+      }
+    ],
+    "custom-property-empty-line-before": null,
+    "hue-degree-notation": "number",
+    "value-keyword-case": [
+      "lower",
+      {
+        "camelCaseSvgKeywords": true,
+        "ignoreProperties": ["/^--font-/"]
+      }
+    ]
+  }
+}

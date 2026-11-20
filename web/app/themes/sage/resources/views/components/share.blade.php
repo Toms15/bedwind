@@ -17,6 +17,7 @@
   è nascosto di default e viene mostrato da resources/js/app.js solo se il
   browser supporta navigator.share.
 --}}
+{{-- blade-formatter-disable --}}
 @props([
   'title' => '',
   'link' => '',
@@ -63,6 +64,7 @@
     ] : null,
   ]);
 @endphp
+{{-- blade-formatter-enable --}}
 
 @if ($url)
   <div {{ $attributes->class('flex items-start justify-start gap-3 flex-col md:flex-row md:items-center') }}>
@@ -75,8 +77,12 @@
             target="_blank"
             rel="noopener noreferrer"
             aria-label="{{ sprintf($share_on, $network['label']) }}"
-            @class(['w-8 min-w-8 max-w-8 h-8 aspect-square rounded-full flex items-center justify-center outline-offset-2 hover:outline-2 focus-visible:outline-2', $network['color']])
-          >
+            {{-- blade-formatter-disable --}}
+            @class([
+              'w-8 min-w-8 max-w-8 h-8 aspect-square rounded-full flex items-center justify-center outline-offset-2 hover:outline-2 focus-visible:outline-2',
+              $network['color'],
+            ])
+            {{-- blade-formatter-enable --}}>
             <svg class="h-4 w-auto fill-white" viewBox="0 0 640 640" aria-hidden="true" focusable="false">
               <path d="{{ $network['icon'] }}" />
             </svg>
@@ -89,8 +95,7 @@
           type="button"
           class="h-8 px-3 rounded-full flex items-center justify-center gap-2 bg-primary-700 text-white text-small font-body font-medium cursor-pointer outline-offset-2 outline-primary-700 hover:outline-2 focus-visible:outline-2"
           data-share-url="{{ $url }}"
-          data-share-title="{{ $text }}"
-        >
+          data-share-title="{{ $text }}">
           {{ __('Condividi', 'sage') }}
         </button>
       </li>

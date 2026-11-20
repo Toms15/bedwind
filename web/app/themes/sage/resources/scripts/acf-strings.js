@@ -19,74 +19,77 @@
  * Default output: resources/lang/acf-json.php (ignored by git).
  */
 
-import fs from 'node:fs'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const themeDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
-const sourceDir = path.join(themeDir, 'acf-json')
-const output = path.resolve(themeDir, process.argv[2] ?? 'resources/lang/acf-json.php')
+const themeDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const sourceDir = path.join(themeDir, 'acf-json');
+const output = path.resolve(themeDir, process.argv[2] ?? 'resources/lang/acf-json.php');
 
 /** @type {Map<string, Set<string>>} string → descriptions (for translators). */
-const strings = new Map()
+const strings = new Map();
 
 const add = (value, description) => {
   if (typeof value !== 'string' || value.trim() === '') {
-    return
+    return;
   }
 
-  if (! strings.has(value)) {
-    strings.set(value, new Set())
+  if (!strings.has(value)) {
+    strings.set(value, new Set());
   }
 
-  strings.get(value).add(description)
-}
+  strings.get(value).add(description);
+};
 
 const walkFields = (fields, group, parents = []) => {
   for (const field of fields ?? []) {
-    const name = [...parents, field.name || field.key].join(' › ')
-    const where = `ACF "${group}", ${name}`
+    const name = [...parents, field.name || field.key].join(' › ');
+    const where = `ACF "${group}", ${name}`;
 
-    add(field.label, `${where} (label)`)
-    add(field.instructions, `${where} (instructions)`)
-    add(field.button_label, `${where} (button_label)`)
-    add(field.message, `${where} (message)`)
-    add(field.ui_on_text, `${where} (ui_on_text)`)
-    add(field.ui_off_text, `${where} (ui_off_text)`)
+    add(field.label, `${where} (label)`);
+    add(field.instructions, `${where} (instructions)`);
+    add(field.button_label, `${where} (button_label)`);
+    add(field.message, `${where} (message)`);
+    add(field.ui_on_text, `${where} (ui_on_text)`);
+    add(field.ui_off_text, `${where} (ui_off_text)`);
 
     if (field.choices && typeof field.choices === 'object') {
       for (const [key, label] of Object.entries(field.choices)) {
-        add(label, `${where} (choice "${key}")`)
+        add(label, `${where} (choice "${key}")`);
       }
     }
 
-    walkFields(field.sub_fields, group, [...parents, field.name])
+    walkFields(field.sub_fields, group, [...parents, field.name]);
 
     for (const layout of Object.values(field.layouts ?? {})) {
-      add(layout.label, `${where} (layout "${layout.name}")`)
-      walkFields(layout.sub_fields, group, [...parents, field.name, layout.name])
+      add(layout.label, `${where} (layout "${layout.name}")`);
+      walkFields(layout.sub_fields, group, [...parents, field.name, layout.name]);
     }
   }
-}
+};
 
 const files = fs.existsSync(sourceDir)
-  ? fs.readdirSync(sourceDir).filter((file) => file.endsWith('.json')).sort()
-  : []
+  ? fs
+      .readdirSync(sourceDir)
+      .filter((file) => file.endsWith('.json'))
+      .sort()
+  : [];
 
 for (const file of files) {
-  const group = JSON.parse(fs.readFileSync(path.join(sourceDir, file), 'utf8'))
+  const group = JSON.parse(fs.readFileSync(path.join(sourceDir, file), 'utf8'));
 
   // Only field groups: post types, taxonomies and options pages have other keys.
-  if (! Array.isArray(group.fields)) {
-    continue
+  if (!Array.isArray(group.fields)) {
+    continue;
   }
 
-  add(group.title, `ACF "${group.title}" (field group title, ${file})`)
-  walkFields(group.fields, group.title)
+  add(group.title, `ACF "${group.title}" (field group title, ${file})`);
+  walkFields(group.fields, group.title);
 }
 
-const php = (value) => `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`
-const comment = (value) => value.replace(/\*\//g, '* /')
+const php = (value) => `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
+const comment = (value) => value.replace(/\*\//g, '* /');
 
 const lines = [
   '<?php',
@@ -100,14 +103,16 @@ const lines = [
   '',
   'return;',
   '',
-]
+];
 
 for (const [value, descriptions] of strings) {
-  lines.push(`/* translators: ${comment([...descriptions].join('; '))} */`)
-  lines.push(`__(${php(value)}, 'sage');`)
+  lines.push(`/* translators: ${comment([...descriptions].join('; '))} */`);
+  lines.push(`__(${php(value)}, 'sage');`);
 }
 
-fs.mkdirSync(path.dirname(output), { recursive: true })
-fs.writeFileSync(output, `${lines.join('\n')}\n`)
+fs.mkdirSync(path.dirname(output), { recursive: true });
+fs.writeFileSync(output, `${lines.join('\n')}\n`);
 
-console.log(`acf-strings: ${strings.size} strings from ${files.length} file(s) → ${path.relative(themeDir, output)}`)
+console.log(
+  `acf-strings: ${strings.size} strings from ${files.length} file(s) → ${path.relative(themeDir, output)}`,
+);

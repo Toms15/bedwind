@@ -1,6 +1,8 @@
+{{-- blade-formatter-disable --}}
 @props([
   'id',
 ])
+{{-- blade-formatter-enable --}}
 
 <div {{ $attributes->merge(['class' => 'flex items-center justify-start gap-2']) }}>
   <button

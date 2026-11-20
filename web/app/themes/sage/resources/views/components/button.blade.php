@@ -21,6 +21,7 @@
   Gli attributi gestiti dal componente (href, target, rel, type, disabled,
   aria-disabled) passati dall'esterno vengono ignorati per evitare duplicati.
 --}}
+{{-- blade-formatter-disable --}}
 @props([
   'link' => null,
   'target' => '_self',
@@ -70,6 +71,7 @@
       'style' => $color ? "background-color: {$color};" : null,
     ]));
 @endphp
+{{-- blade-formatter-enable --}}
 
 @if ($disabled)
   <button type="button" disabled aria-disabled="true" {{ $attributes }}>
@@ -79,8 +81,7 @@
   <a
     href="{{ $url }}"
     @if ($target === '_blank') target="_blank" rel="noopener noreferrer" @endif
-    {{ $attributes }}
-  >
+    {{ $attributes }}>
     {{ $slot }}
   </a>
 @elseif (defined('WP_DEBUG') && WP_DEBUG)

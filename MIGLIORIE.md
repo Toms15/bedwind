@@ -28,7 +28,7 @@
 | M15 | ⬜ | Traduzioni core via Composer, rimozione di twentytwentyfive | Dipendenze | 🟢 | M | M13 |
 | M16 | ⬜ | Metadati e branding (composer, style.css, LICENSE, vincoli PHP) | Repo | 🟢 | S | – |
 | M17 | ✅ | `excerpt_more` duplicato e helper deboli | PHP | 🟠 | S | – |
-| M18 | ⬜ | Rewrite degli archivi (mensili, paginazione, flush) | PHP | 🟠 | M | – |
+| M18 | ✅ | Rewrite degli archivi (mensili, paginazione, flush) | PHP | 🟠 | M | – |
 | M19 | ✅ | CPT `faq`: configurazione coerente | PHP | 🟠 | S | – |
 | M20 | ✅ | `wp-embed` deregistrato male | PHP | 🟠 | S | – |
 | M21 | ✅ | Filtro `allowed_block_types_all` | Blocchi | 🟠 | S | – |
@@ -51,6 +51,7 @@
 | M38 | ⬜ | Ambiente locale riproducibile, deploy, `solo.yml` | DX | 🟠 | M | – |
 | M39 | ⬜ | README e documentazione delle convenzioni | Docs | 🟠 | S | M10, M38 |
 | M40 | ✅ | Permalink di default nel setup (404 e rewrite non funzionano) | Config | 🟠 | S | – |
+| M41 | ⬜ | URL inesistenti a più segmenti rispondono 200 in locale (Valet/Herd PHP_SELF) | Ambiente | 🟢 | S | – |
 
 **Ordine consigliato.** Fase 0 (M01–M10), poi Fase 1 (M11–M16), Fase 2 (M17–M27), Fase 3 (M28–M34), Fase 4 (M35–M39).
 
@@ -514,6 +515,13 @@
   - Impostare la struttura dei permalink nel setup del progetto: `wp rewrite structure '/%postname%/' --hard` nel README, oppure su `after_switch_theme` solo se `permalink_structure` è vuoto, seguito da `flush_rewrite_rules()`.
   - Documentarlo in M39.
   - Poi verificare il 404 e le rewrite di M18.
+
+### M41 – URL inesistenti a più segmenti rispondono 200 in locale 🟢 S
+*Fonte: review di M18 (2026-11-20)*
+- **Problema:** in locale, qualunque URL inesistente con due o più segmenti (es. `/a/b/c/`) risponde 200 con la home invece di 404. Valet/Herd imposta `$_SERVER['PHP_SELF']` uguale all'URI richiesto (`BasicValetDriver.php:20`), e WordPress per questo annulla il 404 (`class-wp.php:287-290`). Non dipende dal tema e probabilmente non si presenta in produzione con nginx o Apache standard.
+- **Soluzione:**
+  - verificare il comportamento in staging o produzione;
+  - in locale valutare un driver Valet personalizzato, oppure documentare il limite nel README (M39).
 
 ## Già a posto (verificato)
 - I salt vengono da env.

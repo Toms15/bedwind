@@ -131,6 +131,33 @@ npm run translate:compile
 
 To add a language (e.g. `de_DE`): copy `sage.pot` to `resources/lang/de_DE.po`, set the `Language` and `Plural-Forms` headers, translate it and run `npm run translate:compile`. For WordPress core and plugin strings add the locale to `extra.wp-translation-downloader.languages` in `composer.json` as described above (`en_US` needs nothing: it is built into WordPress).
 
+## Fonts and images
+
+The theme ships **no webfont**: text uses the system stack in `--font-body` (`resources/css/theme.css`).
+
+To add a webfont (paths from `web/app/themes/sage`):
+
+1. Copy the `.woff2` files into `resources/fonts/`.
+2. Uncomment and adapt the `@font-face` example in `resources/css/fonts.css` (imported by `app.css` and `editor.css`): `font-display: swap`, a `font-weight` range for variable fonts, optional `unicode-range`. Keep the relative `url("../fonts/...")` path.
+3. Put the family first in `--font-body`, keeping the system stack as fallback: `--font-body: "Inter", ui-sans-serif, system-ui, sans-serif;`.
+4. Optionally preload the font used above the fold (1–2 files at most):
+
+   ```php
+   add_filter('sage/preload_fonts', fn () => ['resources/fonts/inter-var.woff2']);
+   ```
+
+   `app/setup.php` prints `<link rel="preload" as="font" type="font/woff2" crossorigin>` in `wp_head` for every listed file that exists in the theme (missing files are skipped, in build and with the dev server). The URL comes from `Vite::asset()` and matches the one in the compiled `@font-face`, so the font is downloaded once. Files under Vite's `assetsInlineLimit` (4 KB) would be inlined in the CSS as data URIs: real fonts are always larger.
+
+For attachment images use the `<x-image>` component (`resources/views/components/image.blade.php`), a wrapper around `wp_get_attachment_image()`:
+
+```blade
+<x-image :id="$post['image_id']" />                                  {{-- large, lazy handled by WP --}}
+<x-image :id="$hero_id" size="full" sizes="100vw" eager class="w-full" /> {{-- LCP image: eager + fetchpriority high --}}
+<x-image :id="$id" alt="" :fallback="false" />                        {{-- decorative, nothing printed without image --}}
+```
+
+WordPress adds `srcset`, `sizes`, `width`/`height`, `decoding="async"` and picks `loading`/`fetchpriority` itself (prefixing `sizes` with `auto,` on lazy images); `eager` forces `loading="eager" fetchpriority="high"` for a single above-the-fold image. With an empty or non-image ID the local `fallback.svg` is printed (alt `""`, lazy) unless `:fallback="false"`.
+
 ## Project Structure
 
 ```

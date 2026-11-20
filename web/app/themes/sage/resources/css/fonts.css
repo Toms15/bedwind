@@ -1,0 +1,30 @@
+/**
+ * Webfont locali del tema.
+ *
+ * Importato da app.css (frontend) ed editor.css (block editor). Di default non
+ * è incluso nessun font: il testo usa lo stack di sistema di --font-body in
+ * theme.css. Per aggiungere un webfont:
+ *
+ * 1. Copia i file .woff2 in resources/fonts/ (es. resources/fonts/inter-var.woff2).
+ * 2. Decommenta e adatta il blocco @font-face qui sotto. Usa un percorso
+ *    relativo a questo file (../fonts/...): Vite lo compila con hash nello
+ *    stesso URL che il preload ottiene da Vite::asset(), così il browser non
+ *    scarica il font due volte.
+ * 3. In theme.css metti la famiglia in testa a --font-body, lasciando lo stack
+ *    di sistema come fallback:
+ *      --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+ * 4. (Opzionale) Preload del font usato sopra la piega, dal tema o da un plugin:
+ *      add_filter('sage/preload_fonts', fn () => ['resources/fonts/inter-var.woff2']);
+ *    Precarica solo 1-2 file: ogni preload compete con CSS e immagini LCP.
+ */
+
+/*
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("../fonts/inter-var.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+*/

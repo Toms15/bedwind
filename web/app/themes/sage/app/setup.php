@@ -47,6 +47,44 @@ add_filter('admin_head', function () {
 });
 
 /**
+ * Preload the theme webfonts.
+ *
+ * Nothing is preloaded by default: return from the 'sage/preload_fonts'
+ * filter the woff2 sources to preload, as Vite paths relative to the theme
+ * (e.g. 'resources/fonts/inter-var.woff2'). Files missing from the theme
+ * (or from the Vite manifest) are skipped, both in build and with the dev
+ * server, so a stale entry never breaks the page. The URL is
+ * the same one the compiled @font-face in fonts.css points to, so the font
+ * is downloaded once.
+ *
+ * @return void
+ */
+add_action('wp_head', function () {
+    $fonts = apply_filters('sage/preload_fonts', []);
+
+    if (! is_array($fonts)) {
+        return;
+    }
+
+    foreach (array_unique(array_filter($fonts, 'is_string')) as $font) {
+        if (! is_file(get_theme_file_path($font))) {
+            continue;
+        }
+
+        try {
+            $url = Vite::asset($font);
+        } catch (\Throwable) {
+            continue;
+        }
+
+        printf(
+            '<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin>'."\n",
+            esc_url($url)
+        );
+    }
+}, 2);
+
+/**
  * Use the generated theme.json file.
  *
  * @return string

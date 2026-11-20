@@ -43,7 +43,7 @@
 | M30 | ⬜ | Separare i field group ACF comuni da quelli specifici | Blocchi | 🟢 | M | M01 |
 | M31 | ⬜ | Struttura cartelle dei componenti e styleguide di sviluppo | Frontend | 🟢 | M | M24 |
 | M32 | ✅ | `base` di Vite indipendente dal nome del tema | DX | 🟠 | S | – |
-| M33 | ⬜ | Strategia per font e immagini responsive | Performance | 🟠 | M | M05 |
+| M33 | ✅ | Strategia per font e immagini responsive | Performance | 🟠 | M | M05 |
 | M34 | ⬜ | `editor.js`: meno fragile, meno costoso | Editor | 🟢 | S | – |
 | M35 | ⬜ | PHPStan/Larastan + Pest + script Composer | Qualità | 🟠 | M | – |
 | M36 | ⬜ | Lint e format frontend + `.nvmrc` | Qualità | 🟠 | M | – |

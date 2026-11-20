@@ -22,6 +22,29 @@ Sage brings proper PHP templating and modern JavaScript tooling to WordPress the
 
 [Read the docs to get started](https://roots.io/sage/docs/installation/)
 
+## Breadcrumb
+
+Componente pronto, non incluso in nessun template: aggiungerlo dove serve.
+
+```blade
+<x-breadcrumbs />
+<x-breadcrumbs :jsonld="false" class="mb-6" />
+<x-breadcrumbs :items="[['label' => 'Home', 'url' => home_url('/')], ['label' => 'Contatti', 'url' => null]]" />
+```
+
+- Voci calcolate da `App\Navigation\Breadcrumbs::items()` sulla query principale: pagine con genitori, articoli (pagina degli articoli → prima categoria con i genitori → titolo), CPT con archivio, tassonomie, archivi per data (anno su `news/archivio/YYYY/`), autore, ricerca, 404 e paginazione. In home page non stampa nulla.
+- Markup: `<nav aria-label="Percorso di navigazione">` con `<ol>`, separatori `aria-hidden` e `aria-current="page"` sull'ultima voce.
+- JSON-LD `BreadcrumbList` (prop `jsonld`, default `true`): disattivarlo se un plugin SEO lo genera già.
+
+Le voci (`label` in testo semplice, `url` o `null`; l'ultima è la pagina corrente) si modificano con il filtro `sage/breadcrumbs`:
+
+```php
+add_filter('sage/breadcrumbs', function (array $items): array {
+    // Es.: togliere la voce "Home".
+    return array_slice($items, 1);
+});
+```
+
 ## Sponsors
 
 Sage is an open source project and completely free to use. If you've benefited from our projects and would like to support our future endeavors, [please consider sponsoring us](https://github.com/sponsors/roots).

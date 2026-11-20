@@ -63,29 +63,9 @@ msgstr "Heroes"
 msgid "Separatori"
 msgstr "Dividers"
 
-#: app/breadcrumbs.php:29
+#: app/Navigation/Breadcrumbs.php:102
 msgid "Home"
 msgstr "Home"
-
-#: app/breadcrumbs.php:96
-msgid "Evento"
-msgstr "Event"
-
-#: app/breadcrumbs.php:117
-msgid "Team"
-msgstr "Team"
-
-#: app/breadcrumbs.php:138
-msgid "Progetti"
-msgstr "Projects"
-
-#: app/breadcrumbs.php:159
-msgid "News"
-msgstr "News"
-
-#: app/breadcrumbs.php:167
-msgid "Categoria"
-msgstr "Category"
 
 #: app/PostTypes/Faq.php:30
 #: app/PostTypes/Faq.php:33
@@ -212,6 +192,7 @@ msgstr "Latest Posts"
 msgid "Risultati della ricerca per %s"
 msgstr "Search Results for %s"
 
+#: app/Navigation/Breadcrumbs.php:128
 #: app/View/Composers/Post.php:50
 msgid "Pagina non trovata"
 msgstr "Not Found"
@@ -473,3 +454,22 @@ msgstr "Background color"
 #: resources/views/components/share.blade.php:95
 msgid "Condividi"
 msgstr "Share"
+
+#. translators: %s: search terms.
+#: app/Navigation/Breadcrumbs.php:124
+msgid "Risultati per “%s”"
+msgstr "Results for “%s”"
+
+#. translators: %d: page number.
+#: app/Navigation/Breadcrumbs.php:136
+msgid "Pagina %d"
+msgstr "Page %d"
+
+#: resources/views/components/breadcrumbs.blade.php:82
+msgid "Percorso di navigazione"
+msgstr "Breadcrumb"
+
+#: app/Navigation/Breadcrumbs.php:158
+#: app/Navigation/Breadcrumbs.php:171
+msgid "Autore"
+msgstr "Author"

@@ -54,7 +54,6 @@ collect(
         'setup',
         'filters',
         'blocks',
-        'breadcrumbs',
         'helpers',
         'svg',
         'rewrites',

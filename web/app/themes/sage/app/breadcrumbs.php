@@ -1,5 +1,7 @@
 <?php
 
+namespace App;
+
 function custom_breadcrumbs(): void
 {
     $item_classes = 'mt-px underline-offset-2 inline-flex items-center justify-center text-small text-black-950 font-body font-normal hover:!underline hover:text-primary-500 focus:text-primary-500 focus:!underline';

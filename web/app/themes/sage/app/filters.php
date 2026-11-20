@@ -10,7 +10,7 @@ namespace App;
  * Append "… Continua a leggere" to automatic excerpts (the_excerpt()).
  *
  * The post title is added for screen readers only, so every link has a
- * unique, descriptive name. The excerpt length is set in app/helpers.php.
+ * unique, descriptive name. The excerpt length is set by excerpt_length().
  *
  * @return string
  */
@@ -24,31 +24,142 @@ add_filter('excerpt_more', function () {
 });
 
 /**
- * Remove core's default link underline from global styles.
+ * Set the length of automatic excerpts (the_excerpt()) to 20 words.
  *
- * Core theme.json sets styles.elements.link.typography.textDecoration,
- * printed as `a:where(:not(.wp-element-button)){text-decoration:underline}`
- * outside any cascade layer, so it beats Tailwind utilities like
- * `no-underline`. The underline is restored in `@layer base` (app.css and
- * editor.css), where utilities can override it.
- *
- * update_with() merges and cannot remove keys, so a new object is returned.
- *
- * @param  \WP_Theme_JSON_Data  $theme_json
- * @return \WP_Theme_JSON_Data
+ * Priority 999 so it wins over plugins setting their own length.
+ * The "Continua a leggere" link is added by the excerpt_more filter above.
  */
-add_filter('wp_theme_json_data_default', function ($theme_json) {
-    $data = $theme_json->get_data();
+function excerpt_length($length)
+{
+    return 20;
+}
+add_filter('excerpt_length', __NAMESPACE__.'\\excerpt_length', 999);
 
-    if (! isset($data['styles']['elements']['link']['typography']['textDecoration'])) {
-        return $theme_json;
+/**
+ * Automatically set title and alt text of uploaded images from their file name.
+ *
+ * Works for every upload channel (media library, REST/Gutenberg, WP-CLI,
+ * media_sideload_image) because the name comes from the attached file.
+ * The title is replaced only when it is WordPress' file-name default, the
+ * alt only when empty. Caption and description are left untouched.
+ */
+function add_image_meta_data(int $attachment_id): void
+{
+    if (! wp_attachment_is_image($attachment_id)) {
+        return;
     }
 
-    unset($data['styles']['elements']['link']['typography']['textDecoration']);
+    $file = get_attached_file($attachment_id);
 
-    if (empty($data['styles']['elements']['link']['typography'])) {
-        unset($data['styles']['elements']['link']['typography']);
+    if (! $file) {
+        return;
     }
 
-    return new \WP_Theme_JSON_Data($data, 'default');
-});
+    $name = pathinfo($file, PATHINFO_FILENAME);
+    // Drop WordPress generated suffixes (-scaled, -150x150, -150x150-1).
+    $name = preg_replace('/(-scaled|-\d+x\d+)+(-\d+)?$/i', '', $name) ?? $name;
+    $name = str_replace(['-', '_'], ' ', $name);
+    $name = preg_replace('/\s+/', ' ', $name) ?? $name;
+    $name = sanitize_text_field(trim($name));
+
+    if ($name === '') {
+        return;
+    }
+
+    // Only replace the title WordPress derives from the file name. A title set
+    // explicitly (REST "title", --title, post_data, IPTC/EXIF) is kept as is.
+    // Inside the hook the original upload name is gone, so compare a
+    // normalized key of the title with the stored file name, which may be
+    // sanitized (accents, spaces, dots) and carry a "-N" uniqueness suffix.
+    $key = static function (string $value): string {
+        $value = mb_strtolower(remove_accents(wp_specialchars_decode($value, ENT_QUOTES)));
+
+        return trim(preg_replace('/[^\p{L}\p{N}]+/u', '-', $value) ?? '', '-');
+    };
+
+    $stored = pathinfo($file, PATHINFO_FILENAME);
+    $title_key = $key((string) get_post_field('post_title', $attachment_id, 'raw'));
+    $defaults = array_unique([
+        $key($stored),
+        $key(preg_replace('/-\d+$/', '', $stored) ?? $stored),
+        $key(preg_replace('/(-scaled|-\d+x\d+)+(-\d+)?$/i', '', $stored) ?? $stored),
+    ]);
+
+    if ($title_key === '' || in_array($title_key, $defaults, true)) {
+        wp_update_post([
+            'ID' => $attachment_id,
+            'post_title' => $name,
+        ]);
+    }
+
+    if (get_post_meta($attachment_id, '_wp_attachment_image_alt', true) === '') {
+        update_post_meta($attachment_id, '_wp_attachment_image_alt', $name);
+    }
+}
+add_action('add_attachment', __NAMESPACE__.'\\add_image_meta_data');
+
+/**
+ * Performance optimizations: disable the WordPress emoji assets.
+ *
+ * Removes the emoji detection script and inline styles from the frontend
+ * <head>, and the static emoji images from feeds and emails.
+ *
+ * The admin emoji assets are handled by disable_admin_emoji() and
+ * disable_tinymce_emoji(): the admin hooks are registered after
+ * "init", so they cannot be removed from here.
+ *
+ * wp-embed is intentionally NOT touched. Since WP 5.9 core enqueues it only
+ * when the rendered content contains a WordPress post embed
+ * (wp_maybe_enqueue_oembed_host_js() on "embed_oembed_html"), so there is
+ * nothing to save on pages without embeds. Deregistering it broke the
+ * auto-resize of post embeds and the TinyMCE preview in the admin, and
+ * unhooking wp_oembed_add_host_js would only add that breakage back.
+ */
+function disable_emoji(): void
+{
+    // Frontend emoji script and styles.
+    remove_action('wp_head', 'print_emoji_detection_script', 7);
+    remove_action('wp_print_styles', 'print_emoji_styles');
+
+    // Static emoji images in feeds and emails.
+    remove_filter('the_content_feed', 'wp_staticize_emoji');
+    remove_filter('comment_text_rss', 'wp_staticize_emoji');
+    remove_filter('wp_mail', 'wp_staticize_emoji_for_email');
+}
+add_action('init', __NAMESPACE__.'\\disable_emoji');
+
+/**
+ * Disable the WordPress emoji assets in the admin.
+ *
+ * Core registers the admin emoji hooks in wp-admin/includes/admin-filters.php
+ * (print_emoji_detection_script on "admin_print_scripts", print_emoji_styles
+ * on "admin_print_styles", both at the default priority 10). That file is
+ * loaded after "init", so the removal runs on "admin_init" instead.
+ *
+ * Removing print_emoji_styles is enough for the CSS as well:
+ * wp_enqueue_emoji_styles() (on "admin_enqueue_scripts") bails out when
+ * print_emoji_styles is no longer hooked to "admin_print_styles".
+ * The block editor already unhooks the detection script itself
+ * (wp-admin/edit-form-blocks.php).
+ */
+function disable_admin_emoji(): void
+{
+    remove_action('admin_print_scripts', 'print_emoji_detection_script');
+    remove_action('admin_print_styles', 'print_emoji_styles');
+}
+add_action('admin_init', __NAMESPACE__.'\\disable_admin_emoji');
+
+/**
+ * Remove the "wpemoji" TinyMCE plugin.
+ *
+ * Applies to the classic editor and to the Classic block of the block
+ * editor, which both pass their plugin list through "tiny_mce_plugins".
+ *
+ * @param  array<int, string>  $plugins  TinyMCE plugin names.
+ * @return array<int, string>
+ */
+function disable_tinymce_emoji(array $plugins): array
+{
+    return array_values(array_diff($plugins, ['wpemoji']));
+}
+add_filter('tiny_mce_plugins', __NAMESPACE__.'\\disable_tinymce_emoji');

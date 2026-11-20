@@ -32,13 +32,13 @@
 | M19 | ✅ | CPT `faq`: configurazione coerente | PHP | 🟠 | S | – |
 | M20 | ✅ | `wp-embed` deregistrato male | PHP | 🟠 | S | – |
 | M21 | ✅ | Filtro `allowed_block_types_all` | Blocchi | 🟠 | S | – |
-| M22 | ⬜ | `render_acf_block`: pulizia e tipizzazione | Blocchi | 🟢 | S | M01 |
+| M22 | ⬜ | `BlockRenderer::render` (ex `render_acf_block`): pulizia e tipizzazione | Blocchi | 🟢 | S | M01 |
 | M23 | ✅ | Query dei post: N+1, dimensione immagini, date | Performance | 🟠 | S | – |
 | M24 | ✅ | Componenti `x-alert`, `x-share`, `x-title`, placeholder ACF | Frontend | 🟠 | M | M05 |
 | M25 | ⬜ | Breadcrumb: Composer + componente + JSON-LD | SEO/A11y | 🟠 | M | M28 |
 | M26 | ✅ | i18n completo (sorgente italiana, en_US, `resources/lang`) | i18n | 🟠 | S | – |
 | M27 | ⬜ | Landmark del layout, skip link, custom logo | A11y | 🟢 | S | M04 |
-| M28 | ⬜ | Architettura: Service Provider e classi PSR-4 | Architettura | 🟠 | L | – |
+| M28 | ✅ | Architettura: Service Provider e classi PSR-4 | Architettura | 🟠 | L | – |
 | M29 | ⬜ | Registrazione dei blocchi via manifest, asset JS/CSS per blocco | Blocchi | 🟢 | M | M28, M22 |
 | M30 | ⬜ | Separare i field group ACF comuni da quelli specifici | Blocchi | 🟢 | M | M01 |
 | M31 | ⬜ | Struttura cartelle dei componenti e styleguide di sviluppo | Frontend | 🟢 | M | M24 |
@@ -292,9 +292,9 @@
 - **Problema:** `app/blocks.php:82-112` riparte da `[]`, scartando il valore in ingresso. I blocchi core sono permessi solo su `post` e widget, quindi il CPT `faq` resta senza paragrafo e senza `core/block`.
 - **Soluzione:** usare `apply_filters('sage/core_blocks_post_types', ['post','faq'])` e partire dal valore ricevuto.
 
-### M22 – `render_acf_block` 🟢 S
+### M22 – `BlockRenderer::render` (ex `render_acf_block`) 🟢 S
 *Fonte: PHP-17*
-- **Problema** in `app/blocks.php:20-45`:
+- **Problema** in `App\Blocks\BlockRenderer::render()` (`app/Blocks/BlockRenderer.php:19-39`, ex `render_acf_block` in `app/blocks.php`, spostato da M28):
   - Il ramo `slug === 'empty'` è morto.
   - `str_replace('acf/', '')` non è ancorato al prefisso.
   - Usa un path assoluto con `file_exists` invece del nome della view.
@@ -302,11 +302,11 @@
   - `"jsx": true` è dichiarato ma `$content`/InnerBlocks non viene mai stampato.
 - **Soluzione**
   ```php
-  function render_acf_block(array $block, string $content = '', bool $is_preview = false, int|string $post_id = 0): void {
+  public static function render(array $block, string $content = '', bool $is_preview = false, int|string $post_id = 0): void {
       $slug = \Illuminate\Support\Str::after($block['name'], 'acf/');
       $name = "blocks.{$slug}.{$slug}";
       if ($is_preview) { echo view('components.acf-block-placeholder', ['block' => $block, 'title' => get_field('title')]); return; }
-      if (view()->exists($name)) echo view($name, ['block' => $block, 'data' => get_block_data($block), 'content' => $content]);
+      if (view()->exists($name)) echo view($name, ['block' => $block, 'data' => self::data($block), 'content' => $content]);
   }
   ```
 
@@ -343,7 +343,7 @@
 
 ### M25 – Breadcrumb 🟠 M
 *Fonti: FE-13, PHP-22*
-- **Problema:** `app/breadcrumbs.php` non è mai chiamato.
+- **Problema:** `App\custom_breadcrumbs()` (`app/breadcrumbs.php`, ex funzione globale, messa nel namespace `App` da M28) non è mai chiamato.
   - Fa `echo` di HTML con classi Tailwind.
   - Mancano `<nav aria-label>`, `<ol>` e `aria-current`.
   - Ha rami per CPT di altri progetti (`event`, `team`, `project`).
@@ -456,7 +456,7 @@
   }
   ```
   - `phpstan.neon` a livello 5–6 su `config/` e `app/`.
-  - I primi test: `get_custom_padding`, `get_custom_margin` e `get_next_heading_level`.
+  - I primi test: `App\Blocks\BlockRenderer::padding()`/`::margin()` (ex `get_custom_padding`/`get_custom_margin`, oggi `private`: renderli `public` o testarli tramite `BlockRenderer::data()`) e `App\get_next_heading_level()`.
   - `declare(strict_types=1)` e tipi sulle funzioni.
 
 ### M36 – Lint del frontend 🟠 M
@@ -499,7 +499,7 @@
   - "Credenziali premium";
   - "Comandi qualità";
   - "Ambienti";
-  - "Convenzioni": blocchi ACF, `render_acf_block`, `get_block_data`, rinomina del tema;
+  - "Convenzioni": blocchi ACF, `App\Blocks\BlockRenderer::render()`/`::data()`, helper in `App\` (`\App\nome()` in Blade), CPT in `app/PostTypes/` registrati da `ThemeServiceProvider`, query in `app/Queries/`, rinomina del tema;
   - "Nuovo blocco: checklist".
 
 ---

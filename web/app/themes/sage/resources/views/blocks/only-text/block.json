@@ -14,6 +14,6 @@
     },
     "acf": {
         "blockVersion": 3,
-        "renderCallback": "App\\render_acf_block"
+        "renderCallback": "App\\Blocks\\BlockRenderer::render"
     }
 }

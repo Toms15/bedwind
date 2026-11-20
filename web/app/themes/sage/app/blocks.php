@@ -4,6 +4,8 @@ namespace App;
 
 /**
  * Registra tutti i blocchi che hanno un block.json.
+ *
+ * Il render dei blocchi ACF è App\Blocks\BlockRenderer::render (block.json).
  */
 add_action('init', function () {
     foreach (glob(get_theme_file_path('/resources/views/blocks/*'), GLOB_ONLYDIR) as $dir) {
@@ -12,32 +14,6 @@ add_action('init', function () {
         }
     }
 });
-
-/**
- * Render callback condiviso da tutti i blocchi ACF.
- * In editor: nessuna preview, placeholder "Modifica blocco" per ogni blocco.
- */
-function render_acf_block($block, $content = '', $is_preview = false, $post_id = 0, $wp_block = null, $context = [])
-{
-    $slug = str_replace('acf/', '', $block['name']);
-    $block['slug'] = $slug;
-
-    if ($is_preview) {
-        echo view('components.acf.placeholder', [
-            'block' => $block,
-            'title' => $slug === 'empty' ? null : get_field('title'),
-            'variant' => $slug === 'empty' ? 'empty' : 'default',
-        ]);
-
-        return;
-    }
-
-    $view = get_theme_file_path("/resources/views/blocks/{$slug}/{$slug}.blade.php");
-
-    if (file_exists($view)) {
-        echo view($view, ['block' => $block]);
-    }
-}
 
 /**
  * Aggiungi categorie blocchi personalizzate

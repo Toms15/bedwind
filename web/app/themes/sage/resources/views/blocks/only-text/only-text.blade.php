@@ -5,7 +5,7 @@
    * Prepares the Only text block data; the markup is in modules/only-text.
    */
 
-  $data = get_block_data($block);
+  $data = \App\Blocks\BlockRenderer::data($block);
   $settings = $data['settings'];
   $contents = $data['contents'];
   $spacings = $data['spacings'];

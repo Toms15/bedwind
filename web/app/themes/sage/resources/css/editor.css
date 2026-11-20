@@ -4,7 +4,7 @@
 @source "../views/";
 @source "../../app/";
 
-/* Stessa sottolineatura di app.css: la regola di core è rimossa da app/filters.php */
+/* Stessa sottolineatura di app.css (WP 7.1 non stampa più la regola di core sui link) */
 @layer base {
   a {
     text-decoration-line: underline;

@@ -72,7 +72,7 @@
     ? wp_get_attachment_image($id, $size, false, $attrs)
     : '';
 
-  $fallbackUrl = ! $html && $fallback ? get_fallback_image_url() : '';
+  $fallbackUrl = ! $html && $fallback ? \App\get_fallback_image_url() : '';
 @endphp
 
 @if ($html)

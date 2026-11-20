@@ -39,109 +39,109 @@ msgstr "Roots"
 msgid "https://roots.io/"
 msgstr "https://roots.io/"
 
-#: app/blocks.php:49
+#: app/blocks.php:25
 msgid "Caroselli"
 msgstr "Carousels"
 
-#: app/blocks.php:53
+#: app/blocks.php:29
 msgid "Contenuti dinamici"
 msgstr "Dynamic content"
 
-#: app/blocks.php:57
+#: app/blocks.php:33
 msgid "Contenuti statici"
 msgstr "Static content"
 
-#: app/blocks.php:61
+#: app/blocks.php:37
 msgid "Generici"
 msgstr "General"
 
-#: app/blocks.php:65
+#: app/blocks.php:41
 msgid "Hero"
 msgstr "Heroes"
 
-#: app/blocks.php:69
+#: app/blocks.php:45
 msgid "Separatori"
 msgstr "Dividers"
 
-#: app/breadcrumbs.php:27
+#: app/breadcrumbs.php:29
 msgid "Home"
 msgstr "Home"
 
-#: app/breadcrumbs.php:94
+#: app/breadcrumbs.php:96
 msgid "Evento"
 msgstr "Event"
 
-#: app/breadcrumbs.php:115
+#: app/breadcrumbs.php:117
 msgid "Team"
 msgstr "Team"
 
-#: app/breadcrumbs.php:136
+#: app/breadcrumbs.php:138
 msgid "Progetti"
 msgstr "Projects"
 
-#: app/breadcrumbs.php:157
+#: app/breadcrumbs.php:159
 msgid "News"
 msgstr "News"
 
-#: app/breadcrumbs.php:165
+#: app/breadcrumbs.php:167
 msgid "Categoria"
 msgstr "Category"
 
-#: app/CustomPostTypes/faqs.php:16
-#: app/CustomPostTypes/faqs.php:19
+#: app/PostTypes/Faq.php:30
+#: app/PostTypes/Faq.php:33
 msgctxt "post type general name"
 msgid "FAQ"
 msgstr "FAQs"
 
-#: app/CustomPostTypes/faqs.php:20
+#: app/PostTypes/Faq.php:34
 msgctxt "post type singular name"
 msgid "FAQ"
 msgstr "FAQ"
 
-#: app/CustomPostTypes/faqs.php:21
+#: app/PostTypes/Faq.php:35
 msgctxt "admin menu"
 msgid "FAQ"
 msgstr "FAQs"
 
-#: app/CustomPostTypes/faqs.php:22
+#: app/PostTypes/Faq.php:36
 msgctxt "add new on admin bar"
 msgid "FAQ"
 msgstr "FAQ"
 
-#: app/CustomPostTypes/faqs.php:23
+#: app/PostTypes/Faq.php:37
 msgctxt "faq"
 msgid "Aggiungi FAQ"
 msgstr "Add New FAQ"
 
-#: app/CustomPostTypes/faqs.php:24
+#: app/PostTypes/Faq.php:38
 msgid "Aggiungi nuova FAQ"
 msgstr "Add New FAQ"
 
-#: app/CustomPostTypes/faqs.php:25
+#: app/PostTypes/Faq.php:39
 msgid "Nuova FAQ"
 msgstr "New FAQ"
 
-#: app/CustomPostTypes/faqs.php:26
+#: app/PostTypes/Faq.php:40
 msgid "Modifica FAQ"
 msgstr "Edit FAQ"
 
-#: app/CustomPostTypes/faqs.php:27
+#: app/PostTypes/Faq.php:41
 msgid "Visualizza FAQ"
 msgstr "View FAQ"
 
-#: app/CustomPostTypes/faqs.php:28
+#: app/PostTypes/Faq.php:42
 msgid "Tutte le FAQ"
 msgstr "All FAQs"
 
-#: app/CustomPostTypes/faqs.php:29
+#: app/PostTypes/Faq.php:43
 msgid "Cerca FAQ"
 msgstr "Search FAQs"
 
-#: app/CustomPostTypes/faqs.php:30
+#: app/PostTypes/Faq.php:44
 msgid "Nessuna FAQ trovata."
 msgstr "No FAQs found."
 
-#: app/CustomPostTypes/faqs.php:31
+#: app/PostTypes/Faq.php:45
 msgid "Nessuna FAQ trovata nel cestino."
 msgstr "No FAQs found in Trash."
 
@@ -154,15 +154,15 @@ msgstr "Continue reading"
 msgid "Archivio %s"
 msgstr "Archive %s"
 
-#: app/setup.php:91
+#: app/setup.php:129
 msgid "Navigazione principale"
 msgstr "Primary Navigation"
 
-#: app/setup.php:159
+#: app/setup.php:197
 msgid "Principale"
 msgstr "Primary"
 
-#: app/setup.php:164
+#: app/setup.php:202
 msgid "Piè di pagina"
 msgstr "Footer"
 

@@ -42,7 +42,45 @@ Node 22 (`.nvmrc` in questa cartella, dove si eseguono gli script npm: `nvm use`
 - Lo stesso vale per gli array multilinea di `@class(...)`: blade-formatter li reindenta con il proprio stile. Si racchiude il solo `@class` tra i due commenti, dentro il tag (vedi `components/share.blade.php` e `modules/only-text.blade.php`), con l'array a 2 spazi.
 - Lo stile del PHP inline nelle Blade (`!$x`) differisce da quello di Pint in `app/` (`! $x`): blade-formatter non è configurabile su questo.
 - `overrides` in `package.json` (`blade-formatter` → `glob ^14.0.6`, `editorconfig ^4.0.1`): portano `npm audit` a 0 vulnerabilità (ReDoS di `minimatch` e `glob` nelle dipendenze di blade-formatter/js-beautify). Rimuoverli quando blade-formatter aggiornerà le proprie dipendenze; `editorconfig` 4 richiede Node >= 22.
-- Esclusi dalla formattazione: `acf-json/` (lo riscrive ACF), `resources/lang/`, lock file, `composer.json`, `pint.json`, `public/`, `vendor/`. Il PHP di `app/` resta a Pint (`vendor/bin/pint`).
+- Esclusi dalla formattazione: `acf-json/` (lo riscrive ACF), `resources/lang/`, lock file, `composer.json`, `pint.json`, `public/`, `vendor/`. Il PHP di `app/` resta a Pint (`composer lint`, vedi sotto).
+
+## Qualità PHP
+
+Gli strumenti PHP sono dipendenze dev di questo `composer.json` (l'autoload `App\` è qui). Gli script si lanciano dalla cartella del tema o dalla root del progetto, che li delega con `composer --working-dir=web/app/themes/sage`.
+
+| Script              | Cosa fa                                                                                                                        |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `composer lint`     | `pint --test`, preset `laravel` (`pint.json`). Dalla root controlla anche la root (preset `per`)                               |
+| `composer lint:fix` | Pint in scrittura                                                                                                              |
+| `composer analyse`  | PHPStan 2, livello 6, su `app/` e `functions.php` (`phpstan.neon.dist`)                                                        |
+| `composer test`     | Pest 3 + Brain Monkey: test unitari in `tests/Unit`, senza WordPress né database                                               |
+| `composer check`    | `validate --strict`, `audit`, `lint`, `analyse`, `test` in sequenza (da usare in CI). Dalla root: anche i controlli della root |
+
+PHPStan:
+
+- `szepeviktor/phpstan-wordpress` (stub di WordPress e tipi di `apply_filters()` & co.) e `php-stubs/acf-pro-stubs` (`get_field()`, ...). Niente Larastan: Acorn non è un'applicazione Laravel completa e il tema non usa Eloquent; le facade di Illuminate sono già tipizzate.
+- `stubs/acorn.php` dichiara gli helper Laravel che Acorn carica all'avvio e che PHPStan non vede (`public_path()`).
+- Per un livello più alto: `vendor/bin/phpstan analyse --level=7`. Niente baseline: gli errori si correggono, e le rare eccezioni hanno un `@phpstan-ignore <identificatore>` con il motivo accanto.
+- I file di `app/` dichiarano `declare(strict_types=1)`: vale solo per le chiamate fatte da quei file, non per le callback chiamate da WordPress.
+
+Scrivere un test:
+
+- Un file `tests/Unit/*Test.php`; `tests/Pest.php` usa `Tests\TestCase` (`Monkey\setUp()`/`Monkey\tearDown()`) e carica `app/helpers.php`. Le classi di `app/` arrivano dall'autoload.
+- Le funzioni di WordPress e ACF si simulano con Brain Monkey: `Functions\when('get_field')->justReturn('...')`, `->alias(fn ...)`, oppure `Functions\expect('get_field')->once()->with('excerpt', 42)->andReturn('...')` per verificare la chiamata.
+- Si testa il comportamento pubblico: per i preset di spaziatura dei blocchi si passa da `BlockRenderer::data()` (vedi `tests/Unit/BlockRendererTest.php`), senza rendere pubblici i metodi privati.
+
+```php
+use App\Blocks\BlockRenderer;
+use Brain\Monkey\Functions;
+
+it('maps the padding preset to Tailwind classes', function () {
+    $fields = ['padding' => 'pt', 'padding_dimension' => 'm', 'margin' => 'no'];
+    Functions\when('get_field')->alias(fn (string $name) => $fields[$name] ?? null);
+    Functions\when('sanitize_hex_color')->justReturn(null);
+
+    expect(BlockRenderer::data([])['spacings']['padding'])->toBe('pt-5 lg:pt-8 xl:pt-10');
+});
+```
 
 ## Breadcrumb
 

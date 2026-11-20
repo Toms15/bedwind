@@ -212,6 +212,23 @@ npm run format
 
 See the theme README for the single `lint:*` / `format:*` scripts and the formatter settings.
 
+### PHP quality (from the project root)
+
+```bash
+# Pint: root (preset per) + theme (preset laravel, own pint.json)
+composer lint
+composer lint:fix
+
+# PHPStan level 6 and Pest tests of the theme
+composer analyse
+composer test
+
+# Everything (CI): validate --strict, audit, lint, analyse, test
+composer check
+```
+
+See "Qualità PHP" in the theme README for the PHPStan setup and how to write a test.
+
 ## Database
 
 Make sure to create the database specified in `DB_NAME` in the `.env` file before accessing the site.

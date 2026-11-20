@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\View\Composers;
 
 use Roots\Acorn\View\Composer;
@@ -9,7 +11,7 @@ class Post extends Composer
     /**
      * List of views served by this composer.
      *
-     * @var array
+     * @var array<string>
      */
     protected static $views = [
         'partials.page-header',

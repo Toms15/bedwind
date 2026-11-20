@@ -5,6 +5,10 @@
 @source '../views/';
 @source '../../app/';
 
+/* Solo strumenti di sviluppo PHP (test, stub PHPStan): fuori dal rilevamento automatico */
+@source not '../../tests/';
+@source not '../../stubs/';
+
 /* Stessa sottolineatura di app.css (WP 7.1 non stampa più la regola di core sui link) */
 @layer base {
   a {

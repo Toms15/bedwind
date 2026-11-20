@@ -38,13 +38,23 @@
       "App\\": "app/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
   "require": {
     "php": ">=8.2",
     "enshrined/svg-sanitize": "^1.1",
     "roots/acorn": "^5.0"
   },
   "require-dev": {
-    "laravel/pint": "^1.20"
+    "brain/monkey": "^2.7",
+    "laravel/pint": "^1.20",
+    "pestphp/pest": "^3.8",
+    "php-stubs/acf-pro-stubs": "^6.8",
+    "phpstan/phpstan": "^2.1",
+    "szepeviktor/phpstan-wordpress": "^2.0"
   },
   "suggest": {
     "log1x/sage-directives": "A collection of useful Blade directives for WordPress and Sage (^1.0)."
@@ -52,13 +62,34 @@
   "config": {
     "optimize-autoloader": true,
     "preferred-install": "dist",
-    "sort-packages": true
+    "sort-packages": true,
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
   },
   "minimum-stability": "dev",
   "prefer-stable": true,
   "scripts": {
     "post-autoload-dump": [
       "Roots\\Acorn\\ComposerScripts::postAutoloadDump"
+    ],
+    "lint": "pint --test",
+    "lint:fix": "pint",
+    "analyse": "phpstan analyse --memory-limit=1G",
+    "test": "pest",
+    "check": [
+      "@composer validate --strict",
+      "@composer audit",
+      "@lint",
+      "@analyse",
+      "@test"
     ]
+  },
+  "scripts-descriptions": {
+    "lint": "Controlla lo stile PHP con Pint (preset laravel), senza modificare i file.",
+    "lint:fix": "Corregge lo stile PHP con Pint.",
+    "analyse": "Analisi statica con PHPStan (phpstan.neon.dist).",
+    "test": "Test unitari con Pest e Brain Monkey (senza WordPress né database).",
+    "check": "validate --strict, audit, lint, analyse e test: tutti i controlli PHP del tema."
   }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Blocks;
 
 /**
@@ -15,6 +17,16 @@ class BlockRenderer
      * Render callback shared by every ACF block.
      *
      * In the editor: no preview, a "Modifica blocco" placeholder for every block.
+     *
+     * The parameters are typed in the PHPDoc only: ACF passes them as they come
+     * from the block (e.g. $post_id can be an int or a string like "options").
+     *
+     * @param  array<string, mixed>  $block  The ACF block data (name, id, anchor, ...).
+     * @param  string  $content  The inner blocks HTML.
+     * @param  bool  $is_preview  Whether the block is rendered in the editor.
+     * @param  int|string  $post_id  The post being edited or viewed.
+     * @param  \WP_Block|null  $wp_block  The block instance.
+     * @param  array<string, mixed>  $context  The block context.
      */
     public static function render($block, $content = '', $is_preview = false, $post_id = 0, $wp_block = null, $context = []): void
     {
@@ -26,7 +38,7 @@ class BlockRenderer
                 'block' => $block,
                 'title' => $slug === 'empty' ? null : get_field('title'),
                 'variant' => $slug === 'empty' ? 'empty' : 'default',
-            ]);
+            ])->render();
 
             return;
         }
@@ -34,7 +46,7 @@ class BlockRenderer
         $view = get_theme_file_path("/resources/views/blocks/{$slug}/{$slug}.blade.php");
 
         if (file_exists($view)) {
-            echo view($view, ['block' => $block]);
+            echo view($view, ['block' => $block])->render();
         }
     }
 
@@ -55,7 +67,7 @@ class BlockRenderer
      * - contents.next_heading is the tag for the block's child headings
      *   (subtitles, card titles, ...), from \App\get_next_heading_level(title_tag).
      *
-     * @param  array  $block  The ACF block data.
+     * @param  array<string, mixed>  $block  The ACF block data.
      * @return array{
      *     settings: array{
      *         id: string,

@@ -5,6 +5,10 @@
 @source '../views/';
 @source '../../app/';
 
+/* Solo strumenti di sviluppo PHP (test, stub PHPStan): fuori dal rilevamento automatico */
+@source not '../../tests/';
+@source not '../../stubs/';
+
 /**
  * Focus visibile (WCAG 2.4.7): niente reset globale di outline/underline
  */

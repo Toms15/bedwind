@@ -45,7 +45,7 @@
 | M32 | ✅ | `base` di Vite indipendente dal nome del tema | DX | 🟠 | S | – |
 | M33 | ✅ | Strategia per font e immagini responsive | Performance | 🟠 | M | M05 |
 | M34 | ⬜ | `editor.js`: meno fragile, meno costoso | Editor | 🟢 | S | – |
-| M35 | ⬜ | PHPStan/Larastan + Pest + script Composer | Qualità | 🟠 | M | – |
+| M35 | ✅ | PHPStan/Larastan + Pest + script Composer | Qualità | 🟠 | M | – |
 | M36 | ✅ | Lint e format frontend + `.nvmrc` | Qualità | 🟠 | M | – |
 | M37 | ⬜ | CI su GitHub Actions + Dependabot | DX | 🟠 | M | M10, M35, M36 |
 | M38 | ⬜ | Ambiente locale riproducibile, deploy, `solo.yml` | DX | 🟠 | M | – |

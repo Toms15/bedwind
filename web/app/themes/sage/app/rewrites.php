@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Yearly post archives exposed as /{base}/YYYY/ (default base: news/archivio).
  *

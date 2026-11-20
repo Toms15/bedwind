@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App;
 
 /**
@@ -68,6 +70,9 @@ add_filter('block_categories_all', function ($categories) {
  *
  * The incoming value is respected: `false` stays `false`, and an array coming
  * from earlier filters is only narrowed, never widened.
+ *
+ * @param  bool|array<mixed>  $allowed_blocks  true (all), false (none) or the allowed block names.
+ * @return bool|list<string> false, or the allowed block names.
  */
 function allowed_block_types(bool|array $allowed_blocks, \WP_Block_Editor_Context $editor_context): bool|array
 {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Queries;
 
 use WP_Query;
@@ -12,6 +14,8 @@ use WP_Query;
  * Composer that feeds a listing). They are not View Composers themselves
  * because the data depends on arguments (page, category, count) chosen by
  * the caller, not on the view being rendered.
+ *
+ * @phpstan-type PostData array{title: string, link: string|false, image: string, image_id: int|null, date: string|int|false, categories: \WP_Term[]}
  */
 class Posts
 {
@@ -24,7 +28,7 @@ class Posts
      * responsive markup. 'date' follows the site's date_format option.
      *
      * @param  int|null  $post_id  Post ID, current post when null.
-     * @return array{title: string, link: string|false, image: string, image_id: int|null, date: string|int|false, categories: \WP_Term[]}|null
+     * @return PostData|null
      */
     public static function data(?int $post_id = null): ?array
     {
@@ -53,7 +57,7 @@ class Posts
      *
      * @param  int|string  $page  Page number (e.g. get_query_var("paged")), at least 1.
      * @param  int|null  $category_id  Category term ID, all categories when null.
-     * @return array{posts: array[], total_pages: int, current_page: int, total_posts: int}
+     * @return array{posts: list<PostData>, total_pages: int, current_page: int, total_posts: int}
      */
     public static function paginated(int|string $page = 1, ?int $category_id = null): array
     {
@@ -87,7 +91,7 @@ class Posts
      * Get the latest published posts, sticky posts not moved to the top.
      *
      * @param  int  $posts  Number of posts.
-     * @return array[] Post data as returned by self::data().
+     * @return list<PostData> Post data as returned by self::data().
      */
     public static function latest(int $posts = 3): array
     {
@@ -107,7 +111,7 @@ class Posts
      *
      * The thumbnails are primed in one query to avoid N+1 lookups.
      *
-     * @return array[] Post data as returned by self::data().
+     * @return list<PostData> Post data as returned by self::data().
      */
     private static function collect(WP_Query $query): array
     {

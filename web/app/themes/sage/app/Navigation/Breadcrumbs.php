@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Navigation;
 
 use WP_Post_Type;
@@ -43,6 +45,9 @@ class Breadcrumbs
          */
         $items = apply_filters('sage/breadcrumbs', static::normalize($items));
 
+        // The PHPDoc above describes the expected value, but a third-party
+        // callback can return anything: keep the runtime check.
+        // @phpstan-ignore function.alreadyNarrowedType
         return static::normalize(is_array($items) ? $items : []);
     }
 

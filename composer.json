@@ -76,7 +76,28 @@
     }
   },
   "scripts": {
-    "lint": "pint --test",
-    "lint:fix": "pint"
+    "lint": [
+      "pint --test",
+      "@composer --working-dir=web/app/themes/sage lint"
+    ],
+    "lint:fix": [
+      "pint",
+      "@composer --working-dir=web/app/themes/sage lint:fix"
+    ],
+    "analyse": "@composer --working-dir=web/app/themes/sage analyse",
+    "test": "@composer --working-dir=web/app/themes/sage test",
+    "check": [
+      "@composer validate --strict",
+      "@composer audit",
+      "pint --test",
+      "@composer --working-dir=web/app/themes/sage check"
+    ]
+  },
+  "scripts-descriptions": {
+    "lint": "Controlla lo stile PHP della root (Pint, preset per) e del tema (Pint, preset laravel).",
+    "lint:fix": "Corregge lo stile PHP della root e del tema.",
+    "analyse": "Analisi statica del tema con PHPStan.",
+    "test": "Test unitari del tema con Pest.",
+    "check": "Tutti i controlli PHP: validate --strict, audit e Pint della root, poi composer check del tema."
   }
 }

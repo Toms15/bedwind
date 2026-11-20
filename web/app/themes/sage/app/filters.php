@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Theme filters.
  */
@@ -28,8 +30,10 @@ add_filter('excerpt_more', function () {
  *
  * Priority 999 so it wins over plugins setting their own length.
  * The "Continua a leggere" link is added by the excerpt_more filter above.
+ *
+ * @param  mixed  $length  The length set so far (ignored).
  */
-function excerpt_length($length)
+function excerpt_length(mixed $length): int
 {
     return 20;
 }

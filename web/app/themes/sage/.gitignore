@@ -5,3 +5,4 @@
 .env
 npm-debug.log
 /resources/lang/acf-json.php
+/.phpunit.cache

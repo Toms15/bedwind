@@ -9,6 +9,6 @@
     class="components-button is-primary"
     data-acf-expanded-editor
   >
-    Edit Block
+    {{ __('Modifica blocco', 'sage') }}
   </button>
 </div>

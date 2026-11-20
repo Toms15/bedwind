@@ -183,7 +183,7 @@ function wordpack_excerpt(int $num, int|\WP_Post|null $post = null): string
  * Set the length of automatic excerpts (the_excerpt()) to 20 words.
  *
  * Priority 999 so it wins over plugins setting their own length.
- * The "Continue reading" link is added by the excerpt_more filter in
+ * The "Continua a leggere" link is added by the excerpt_more filter in
  * app/filters.php.
  */
 function wordpack_excerpt_length($length)
@@ -191,14 +191,6 @@ function wordpack_excerpt_length($length)
     return 20;
 }
 add_filter('excerpt_length', 'wordpack_excerpt_length', 999);
-
-/**
- * Make theme available for translation
- * Translations can be placed in the /resources/lang directory
- */
-add_action('after_setup_theme', function () {
-    load_theme_textdomain('sage', get_template_directory().'/resources/lang');
-});
 
 /**
  * Performance optimizations: disable the WordPress emoji assets.

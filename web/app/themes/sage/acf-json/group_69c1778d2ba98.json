@@ -108,7 +108,7 @@
         },
         {
             "key": "field_69c17815e7bfe",
-            "label": "Colore background",
+            "label": "Colore di sfondo",
             "name": "background_color",
             "aria-label": "",
             "type": "color_picker",
@@ -287,5 +287,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1795078229
+    "modified": 1795172327
 }

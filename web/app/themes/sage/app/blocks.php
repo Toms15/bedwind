@@ -15,7 +15,7 @@ add_action('init', function () {
 
 /**
  * Render callback condiviso da tutti i blocchi ACF.
- * In editor: nessuna preview, placeholder "Edit Block" per ogni blocco.
+ * In editor: nessuna preview, placeholder "Modifica blocco" per ogni blocco.
  */
 function render_acf_block($block, $content = '', $is_preview = false, $post_id = 0, $wp_block = null, $context = [])
 {
@@ -34,6 +34,7 @@ function render_acf_block($block, $content = '', $is_preview = false, $post_id =
                 'title' => $title ?? null,
             ]);
         }
+
         return;
     }
 
@@ -51,27 +52,27 @@ add_filter('block_categories_all', function ($categories) {
     $new_categories = [
         [
             'slug' => 'carousels',
-            'title' => 'Carousel'
+            'title' => __('Caroselli', 'sage'),
         ],
         [
             'slug' => 'dynamic-content',
-            'title' => 'Contenuti dinamici'
+            'title' => __('Contenuti dinamici', 'sage'),
         ],
         [
             'slug' => 'static-content',
-            'title' => 'Contenuti statici'
+            'title' => __('Contenuti statici', 'sage'),
         ],
         [
             'slug' => 'commons',
-            'title' => 'Generici'
+            'title' => __('Generici', 'sage'),
         ],
         [
             'slug' => 'heroes',
-            'title' => 'Heroes'
+            'title' => __('Hero', 'sage'),
         ],
         [
             'slug' => 'dividers',
-            'title' => 'Separatori'
+            'title' => __('Separatori', 'sage'),
         ],
     ];
 

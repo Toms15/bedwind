@@ -1,0 +1,472 @@
+# Copyright (C) 2026 Roots
+# This file is distributed under the MIT License.
+msgid ""
+msgstr ""
+"Project-Id-Version: Sage Starter Theme 11.0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-11-20T10:58:48+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.11.0\n"
+"X-Domain: sage\n"
+
+#. Theme Name of the theme
+#: style.css
+msgid "Sage Starter Theme"
+msgstr ""
+
+#. Theme URI of the theme
+#: style.css
+msgid "https://roots.io/sage/"
+msgstr ""
+
+#. Description of the theme
+#: style.css
+msgid "Tema starter WordPress basato su Sage di Roots."
+msgstr ""
+
+#. Author of the theme
+#: style.css
+msgid "Roots"
+msgstr ""
+
+#. Author URI of the theme
+#: style.css
+msgid "https://roots.io/"
+msgstr ""
+
+#: app/blocks.php:55
+msgid "Caroselli"
+msgstr ""
+
+#: app/blocks.php:59
+msgid "Contenuti dinamici"
+msgstr ""
+
+#: app/blocks.php:63
+msgid "Contenuti statici"
+msgstr ""
+
+#: app/blocks.php:67
+msgid "Generici"
+msgstr ""
+
+#: app/blocks.php:71
+msgid "Hero"
+msgstr ""
+
+#: app/blocks.php:75
+msgid "Separatori"
+msgstr ""
+
+#: app/breadcrumbs.php:27
+msgid "Home"
+msgstr ""
+
+#: app/breadcrumbs.php:94
+msgid "Evento"
+msgstr ""
+
+#: app/breadcrumbs.php:115
+msgid "Team"
+msgstr ""
+
+#: app/breadcrumbs.php:136
+msgid "Progetti"
+msgstr ""
+
+#: app/breadcrumbs.php:157
+msgid "News"
+msgstr ""
+
+#: app/breadcrumbs.php:165
+msgid "Categoria"
+msgstr ""
+
+#: app/CustomPostTypes/faqs.php:16
+#: app/CustomPostTypes/faqs.php:19
+msgctxt "post type general name"
+msgid "FAQ"
+msgstr ""
+
+#: app/CustomPostTypes/faqs.php:20
+msgctxt "post type singular name"
+msgid "FAQ"
+msgstr ""
+
+#: app/CustomPostTypes/faqs.php:21
+msgctxt "admin menu"
+msgid "FAQ"
+msgstr ""
+
+#: app/CustomPostTypes/faqs.php:22
+msgctxt "add new on admin bar"
+msgid "FAQ"
+msgstr ""
+
+#: app/CustomPostTypes/faqs.php:23
+msgctxt "faq"
+msgid "Aggiungi FAQ"
+msgstr ""
+
+#: app/CustomPostTypes/faqs.php:24
+msgid "Aggiungi nuova FAQ"
+msgstr ""
+
+#: app/CustomPostTypes/faqs.php:25
+msgid "Nuova FAQ"
+msgstr ""
+
+#: app/CustomPostTypes/faqs.php:26
+msgid "Modifica FAQ"
+msgstr ""
+
+#: app/CustomPostTypes/faqs.php:27
+msgid "Visualizza FAQ"
+msgstr ""
+
+#: app/CustomPostTypes/faqs.php:28
+msgid "Tutte le FAQ"
+msgstr ""
+
+#: app/CustomPostTypes/faqs.php:29
+msgid "Cerca FAQ"
+msgstr ""
+
+#: app/CustomPostTypes/faqs.php:30
+msgid "Nessuna FAQ trovata."
+msgstr ""
+
+#: app/CustomPostTypes/faqs.php:31
+msgid "Nessuna FAQ trovata nel cestino."
+msgstr ""
+
+#: app/filters.php:21
+msgid "Continua a leggere"
+msgstr ""
+
+#. translators: %s: year, e.g. 2026.
+#: app/rewrites.php:96
+msgid "Archivio %s"
+msgstr ""
+
+#: app/setup.php:91
+msgid "Navigazione principale"
+msgstr ""
+
+#: app/setup.php:159
+msgid "Principale"
+msgstr ""
+
+#: app/setup.php:164
+msgid "Piè di pagina"
+msgstr ""
+
+#: app/svg.php:99
+msgid "I file SVG compressi (.svgz) non sono consentiti."
+msgstr ""
+
+#: app/svg.php:111
+msgid "Il contenuto SVG è consentito solo nei file con estensione .svg."
+msgstr ""
+
+#: app/svg.php:117
+msgid "Non hai i permessi per caricare file SVG."
+msgstr ""
+
+#: app/svg.php:129
+msgid "Non è stato possibile ripulire questo file SVG, che è stato quindi rifiutato."
+msgstr ""
+
+#: app/svg.php:186
+msgid "I file SVG devono essere caricati dalla libreria media."
+msgstr ""
+
+#. translators: 1: number of comments ("Una" when 1), 2: post title.
+#: app/View/Composers/Comments.php:25
+msgctxt "comments title"
+msgid "%1$s risposta a &ldquo;%2$s&rdquo;"
+msgid_plural "%1$s risposte a &ldquo;%2$s&rdquo;"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/View/Composers/Comments.php:26
+msgctxt "comments title"
+msgid "Una"
+msgstr ""
+
+#: app/View/Composers/Comments.php:57
+msgid "&larr; Commenti meno recenti"
+msgstr ""
+
+#: app/View/Composers/Comments.php:71
+msgid "Commenti più recenti &rarr;"
+msgstr ""
+
+#: app/View/Composers/Post.php:34
+msgid "Ultimi articoli"
+msgstr ""
+
+#. translators: %s: search query.
+#: app/View/Composers/Post.php:44
+msgid "Risultati della ricerca per %s"
+msgstr ""
+
+#: app/View/Composers/Post.php:50
+msgid "Pagina non trovata"
+msgstr ""
+
+#: app/View/Composers/Post.php:63
+msgid "Pagine:"
+msgstr ""
+
+#. translators: ACF "Blocco" (field group title, group_69c1778d2ba98.json)
+#: resources/lang/acf-json.php:13
+msgid "Blocco"
+msgstr ""
+
+#. translators: ACF "Blocco", padding (label)
+#: resources/lang/acf-json.php:15
+msgid "Padding"
+msgstr ""
+
+#. translators: ACF "Blocco", padding (choice "no"); ACF "Blocco", margin (choice "no")
+#: resources/lang/acf-json.php:17
+msgid "Nessuno"
+msgstr ""
+
+#. translators: ACF "Blocco", padding (choice "py"); ACF "Blocco", margin (choice "my")
+#: resources/lang/acf-json.php:19
+msgid "Sopra / Sotto"
+msgstr ""
+
+#. translators: ACF "Blocco", padding (choice "pt"); ACF "Blocco", margin (choice "mt")
+#: resources/lang/acf-json.php:21
+msgid "Solo sopra"
+msgstr ""
+
+#. translators: ACF "Blocco", padding (choice "pb"); ACF "Blocco", margin (choice "mb")
+#: resources/lang/acf-json.php:23
+msgid "Solo sotto"
+msgstr ""
+
+#. translators: ACF "Blocco", padding_dimension (label)
+#: resources/lang/acf-json.php:25
+msgid "Dimensione padding"
+msgstr ""
+
+#. translators: ACF "Blocco", padding_dimension (choice "xl"); ACF "Blocco", margin_dimension (choice "xl")
+#: resources/lang/acf-json.php:27
+msgid "XL"
+msgstr ""
+
+#. translators: ACF "Blocco", padding_dimension (choice "l"); ACF "Blocco", margin_dimension (choice "l")
+#: resources/lang/acf-json.php:29
+msgid "L"
+msgstr ""
+
+#. translators: ACF "Blocco", padding_dimension (choice "m"); ACF "Blocco", margin_dimension (choice "m")
+#: resources/lang/acf-json.php:31
+msgid "M"
+msgstr ""
+
+#. translators: ACF "Blocco", padding_dimension (choice "s"); ACF "Blocco", margin_dimension (choice "s")
+#: resources/lang/acf-json.php:33
+msgid "S"
+msgstr ""
+
+#. translators: ACF "Blocco", margin (label)
+#: resources/lang/acf-json.php:35
+msgid "Margine"
+msgstr ""
+
+#. translators: ACF "Blocco", margin_dimension (label)
+#: resources/lang/acf-json.php:37
+msgid "Dimensione margine"
+msgstr ""
+
+#. translators: ACF "Blocco", background_color (label)
+#: resources/lang/acf-json.php:39
+msgid "Colore di sfondo"
+msgstr ""
+
+#. translators: ACF "Blocco", text_color (label)
+#: resources/lang/acf-json.php:41
+msgid "Colore testi"
+msgstr ""
+
+#. translators: ACF "Blocco", title (label)
+#: resources/lang/acf-json.php:43
+msgid "Titolo"
+msgstr ""
+
+#. translators: ACF "Blocco", title_formatting (label)
+#: resources/lang/acf-json.php:45
+msgid "Formattazione"
+msgstr ""
+
+#. translators: ACF "Blocco", title_formatting (instructions)
+#: resources/lang/acf-json.php:47
+msgid "Nella pagina deve essere presente solamente un H1 per fini SEO."
+msgstr ""
+
+#. translators: ACF "Blocco", title_formatting (choice "h1")
+#: resources/lang/acf-json.php:49
+msgid "H1"
+msgstr ""
+
+#. translators: ACF "Blocco", title_formatting (choice "h2")
+#: resources/lang/acf-json.php:51
+msgid "H2"
+msgstr ""
+
+#. translators: ACF "Blocco", title_formatting (choice "h3")
+#: resources/lang/acf-json.php:53
+msgid "H3"
+msgstr ""
+
+#. translators: ACF "Blocco", title_formatting (choice "h4")
+#: resources/lang/acf-json.php:55
+msgid "H4"
+msgstr ""
+
+#. translators: ACF "Blocco", title_formatting (choice "h5")
+#: resources/lang/acf-json.php:57
+msgid "H5"
+msgstr ""
+
+#. translators: ACF "Blocco", title_formatting (choice "h6")
+#: resources/lang/acf-json.php:59
+msgid "H6"
+msgstr ""
+
+#. translators: ACF "Blocco", title_formatting (choice "p")
+#: resources/lang/acf-json.php:61
+msgid "Testo"
+msgstr ""
+
+#. translators: ACF "Blocco", content (label)
+#: resources/lang/acf-json.php:63
+msgid "Contenuto"
+msgstr ""
+
+#. translators: ACF "Blocco", buttons (label)
+#: resources/lang/acf-json.php:65
+msgid "Pulsanti"
+msgstr ""
+
+#. translators: ACF "Blocco", buttons (button_label)
+#: resources/lang/acf-json.php:67
+msgid "Aggiungi pulsante"
+msgstr ""
+
+#. translators: ACF "Blocco", buttons › button (label)
+#: resources/lang/acf-json.php:69
+msgid "Pulsante"
+msgstr ""
+
+#. Template Name of the theme
+msgid "Template personalizzato"
+msgstr ""
+
+#: resources/views/404.blade.php:8
+msgid "Spiacenti, la pagina che stai cercando non esiste."
+msgstr ""
+
+#: resources/views/components/acf-block-empty.blade.php:13
+#: resources/views/components/acf-block-placeholder.blade.php:28
+msgid "Modifica blocco"
+msgstr ""
+
+#: resources/views/components/acf-block-placeholder.blade.php:19
+msgid "Nessun titolo impostato per questa sezione."
+msgstr ""
+
+#: resources/views/components/carousel-navigation.blade.php:9
+msgid "Slide precedente"
+msgstr ""
+
+#: resources/views/components/carousel-navigation.blade.php:26
+msgid "Slide successiva"
+msgstr ""
+
+#. translators: %s: social network name, e.g. Facebook.
+#: resources/views/components/share.blade.php:12
+msgid "Condividi su %s"
+msgstr ""
+
+#: resources/views/components/share.blade.php:16
+msgctxt "share label"
+msgid "Condividi su"
+msgstr ""
+
+#: resources/views/forms/search.blade.php:4
+msgctxt "label"
+msgid "Cerca:"
+msgstr ""
+
+#: resources/views/forms/search.blade.php:10
+msgctxt "placeholder"
+msgid "Cerca &hellip;"
+msgstr ""
+
+#: resources/views/forms/search.blade.php:16
+msgctxt "submit button"
+msgid "Cerca"
+msgstr ""
+
+#: resources/views/index.blade.php:8
+#: resources/views/search.blade.php:8
+msgid "Spiacenti, nessun risultato trovato."
+msgstr ""
+
+#: resources/views/layouts/app.blade.php:19
+msgid "Vai al contenuto"
+msgstr ""
+
+#: resources/views/partials/comments.blade.php:15
+msgid "Navigazione commenti"
+msgstr ""
+
+#: resources/views/partials/comments.blade.php:37
+msgid "I commenti sono chiusi."
+msgstr ""
+
+#: resources/views/partials/content-page.blade.php:4
+#: resources/views/partials/content-single.blade.php:17
+msgid "Navigazione pagine"
+msgstr ""
+
+#: resources/views/partials/entry-meta.blade.php:7
+msgctxt "post author"
+msgid "Di"
+msgstr ""
+
+#: resources/views/blocks/only-text/block.json
+msgctxt "block title"
+msgid "Solo testo"
+msgstr ""
+
+#: resources/views/blocks/only-text/block.json
+msgctxt "block description"
+msgid "Sezione testuale"
+msgstr ""
+
+#: resources/views/blocks/only-text/block.json
+msgctxt "block keyword"
+msgid "contenuto"
+msgstr ""
+
+#: resources/views/blocks/only-text/block.json
+msgctxt "block keyword"
+msgid "paragrafo"
+msgstr ""
+
+#: resources/views/blocks/only-text/block.json
+msgctxt "block keyword"
+msgid "testo"
+msgstr ""

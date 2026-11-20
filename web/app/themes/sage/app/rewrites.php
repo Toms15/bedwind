@@ -91,7 +91,11 @@ add_action('template_redirect', function (): void {
 
 add_filter('get_the_archive_title', function (string $title): string {
     if (is_year()) {
-        $title = __('Archivio', 'sage').' '.get_query_var('year');
+        $title = sprintf(
+            /* translators: %s: year, e.g. 2026. */
+            __('Archivio %s', 'sage'),
+            (int) get_query_var('year')
+        );
     }
 
     return $title;

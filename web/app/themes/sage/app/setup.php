@@ -64,6 +64,18 @@ add_filter('theme_file_path', function ($path, $file) {
  */
 add_action('after_setup_theme', function () {
     /**
+     * Make the theme available for translation.
+     *
+     * Source strings are in Italian (text domain `sage`); translations live
+     * in resources/lang as {locale}.mo / {locale}.l10n.php (e.g. en_US.mo).
+     * Since WP 6.7 this only registers the path: the files are loaded just in
+     * time on the first __() call. Acorn does not do this for the theme.
+     *
+     * @link https://developer.wordpress.org/reference/functions/load_theme_textdomain/
+     */
+    load_theme_textdomain('sage', get_template_directory().'/resources/lang');
+
+    /**
      * Disable full-site editing support.
      *
      * @link https://wptavern.com/gutenberg-10-5-embeds-pdfs-adds-verse-block-color-options-and-introduces-new-patterns
@@ -76,7 +88,7 @@ add_action('after_setup_theme', function () {
      * @link https://developer.wordpress.org/reference/functions/register_nav_menus/
      */
     register_nav_menus([
-        'primary_navigation' => __('Primary Navigation', 'sage'),
+        'primary_navigation' => __('Navigazione principale', 'sage'),
     ]);
 
     /**
@@ -144,12 +156,12 @@ add_action('widgets_init', function () {
     ];
 
     register_sidebar([
-        'name' => __('Primary', 'sage'),
+        'name' => __('Principale', 'sage'),
         'id' => 'sidebar-primary',
     ] + $config);
 
     register_sidebar([
-        'name' => __('Footer', 'sage'),
+        'name' => __('Piè di pagina', 'sage'),
         'id' => 'sidebar-footer',
     ] + $config);
 });
@@ -166,6 +178,39 @@ add_filter('acf/settings/load_json', function ($paths) {
     $paths[] = get_stylesheet_directory().'/acf-json';
 
     return $paths;
+});
+
+/**
+ * Translate the ACF field groups of the theme with the `sage` text domain.
+ *
+ * Labels, instructions, choices, button labels and group titles in
+ * acf-json are written in Italian; with a text domain set ACF passes them
+ * through __($string, 'sage') when it loads them, so en_US.po translates
+ * them like any other theme string. The .pot gets them from
+ * resources/scripts/acf-strings.js (see `npm run translate:pot`).
+ *
+ * The text domain is turned off while field groups are edited or saved:
+ * on the ACF admin screens of `acf-field-group` and in the ACF field group
+ * AJAX actions (`acf/field_group/*`, e.g. `acf/field_group/move_field`,
+ * which loads the groups and fires `acf/update_field_group`, so local JSON
+ * rewrites the files; there `$typenow` is empty). ACF does not skip
+ * translation in these requests, so with a non-Italian admin language the
+ * translated values would be shown in the editor and written back to
+ * acf-json.
+ *
+ * @link https://www.advancedcustomfields.com/resources/acf-settings/
+ */
+add_filter('acf/settings/l10n_textdomain', function () {
+    global $typenow;
+
+    $editing = (is_admin() && ($typenow ?? null) === 'acf-field-group')
+        || (wp_doing_ajax() && str_starts_with((string) ($_REQUEST['action'] ?? ''), 'acf/field_group/'));
+
+    if ($editing) {
+        return '';
+    }
+
+    return 'sage';
 });
 
 /**

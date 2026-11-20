@@ -36,7 +36,7 @@
 | M23 | ✅ | Query dei post: N+1, dimensione immagini, date | Performance | 🟠 | S | – |
 | M24 | ⬜ | Componenti `x-alert`, `x-share`, `x-title`, placeholder ACF | Frontend | 🟠 | M | M05 |
 | M25 | ⬜ | Breadcrumb: Composer + componente + JSON-LD | SEO/A11y | 🟠 | M | M28 |
-| M26 | ⬜ | i18n completo (stringhe sorgente in inglese, `resources/lang`) | i18n | 🟠 | S | – |
+| M26 | ✅ | i18n completo (sorgente italiana, en_US, `resources/lang`) | i18n | 🟠 | S | – |
 | M27 | ⬜ | Landmark del layout, skip link, custom logo | A11y | 🟢 | S | M04 |
 | M28 | ⬜ | Architettura: Service Provider e classi PSR-4 | Architettura | 🟠 | L | – |
 | M29 | ⬜ | Registrazione dei blocchi via manifest, asset JS/CSS per blocco | Blocchi | 🟢 | M | M28, M22 |
@@ -362,7 +362,7 @@
   - `resources/lang/` non esiste.
   - `load_theme_textdomain` è chiamato in `helpers.php:129` e duplica quello che fa già Sage.
 - **Soluzione**
-  - Tutte le stringhe sorgente in inglese, con il dominio `sage`.
+  - ~~Tutte le stringhe sorgente in inglese~~ → decisione 2026-11-20: sorgente in italiano (anche ACF e block.json), dominio `sage`, traduzione `en_US`.
   - Creare `resources/lang/.gitkeep`.
   - Eseguire `npm run translate` per ottenere `it_IT.po`.
 

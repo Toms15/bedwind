@@ -6,7 +6,7 @@
   <button
     type="button"
     class="{{ $id }}-prev w-10 h-10 flex items-center justify-center rounded-full bg-black-950/30 backdrop-blur-md cursor-pointer [&.swiper-button-disabled]:pointer-events-none [&.swiper-button-disabled]:opacity-50"
-    aria-label="{{ __('Previous slide', 'sage') }}"
+    aria-label="{{ __('Slide precedente', 'sage') }}"
   >
     <svg
       class="w-5 h-auto fill-white rotate-180"
@@ -23,7 +23,7 @@
   <button
     type="button"
     class="{{ $id }}-next w-10 h-10 flex items-center justify-center rounded-full bg-black-950/30 backdrop-blur-md cursor-pointer [&.swiper-button-disabled]:pointer-events-none [&.swiper-button-disabled]:opacity-50"
-    aria-label="{{ __('Next slide', 'sage') }}"
+    aria-label="{{ __('Slide successiva', 'sage') }}"
   >
     <svg
       class="w-5 h-auto fill-white"

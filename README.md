@@ -107,6 +107,30 @@ composer wp-translation-downloader:download
 
 To add a language, add its locale to `extra.wp-translation-downloader.languages` in `composer.json` (e.g. `["it_IT", "en_GB"]`) and run `composer wp-translation-downloader:download`. Packages that ship their own translations (e.g. ACF Pro) are listed in `excludes`.
 
+### Theme translations
+
+The source language of the theme is **Italian**: every string in `app/`, `resources/views/` (Blade, `block.json`), the ACF field groups in `acf-json/` and the `style.css` header is written in Italian and uses the `sage` text domain (`__('Continua a leggere', 'sage')`, `{{ __('Vai al contenuto', 'sage') }}`). With the site in Italian no translation file is loaded; `resources/lang/en_US.po` provides the English translation, so the project can be switched to English by changing the site language (`wp site switch-language en_US`, or *Settings → General → Site Language*).
+
+Files in `web/app/themes/sage/resources/lang/` (all versioned, the theme is deployed as is):
+
+- `sage.pot`: template with every string of the theme;
+- `{locale}.po`: translation, edited by hand or with Poedit;
+- `{locale}.mo` and `{locale}.l10n.php`: compiled files loaded by WordPress (since 6.5 the `.l10n.php` file is preferred).
+
+The path is registered with `load_theme_textdomain()` in `app/setup.php` (also declared as `Domain Path` in `style.css`). ACF labels are translated at runtime through `acf/settings/l10n_textdomain` (disabled while editing field groups, so acf-json always stays in Italian); `wp i18n make-pot` does not read acf-json, so `npm run translate:acf` extracts those strings into `resources/lang/acf-json.php` (generated, not versioned) before the `.pot` is built.
+
+From `web/app/themes/sage` (requires WP-CLI):
+
+```bash
+# After adding or changing strings: rebuild sage.pot and merge it into every .po
+npm run translate
+
+# Translate the new/empty entries in the .po files, then compile .mo and .l10n.php
+npm run translate:compile
+```
+
+To add a language (e.g. `de_DE`): copy `sage.pot` to `resources/lang/de_DE.po`, set the `Language` and `Plural-Forms` headers, translate it and run `npm run translate:compile`. For WordPress core and plugin strings add the locale to `extra.wp-translation-downloader.languages` in `composer.json` as described above (`en_US` needs nothing: it is built into WordPress).
+
 ## Project Structure
 
 ```

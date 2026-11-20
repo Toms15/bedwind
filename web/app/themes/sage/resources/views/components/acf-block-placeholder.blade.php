@@ -13,7 +13,7 @@
     </span>
   @else
     <span class="text-base text-slate-500 font-body font-normal">
-      No title has been set for this section
+      {{ __('Nessun titolo impostato per questa sezione.', 'sage') }}
     </span>
   @endif
   <button
@@ -21,6 +21,6 @@
     class="components-button is-primary"
     data-acf-expanded-editor
   >
-    Edit Block
+    {{ __('Modifica blocco', 'sage') }}
   </button>
 </div>

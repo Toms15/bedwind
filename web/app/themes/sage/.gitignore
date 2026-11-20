@@ -4,3 +4,4 @@
 !/public/.gitkeep
 .env
 npm-debug.log
+/resources/lang/acf-json.php

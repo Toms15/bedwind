@@ -96,7 +96,7 @@ function sanitize_upload(array $file): array
     $mime = real_mime($path);
 
     if ($ext === 'svgz') {
-        $file['error'] = __('Compressed SVG files (.svgz) are not allowed.', 'sage');
+        $file['error'] = __('I file SVG compressi (.svgz) non sono consentiti.', 'sage');
 
         return $file;
     }
@@ -108,13 +108,13 @@ function sanitize_upload(array $file): array
     }
 
     if ($ext !== 'svg') {
-        $file['error'] = __('SVG content is only allowed in files with the .svg extension.', 'sage');
+        $file['error'] = __('Il contenuto SVG è consentito solo nei file con estensione .svg.', 'sage');
 
         return $file;
     }
 
     if (! user_can_upload()) {
-        $file['error'] = __('Sorry, you are not allowed to upload SVG files.', 'sage');
+        $file['error'] = __('Non hai i permessi per caricare file SVG.', 'sage');
 
         return $file;
     }
@@ -126,7 +126,7 @@ function sanitize_upload(array $file): array
     $clean = $dirty === false || $dirty === '' ? false : $sanitizer->sanitize($dirty);
 
     if (! is_string($clean) || trim($clean) === '' || file_put_contents($path, $clean) === false) {
-        $file['error'] = __('This SVG file could not be sanitized and has been rejected.', 'sage');
+        $file['error'] = __('Non è stato possibile ripulire questo file SVG, che è stato quindi rifiutato.', 'sage');
 
         return $file;
     }
@@ -183,7 +183,7 @@ function reject_upload_bits(mixed $upload): mixed
     $bits = $upload['bits'] ?? '';
 
     if (in_array($ext, ['svg', 'svgz'], true) || (is_string($bits) && is_svg_content($bits))) {
-        return __('SVG files must be uploaded through the media library.', 'sage');
+        return __('I file SVG devono essere caricati dalla libreria media.', 'sage');
     }
 
     return $upload;

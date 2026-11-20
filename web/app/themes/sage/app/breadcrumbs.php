@@ -35,7 +35,7 @@ function custom_breadcrumbs(): void
     if (is_singular('post')) {
         $terms = get_the_category();
 
-        if (!empty($terms) && !is_wp_error($terms)) {
+        if (! empty($terms) && ! is_wp_error($terms)) {
             $parents = [];
             $children = [];
 
@@ -45,7 +45,7 @@ function custom_breadcrumbs(): void
 
                     $parent = get_term($term->parent, 'category');
 
-                    if ($parent && !is_wp_error($parent)) {
+                    if ($parent && ! is_wp_error($parent)) {
                         $parents[$parent->term_id] = $parent;
                     }
                 } else {
@@ -91,7 +91,7 @@ function custom_breadcrumbs(): void
         echo $separator;
 
         $current(
-            __('Event', 'sage'),
+            __('Evento', 'sage'),
             'text-small text-black-950 font-body font-normal'
         );
 
@@ -133,7 +133,7 @@ function custom_breadcrumbs(): void
         echo $separator;
 
         $current(
-            __('Projects', 'sage'),
+            __('Progetti', 'sage'),
             'text-small text-black-950 font-body font-normal'
         );
 
@@ -182,7 +182,7 @@ function custom_breadcrumbs(): void
     if (is_page()) {
         $ancestors = get_post_ancestors(get_the_ID());
 
-        if (!empty($ancestors)) {
+        if (! empty($ancestors)) {
             foreach (array_reverse($ancestors) as $ancestor_id) {
                 echo $separator;
 

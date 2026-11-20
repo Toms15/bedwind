@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "743865d8d8c1fee18e4122683054c5ec",
+    "content-hash": "74fdc4e3cee58fd7886971857eec4877",
     "packages": [
         {
             "name": "composer/installers",
@@ -214,6 +214,69 @@
             ],
             "time": "2026-08-24T09:06:52+00:00",
             "published-time": "2026-08-24T09:07:57+00:00"
+        },
+        {
+            "name": "inpsyde/wp-translation-downloader",
+            "version": "2.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/inpsyde/wp-translation-downloader.git",
+                "reference": "60c4a8092d5e0feca2bd8b62c645257fc3bff12e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/inpsyde/wp-translation-downloader/zipball/60c4a8092d5e0feca2bd8b62c645257fc3bff12e",
+                "reference": "60c4a8092d5e0feca2bd8b62c645257fc3bff12e",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^2.0",
+                "composer/installers": "^1.0 || ^2.0",
+                "ext-json": "*",
+                "php": ">=7.2"
+            },
+            "require-dev": {
+                "behat/behat": "^v3.10.0",
+                "brain/monkey": "^2.6.1",
+                "composer/composer": "^2.3.7",
+                "inpsyde/php-coding-standards": "^1.0.0",
+                "mikey179/vfsstream": "^v1.6.10",
+                "ondram/ci-detector": "^4.1.0",
+                "phpunit/phpunit": "^9.6.0",
+                "vimeo/psalm": "^4.23.0"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Inpsyde\\WpTranslationDownloader\\Plugin"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Inpsyde\\WpTranslationDownloader\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Syde GmbH",
+                    "email": "hello@syde.com",
+                    "homepage": "https://syde.com/",
+                    "role": "Company"
+                },
+                {
+                    "name": "Christian Leucht",
+                    "email": "c.leucht@inpsyde.com"
+                }
+            ],
+            "description": "Composer plugin to download translations from wordpress.org API.",
+            "support": {
+                "issues": "https://github.com/inpsyde/wp-translation-downloader/issues",
+                "source": "https://github.com/inpsyde/wp-translation-downloader/tree/2.6"
+            },
+            "time": "2025-05-28T12:02:26+00:00",
+            "published-time": "2025-05-28T12:03:22+00:00"
         },
         {
             "name": "oscarotero/env",
@@ -1052,24 +1115,6 @@
             ],
             "time": "2026-10-25T16:26:19+00:00",
             "published-time": "2026-10-25T16:26:50+00:00"
-        },
-        {
-            "name": "wpackagist-theme/twentytwentyfive",
-            "version": "1.5",
-            "source": {
-                "type": "svn",
-                "url": "https://themes.svn.wordpress.org/twentytwentyfive/",
-                "reference": "1.5"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://downloads.wordpress.org/theme/twentytwentyfive.1.5.zip"
-            },
-            "require": {
-                "composer/installers": "^1.0 || ^2.0"
-            },
-            "type": "wordpress-theme",
-            "homepage": "https://wordpress.org/themes/twentytwentyfive/"
         },
         {
             "name": "wpengine/advanced-custom-fields-pro",

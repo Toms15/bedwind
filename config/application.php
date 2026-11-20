@@ -128,6 +128,9 @@ Config::define('DISALLOW_FILE_EDIT', true);
 // Disable plugin and theme updates and installation from the admin
 Config::define('DISALLOW_FILE_MODS', true);
 
+// Default/fallback theme: no bundled twentytwenty* theme is installed
+Config::define('WP_DEFAULT_THEME', 'sage');
+
 // Limit the number of post revisions
 Config::define('WP_POST_REVISIONS', env('WP_POST_REVISIONS') ?? true);
 

@@ -6,12 +6,16 @@
 web/app/plugins/*
 !web/app/plugins/.gitkeep
 web/app/mu-plugins/*/
-web/app/themes/twentytwentyfive/
 web/app/upgrade/
 web/app/upgrade-temp-backup/
 web/app/uploads/*
 !web/app/uploads/.gitkeep
 web/app/cache/*
+
+# Traduzioni (scaricate da inpsyde/wp-translation-downloader)
+web/app/languages/*
+!web/app/languages/.gitkeep
+/wp-translation-downloader.lock
 
 # WordPress
 web/wp

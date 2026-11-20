@@ -95,6 +95,18 @@ To compile assets for production:
 npm run build
 ```
 
+## Translations
+
+WordPress translations (core and wordpress.org plugins/themes installed via Composer) are downloaded by [`inpsyde/wp-translation-downloader`](https://github.com/inpsyde/wp-translation-downloader) on every `composer install`/`composer update`, matching the installed versions. The files in `web/app/languages/` and `wp-translation-downloader.lock` are **not versioned**: if they are missing or stale, regenerate them with:
+
+```bash
+composer install
+# or, to force the download
+composer wp-translation-downloader:download
+```
+
+To add a language, add its locale to `extra.wp-translation-downloader.languages` in `composer.json` (e.g. `["it_IT", "en_GB"]`) and run `composer wp-translation-downloader:download`. Packages that ship their own translations (e.g. ACF Pro) are listed in `excludes`.
+
 ## Project Structure
 
 ```
@@ -102,6 +114,7 @@ project-name/
 ├── config/                 # Bedrock configuration files
 ├── web/
 │   ├── app/
+│   │   ├── languages/      # Translations (generated, not versioned)
 │   │   ├── mu-plugins/     # Must-use plugins
 │   │   ├── plugins/        # Standard plugins
 │   │   ├── themes/         # Custom themes

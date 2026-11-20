@@ -23,17 +23,11 @@ function render_acf_block($block, $content = '', $is_preview = false, $post_id =
     $block['slug'] = $slug;
 
     if ($is_preview) {
-        $title = get_field('title');
-        if ($block['slug'] === 'empty') {
-            echo view('components.acf-block-empty', [
-                'block' => $block,
-            ]);
-        } else {
-            echo view('components.acf-block-placeholder', [
-                'block' => $block,
-                'title' => $title ?? null,
-            ]);
-        }
+        echo view('components.acf.placeholder', [
+            'block' => $block,
+            'title' => $slug === 'empty' ? null : get_field('title'),
+            'variant' => $slug === 'empty' ? 'empty' : 'default',
+        ]);
 
         return;
     }

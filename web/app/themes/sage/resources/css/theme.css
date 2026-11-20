@@ -44,13 +44,9 @@
   --color-slate-400: oklch(70.4% 0.04 256.788);
   --color-slate-500: oklch(55.4% 0.046 257.417);
 
-  /* Default Tailwind v4 — usati da components/alert (da rivedere in M24) */
-  --color-red-50: oklch(97.1% 0.013 17.38);
+  /* Default Tailwind v4 — sfondi di components/alert (testo black-950, contrasto ≥ 6.3:1) */
   --color-red-400: oklch(70.4% 0.191 22.216);
-  --color-yellow-50: oklch(98.7% 0.026 102.212);
   --color-yellow-400: oklch(85.2% 0.199 91.936);
-  --color-green-50: oklch(98.2% 0.018 155.826);
   --color-green-400: oklch(79.2% 0.209 151.711);
-  --color-indigo-50: oklch(96.2% 0.018 272.314);
   --color-indigo-400: oklch(67.3% 0.182 276.935);
 }

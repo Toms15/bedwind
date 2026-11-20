@@ -39,27 +39,27 @@ msgstr "Roots"
 msgid "https://roots.io/"
 msgstr "https://roots.io/"
 
-#: app/blocks.php:55
+#: app/blocks.php:49
 msgid "Caroselli"
 msgstr "Carousels"
 
-#: app/blocks.php:59
+#: app/blocks.php:53
 msgid "Contenuti dinamici"
 msgstr "Dynamic content"
 
-#: app/blocks.php:63
+#: app/blocks.php:57
 msgid "Contenuti statici"
 msgstr "Static content"
 
-#: app/blocks.php:67
+#: app/blocks.php:61
 msgid "Generici"
 msgstr "General"
 
-#: app/blocks.php:71
+#: app/blocks.php:65
 msgid "Hero"
 msgstr "Heroes"
 
-#: app/blocks.php:75
+#: app/blocks.php:69
 msgid "Separatori"
 msgstr "Dividers"
 
@@ -368,12 +368,11 @@ msgstr "Custom Template"
 msgid "Spiacenti, la pagina che stai cercando non esiste."
 msgstr "Sorry, but the page you are trying to view does not exist."
 
-#: resources/views/components/acf-block-empty.blade.php:13
-#: resources/views/components/acf-block-placeholder.blade.php:28
+#: resources/views/components/acf/placeholder.blade.php:62
 msgid "Modifica blocco"
 msgstr "Edit Block"
 
-#: resources/views/components/acf-block-placeholder.blade.php:19
+#: resources/views/components/acf/placeholder.blade.php:25
 msgid "Nessun titolo impostato per questa sezione."
 msgstr "No title has been set for this section."
 
@@ -386,11 +385,11 @@ msgid "Slide successiva"
 msgstr "Next slide"
 
 #. translators: %s: social network name, e.g. Facebook.
-#: resources/views/components/share.blade.php:12
+#: resources/views/components/share.blade.php:37
 msgid "Condividi su %s"
 msgstr "Share on %s"
 
-#: resources/views/components/share.blade.php:16
+#: resources/views/components/share.blade.php:69
 msgctxt "share label"
 msgid "Condividi su"
 msgstr "Share on"
@@ -428,7 +427,7 @@ msgid "I commenti sono chiusi."
 msgstr "Comments are closed."
 
 #: resources/views/partials/content-page.blade.php:4
-#: resources/views/partials/content-single.blade.php:17
+#: resources/views/partials/content-single.blade.php:19
 msgid "Navigazione pagine"
 msgstr "Pages navigation"
 
@@ -470,3 +469,7 @@ msgstr "This SVG file could not be sanitized and was rejected."
 #: resources/lang/acf-json.php:39
 msgid "Colore di sfondo"
 msgstr "Background color"
+
+#: resources/views/components/share.blade.php:95
+msgid "Condividi"
+msgstr "Share"

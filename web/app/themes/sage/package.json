@@ -8,9 +8,11 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "blocks:manifest": "node resources/scripts/blocks-manifest.js",
+    "blocks:manifest:check": "node resources/scripts/blocks-manifest.js --check",
     "lint": "npm run lint:js && npm run lint:css && npm run lint:blade && npm run format:check",
     "lint:js": "eslint .",
-    "lint:css": "stylelint \"resources/css/**/*.css\"",
+    "lint:css": "stylelint \"resources/css/**/*.css\" \"resources/views/blocks/*/*.css\"",
     "lint:blade": "blade-formatter \"resources/views/**/*.blade.php\" --check-formatted",
     "format": "prettier --write . && npm run format:blade",
     "format:blade": "blade-formatter \"resources/views/**/*.blade.php\" --write",

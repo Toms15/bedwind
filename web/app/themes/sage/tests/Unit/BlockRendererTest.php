@@ -111,6 +111,9 @@ function fake_views(array $views): void
     $factory->shouldNotReceive('file');
 
     Functions\when('app')->justReturn($factory);
+
+    // No block has assets (view.js/style.css): see BlockAssetsTest.
+    Functions\when('get_theme_file_path')->alias(fn (string $path) => '/nonexistent/'.$path);
 }
 
 /**
@@ -148,6 +151,29 @@ describe('render', function () {
 
         expect(render_block(['name' => 'acf/missing']))->toBe('')
             ->and(render_block([]))->toBe('');
+    });
+
+    it('enqueues the block assets only when the view is rendered on the frontend', function () {
+        fake_views(['components.acf.placeholder', 'blocks.only-text.only-text']);
+        fake_block_fields([]);
+        Functions\expect('wp_enqueue_style')->never();
+
+        $checked = [];
+        Functions\when('get_theme_file_path')->alias(function (string $path) use (&$checked) {
+            $checked[] = $path;
+
+            return '/nonexistent/'.$path;
+        });
+
+        render_block(['name' => 'acf/only-text'], true);
+        render_block(['name' => 'acf/missing']);
+        expect($checked)->toBe([]);
+
+        render_block(['name' => 'acf/only-text']);
+        expect($checked)->toBe([
+            'resources/views/blocks/only-text/style.css',
+            'resources/views/blocks/only-text/view.js',
+        ]);
     });
 
     it('renders the placeholder with the title field in the editor', function () {

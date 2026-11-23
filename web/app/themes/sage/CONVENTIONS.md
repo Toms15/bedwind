@@ -3,6 +3,7 @@
 Conventions decided for this theme. Tooling (build, lint, PHP quality, translation scripts) is described in the [README](README.md); the project setup in the [project README](../../../../README.md).
 
 - [ACF blocks](#acf-blocks)
+- [Block assets](#block-assets)
 - [New block checklist](#new-block-checklist)
 - [Internationalization](#internationalization)
 - [PHP](#php)
@@ -12,13 +13,18 @@ Conventions decided for this theme. Tooling (build, lint, PHP quality, translati
 
 ## ACF blocks
 
-Every block is an ACF block (`acf/<slug>`) split in three files. Reference implementation: the `only-text` block.
+Every block is an ACF block (`acf/<slug>`) split in three files, plus two optional assets. Reference implementation: the `only-text` block.
 
-| File                                             | Role                                                         |
-| ------------------------------------------------ | ------------------------------------------------------------ |
-| `resources/views/blocks/<slug>/block.json`       | Block metadata, registered automatically by `app/blocks.php` |
-| `resources/views/blocks/<slug>/<slug>.blade.php` | Block view: prepares the data, no markup                     |
-| `resources/views/modules/<slug>.blade.php`       | Module: the markup, receives ready-to-print data             |
+| File                                             | Role                                                                                    |
+| ------------------------------------------------ | --------------------------------------------------------------------------------------- |
+| `resources/views/blocks/<slug>/block.json`       | Block metadata, registered by `app/blocks.php` through the block manifest               |
+| `resources/views/blocks/<slug>/<slug>.blade.php` | Block view: prepares the data, no markup                                                |
+| `resources/views/modules/<slug>.blade.php`       | Module: the markup, receives ready-to-print data                                        |
+| `resources/views/blocks/<slug>/view.js`          | Optional: frontend script module, loaded only where the block is rendered               |
+| `resources/views/blocks/<slug>/style.css`        | Optional: frontend stylesheet, loaded only where the block is rendered                  |
+| `resources/views/blocks/blocks-manifest.php`     | Generated from every `block.json` (`npm run blocks:manifest`): versioned, never edit it |
+
+**Block manifest**: `app/blocks.php` registers the blocks with `wp_register_block_types_from_metadata_collection()` (WordPress 6.8+), reading the metadata of every block from `blocks-manifest.php` instead of globbing the folders and decoding each `block.json` on every request (without the function or the manifest it falls back to one `register_block_type()` per folder). The registration still goes through `register_block_type_from_metadata()` and its filters, so ACF and the translations (`textdomain`) work as with `block.json`. Only the blocks listed in the manifest are registered and with the metadata it contains: Vite rewrites it at every build and, with `npm run dev`, whenever a `block.json` is added, changed or removed; otherwise run `npm run blocks:manifest`. Commit it with the `block.json` changes: CI fails if it is stale (`npm run blocks:manifest:check`).
 
 **`block.json`**
 
@@ -66,19 +72,29 @@ ACF blocks are allowed in every editor; core blocks only in the post types of `s
 
 **Field groups** live in `acf-json/` (ACF local JSON, saved there by `acf/settings/save_json` in `app/setup.php`). Labels, instructions and choices are in **Italian**. The shared group _Blocco_ (`group_69c1778d2ba98.json`, location: every block) provides padding, margin, colors, title, title formatting, content and buttons. Block-specific fields go in a separate group with location _Block → is equal to → <block title>_.
 
+## Block assets
+
+Most blocks need no assets of their own: Tailwind classes in the module and `resources/js/app.js` cover them. When a block does need its own JS or CSS, put it in the block folder:
+
+- `view.js`: enqueued as a script module (`wp_enqueue_script_module()`, `type="module"` in the footer, handle `sage-block-<slug>`). It runs once per page even with several instances of the block: select them all (`document.querySelectorAll('.cards')`). Do not import CSS from it (in build Vite would emit a separate file that is not enqueued): use `style.css`;
+- `style.css`: enqueued as a stylesheet (`wp_enqueue_style()`, handle `sage-block-<slug>`); WordPress 6.9+ moves the styles enqueued while rendering into the `<head>`. Tailwind utilities are already in `app.css`: use it for what they cannot express. To use the theme tokens, start it with `@reference "../../../css/app.css";`.
+
+Both are Vite entries (`vite.config.js` globs `resources/views/blocks/*/{view.js,style.css}` when it starts: restart `npm run dev` after adding the first asset of a block, then run `npm run build`) and are enqueued by `App\Blocks\BlockAssets` from `BlockRenderer::render()`, only when the block view is rendered on the frontend: pages without the block do not load them, and in the editor (placeholder) nothing is enqueued. With the dev server they come from Vite (a change reloads the page); an asset missing from the build manifest is skipped.
+
 ## New block checklist
 
 Example slug: `cards`. Copy from `only-text` where possible.
 
-1. **Metadata**: create `resources/views/blocks/cards/block.json` with `"name": "acf/cards"`, Italian `title`/`description`/`keywords`, a theme `category`, `"textdomain": "sage"`, `"apiVersion": 3`, `supports` with `"anchor": true` and `"align": false` only (no `supports.jsx`: the theme blocks do not use InnerBlocks and `blockVersion` 3 ignores it), `acf.blockVersion: 3` and `acf.renderCallback: "App\\Blocks\\BlockRenderer::render"`. No PHP registration needed: `app/blocks.php` registers every folder with a `block.json`.
+1. **Metadata**: create `resources/views/blocks/cards/block.json` with `"name": "acf/cards"`, Italian `title`/`description`/`keywords`, a theme `category`, `"textdomain": "sage"`, `"apiVersion": 3`, `supports` with `"anchor": true` and `"align": false` only (no `supports.jsx`: the theme blocks do not use InnerBlocks and `blockVersion` 3 ignores it), `acf.blockVersion: 3` and `acf.renderCallback: "App\\Blocks\\BlockRenderer::render"`. No PHP registration needed: `app/blocks.php` registers the blocks of the manifest, which `npm run dev`/`npm run build` (or `npm run blocks:manifest`) regenerate from the `block.json` files. Commit `resources/views/blocks/blocks-manifest.php` too.
 2. **Fields**: locally, in _ACF → Field Groups_ create a group with Italian labels and location _Block is equal to_ the new block. Saving writes `acf-json/group_*.json`: commit it. Reuse the shared _Blocco_ fields (title, content, spacings, colors, buttons) instead of duplicating them.
 3. **Block view**: create `resources/views/blocks/cards/cards.blade.php`: `BlockRenderer::data($block)`, read and validate the block fields, sanitize URLs (`sanitize_url()`) and colors (`sanitize_hex_color()`), then `@include('modules.cards', [...])`.
-4. **Module**: create `resources/views/modules/cards.blade.php` with the `@var` header, the `<section id … class="w-full overflow-x-clip …">` and `<div class="container mx-auto px-6 3xl:px-0">` markup, `<x-title :tag>` for the title and `next_heading` for the child headings. Use the [components](#components) for buttons, images and titles.
-5. **Strings**: every visible string in Italian with the `sage` text domain (`{{ __('Leggi di più', 'sage') }}`).
-6. **Logic and tests**: move non-trivial data preparation (queries, mapping) to a class in `app/` (e.g. `App\Queries\…` or a static method in `App\Blocks\`), with a Pest test in `tests/Unit/` that mocks `get_field()` with Brain Monkey (see `tests/Unit/BlockRendererTest.php`). Run `composer test` and `composer analyse`.
-7. **Translations**: `npm run translate` (block.json, Blade and the new ACF group end up in `sage.pot` and in the `.po` files), translate the new entries in `resources/lang/en_US.po`, then `npm run translate:compile`.
-8. **Lint**: `npm run format` (or `npm run format:blade`), then `npm run lint` and `composer lint`.
-9. **Check**: `npm run build` (or `npm run dev`), insert the block in a page: placeholder in the editor, markup, anchor, spacings and heading levels on the frontend; with the site in English (`wp site switch-language en_US`) the labels are translated.
+4. **Assets (optional)**: only if the block needs its own JS or CSS, add `resources/views/blocks/cards/view.js` and/or `style.css` (see [Block assets](#block-assets)), then restart `npm run dev`.
+5. **Module**: create `resources/views/modules/cards.blade.php` with the `@var` header, the `<section id … class="w-full overflow-x-clip …">` and `<div class="container mx-auto px-6 3xl:px-0">` markup, `<x-title :tag>` for the title and `next_heading` for the child headings. Use the [components](#components) for buttons, images and titles.
+6. **Strings**: every visible string in Italian with the `sage` text domain (`{{ __('Leggi di più', 'sage') }}`).
+7. **Logic and tests**: move non-trivial data preparation (queries, mapping) to a class in `app/` (e.g. `App\Queries\…` or a static method in `App\Blocks\`), with a Pest test in `tests/Unit/` that mocks `get_field()` with Brain Monkey (see `tests/Unit/BlockRendererTest.php`). Run `composer test` and `composer analyse`.
+8. **Translations**: `npm run translate` (block.json, Blade and the new ACF group end up in `sage.pot` and in the `.po` files), translate the new entries in `resources/lang/en_US.po`, then `npm run translate:compile`.
+9. **Lint**: `npm run format` (or `npm run format:blade`), then `npm run lint` and `composer lint`.
+10. **Check**: `npm run build` (or `npm run dev`), insert the block in a page: placeholder in the editor, markup, anchor, spacings and heading levels on the frontend; with the site in English (`wp site switch-language en_US`) the labels are translated.
 
 ## Internationalization
 
@@ -93,7 +109,7 @@ Example slug: `cards`. Copy from `only-text` where possible.
 - Classes, one per file:
   - `App\PostTypes\*`: custom post types, a static `register()` calling `register_post_type()`; listed in `$postTypes` of `App\Providers\ThemeServiceProvider`, which hooks them on `init` (taxonomies: `$taxonomies`, same contract, registered first);
   - `App\Queries\*`: static query methods returning plain arrays for the views (`Posts::latest()`, `Posts::paginated()`, `Pages::children()`);
-  - `App\Blocks\*`: block rendering and shared block data (`BlockRenderer`);
+  - `App\Blocks\*`: block rendering and shared block data (`BlockRenderer`), per-block assets (`BlockAssets`);
   - `App\Navigation\*`: navigation helpers (`Breadcrumbs`);
   - `App\View\Composers\*`: Acorn view composers.
 - Hooks and functions without a class are in the files loaded by `functions.php` (`setup`, `filters`, `blocks`, `helpers`, `svg`, `rewrites`). Helper functions live in `app/helpers.php`, namespace `App`, and are called in Blade with the fully qualified name: `\App\get_next_heading_level()`, `\App\get_trimmed_excerpt()`, `\App\random_string_for_id()`, `\App\get_fallback_image_url()`.

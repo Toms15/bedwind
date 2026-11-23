@@ -19,6 +19,8 @@ class BlockRenderer
      * In the editor: no preview, a "Modifica blocco" placeholder for every block.
      * On the frontend: the view blocks/<slug>/<slug> with $block (slug and
      * block.json "name" "acf/<slug>" must match); nothing if the view is missing.
+     * The optional blocks/<slug>/{view.js,style.css} are enqueued only when the
+     * view is rendered (BlockAssets).
      *
      * ACF calls it with ($block, $content, $is_preview, $post_id, $wp_block,
      * $context). Only the first three are declared, the others are unused:
@@ -49,6 +51,8 @@ class BlockRenderer
         $view = "blocks.{$slug}.{$slug}";
 
         if ($slug !== '' && view()->exists($view)) {
+            BlockAssets::enqueue($slug);
+
             echo view($view, ['block' => $block])->render();
         }
     }

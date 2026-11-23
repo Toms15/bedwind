@@ -122,4 +122,7 @@ jobs:
       # La build non usa vendor/ né WordPress: Vite legge resources/ e theme.json.
       - run: npm ci
       - run: npm run lint
+      # resources/views/blocks/blocks-manifest.php è versionato: deve
+      # corrispondere ai block.json (npm run blocks:manifest).
+      - run: npm run blocks:manifest:check
       - run: npm run build

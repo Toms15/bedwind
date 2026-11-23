@@ -5,12 +5,32 @@ declare(strict_types=1);
 namespace App;
 
 /**
- * Registra tutti i blocchi che hanno un block.json.
+ * Registra i blocchi del tema (resources/views/blocks/<slug>/block.json).
+ *
+ * Da WordPress 6.8 la registrazione legge il manifest generato
+ * resources/views/blocks/blocks-manifest.php (npm run blocks:manifest, lo
+ * rigenera anche Vite): niente glob() né decodifica dei block.json a ogni
+ * richiesta. I metadati passano comunque da register_block_type_from_metadata(),
+ * quindi dagli stessi filtri di prima (block_type_metadata e
+ * block_type_metadata_settings, usati da ACF). Un blocco assente dal manifest
+ * non viene registrato: il manifest va rigenerato quando cambia un block.json.
+ *
+ * Senza la funzione (WordPress < 6.8) o senza manifest: un block.json per
+ * cartella, come prima.
  *
  * Il render dei blocchi ACF è App\Blocks\BlockRenderer::render (block.json).
  */
 add_action('init', function () {
-    foreach (glob(get_theme_file_path('/resources/views/blocks/*'), GLOB_ONLYDIR) as $dir) {
+    $blocks_dir = get_theme_file_path('/resources/views/blocks');
+    $manifest = "{$blocks_dir}/blocks-manifest.php";
+
+    if (function_exists('wp_register_block_types_from_metadata_collection') && is_file($manifest)) {
+        wp_register_block_types_from_metadata_collection($blocks_dir, $manifest);
+
+        return;
+    }
+
+    foreach (glob("{$blocks_dir}/*", GLOB_ONLYDIR) ?: [] as $dir) {
         if (file_exists("{$dir}/block.json")) {
             register_block_type($dir);
         }

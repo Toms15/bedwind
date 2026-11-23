@@ -6,6 +6,7 @@ import { defineConfig, loadEnv } from 'vite';
 import tailwindcss from '@tailwindcss/vite';
 import laravel from 'laravel-vite-plugin';
 import { wordpressPlugin, wordpressThemeJson } from '@roots/vite-plugin';
+import { blocksDir, writeBlocksManifest } from './resources/scripts/blocks-manifest.js';
 
 const themeDir = path.dirname(fileURLToPath(import.meta.url));
 
@@ -52,6 +53,50 @@ function resolveDetectTls(appUrl) {
   return hasCertificate ? host : null;
 }
 
+// Optional per-block assets (resources/views/blocks/<slug>/view.js and
+// style.css): one entry each, enqueued only on the pages that render the block
+// (App\Blocks\BlockAssets). Globbed when the config loads: restart `npm run
+// dev` after adding one (the dev server serves it anyway, the build needs it).
+const blockAssets = fs
+  .globSync(['resources/views/blocks/*/view.js', 'resources/views/blocks/*/style.css'], {
+    cwd: themeDir,
+  })
+  .map((file) => file.split(path.sep).join('/'))
+  .sort();
+
+// Keep resources/views/blocks/blocks-manifest.php in sync with the block.json
+// files: written at build start and, in dev, whenever a block.json is added,
+// changed or removed (the refresh option then reloads the page).
+function blocksManifest() {
+  const isBlockJson = (file) =>
+    path.basename(file) === 'block.json' && path.dirname(path.dirname(file)) === blocksDir;
+
+  const regenerate = (file) => {
+    if (!isBlockJson(path.resolve(file))) {
+      return;
+    }
+
+    try {
+      writeBlocksManifest();
+    } catch (error) {
+      console.error(`[blocks-manifest] ${error.message}`);
+    }
+  };
+
+  return {
+    name: 'sage-blocks-manifest',
+    buildStart() {
+      writeBlocksManifest();
+    },
+    configureServer(server) {
+      server.watcher.add(path.join(blocksDir, '*/block.json'));
+      server.watcher.on('add', regenerate);
+      server.watcher.on('change', regenerate);
+      server.watcher.on('unlink', regenerate);
+    },
+  };
+}
+
 export default defineConfig(({ mode }) => {
   // laravel-vite-plugin reads APP_URL (process.env included) for the dev-server
   // CORS allowlist, the TLS host with VITE_DEV_SERVER_KEY/CERT, its fallback
@@ -64,6 +109,7 @@ export default defineConfig(({ mode }) => {
   return {
     base: `/app/themes/${themeSlug}/public/build/`,
     plugins: [
+      blocksManifest(),
       tailwindcss(),
       laravel({
         input: [
@@ -71,6 +117,7 @@ export default defineConfig(({ mode }) => {
           'resources/css/editor.css',
           'resources/js/app.js',
           'resources/js/editor.js',
+          ...blockAssets,
         ],
         refresh: true,
         detectTls: resolveDetectTls(appUrl),

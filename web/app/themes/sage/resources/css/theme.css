@@ -45,7 +45,7 @@
   --color-slate-400: oklch(70.4% 0.04 256.788);
   --color-slate-500: oklch(55.4% 0.046 257.417);
 
-  /* Default Tailwind v4 — sfondi di components/alert (testo black-950, contrasto ≥ 6.3:1) */
+  /* Default Tailwind v4 — sfondi di components/ui/alert (testo black-950, contrasto ≥ 6.3:1) */
   --color-red-400: oklch(70.4% 0.191 22.216);
   --color-yellow-400: oklch(85.2% 0.199 91.936);
   --color-green-400: oklch(79.2% 0.209 151.711);

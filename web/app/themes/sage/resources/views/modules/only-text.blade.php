@@ -22,7 +22,7 @@
   @if ($section_style) style="{{ $section_style }}" @endif>
   <div class="container mx-auto px-6 3xl:px-0">
     @if ($contents['title'])
-      <x-title :tag="$contents['title_tag']" class="mb-6">{{ $contents['title'] }}</x-title>
+      <x-ui.title :tag="$contents['title_tag']" class="mb-6">{{ $contents['title'] }}</x-ui.title>
     @endif
 
     @if ($contents['content'])
@@ -34,9 +34,9 @@
     @if ($buttons)
       <div class="mt-8 flex flex-wrap gap-4">
         @foreach ($buttons as $button)
-          <x-button :link="$button['url']" :target="$button['target']" :label="$button['label']">
+          <x-ui.button :link="$button['url']" :target="$button['target']" :label="$button['label']">
             {{ $button['label'] }}
-          </x-button>
+          </x-ui.button>
         @endforeach
       </div>
     @endif

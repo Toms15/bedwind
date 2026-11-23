@@ -82,7 +82,7 @@ class BlockRenderer
      *
      * Heading convention for every block:
      * - contents.title_tag is the tag of the block title (ACF title_formatting,
-     *   whitelisted to h1..h6/p, default 'h2'): <x-title :tag="$contents['title_tag']">.
+     *   whitelisted to h1..h6/p, default 'h2'): <x-ui.title :tag="$contents['title_tag']">.
      * - contents.next_heading is the tag for the block's child headings
      *   (subtitles, card titles, ...), from \App\get_next_heading_level(title_tag).
      *

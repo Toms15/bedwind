@@ -85,5 +85,5 @@
     {{ $slot }}
   </a>
 @elseif (defined('WP_DEBUG') && WP_DEBUG)
-  <!-- x-button: link vuoto o non valido -->
+  <!-- x-ui.button: link vuoto o non valido -->
 @endif

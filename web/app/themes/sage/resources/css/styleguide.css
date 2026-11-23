@@ -1,0 +1,19 @@
+/**
+ * Styleguide di sviluppo (/styleguide/, solo WP_ENV development): vedi App\Styleguide.
+ *
+ * Solo le utility usate da resources/views/styleguide.blade.php, esclusa da app.css
+ * ed editor.css (@source not) così le sue classi non finiscono in produzione.
+ * Variabili e stili base arrivano da app.css (theme(static)), caricato prima;
+ * i componenti mostrati usano classi già compilate in app.css.
+ *
+ * Accodato con wp_enqueue_style, quindi stampato in wp_head() prima di app.css:
+ * l'ordine dei layer è dichiarato qui, altrimenti utilities verrebbe prima di
+ * base e components di app.css e perderebbe contro di loro.
+ */
+@layer theme, base, components, utilities;
+
+@import 'tailwindcss/theme' theme(reference);
+@import './theme.css' theme(reference);
+@import 'tailwindcss/utilities' layer(utilities) source(none);
+
+@source '../views/styleguide.blade.php';

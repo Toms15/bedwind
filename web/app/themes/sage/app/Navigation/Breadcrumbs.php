@@ -13,7 +13,7 @@ use WP_User;
  *
  * Stateless static methods (like App\Queries\*): the trail depends only on
  * the main query, so it can be built from any view, component or block,
- * wherever <x-breadcrumbs /> is included. It is not a View Composer because
+ * wherever <x-content.breadcrumbs /> is included. It is not a View Composer because
  * a composer is bound to view names, while the component must work in any
  * template without being registered for it.
  *
@@ -56,7 +56,7 @@ class Breadcrumbs
      * dropped), string or null URLs, last item (current page) without URL.
      *
      * Idempotent and without decoding: labels coming from the filter or from
-     * <x-breadcrumbs :items="..."> are already plain text.
+     * <x-content.breadcrumbs :items="..."> are already plain text.
      *
      * @param  array<mixed>  $items
      * @return array<int, array{label: string, url: ?string}>

@@ -9,6 +9,12 @@
 @source not '../../tests/';
 @source not '../../stubs/';
 
+/* Styleguide di sviluppo: le sue utility stanno in styleguide.css, caricato solo su /styleguide/ */
+@source not '../views/styleguide.blade.php';
+
+/* Traduzioni (.pot/.po/.mo/.l10n.php): testo, non classi */
+@source not '../lang/';
+
 /**
  * Focus visibile (WCAG 2.4.7): niente reset globale di outline/underline
  */

@@ -1,5 +1,5 @@
 /**
- * Condivisione nativa (Web Share API) per components/share.
+ * Condivisione nativa (Web Share API) per components/content/share.
  *
  * Il pulsante è nascosto di default: viene mostrato solo se il browser
  * supporta navigator.share, altrimenti restano i soli link social.

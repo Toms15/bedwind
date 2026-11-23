@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-23T15:13:53+00:00\n"
+"POT-Creation-Date: 2026-11-23T15:53:48+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: sage\n"
@@ -68,6 +68,7 @@ msgid "Continua a leggere"
 msgstr ""
 
 #: app/Navigation/Breadcrumbs.php:107
+#: resources/views/styleguide.blade.php:43
 msgid "Home"
 msgstr ""
 
@@ -164,6 +165,11 @@ msgstr ""
 
 #: app/setup.php:192
 msgid "Piè di pagina"
+msgstr ""
+
+#: app/Styleguide.php:245
+#: resources/views/styleguide.blade.php:55
+msgid "Styleguide"
 msgstr ""
 
 #: app/svg.php:101
@@ -307,6 +313,7 @@ msgstr ""
 
 #. translators: ACF "Blocco: Solo testo", title (label)
 #: resources/lang/acf-json.php:47
+#: resources/views/styleguide.blade.php:200
 msgid "Titolo"
 msgstr ""
 
@@ -391,29 +398,29 @@ msgstr ""
 msgid "Modifica blocco"
 msgstr ""
 
-#: resources/views/components/breadcrumbs.blade.php:86
+#: resources/views/components/content/breadcrumbs.blade.php:86
 msgid "Percorso di navigazione"
 msgstr ""
 
-#: resources/views/components/carousel-navigation.blade.php:11
+#: resources/views/components/content/carousel-navigation.blade.php:11
 msgid "Slide precedente"
 msgstr ""
 
-#: resources/views/components/carousel-navigation.blade.php:28
+#: resources/views/components/content/carousel-navigation.blade.php:28
 msgid "Slide successiva"
 msgstr ""
 
 #. translators: %s: social network name, e.g. Facebook.
-#: resources/views/components/share.blade.php:38
+#: resources/views/components/content/share.blade.php:38
 msgid "Condividi su %s"
 msgstr ""
 
-#: resources/views/components/share.blade.php:71
+#: resources/views/components/content/share.blade.php:71
 msgctxt "share label"
 msgid "Condividi su"
 msgstr ""
 
-#: resources/views/components/share.blade.php:100
+#: resources/views/components/content/share.blade.php:100
 msgid "Condividi"
 msgstr ""
 
@@ -457,6 +464,197 @@ msgstr ""
 #: resources/views/partials/entry-meta.blade.php:7
 msgctxt "post author"
 msgid "Di"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:19
+#: resources/views/styleguide.blade.php:71
+msgid "Colori"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:20
+#: resources/views/styleguide.blade.php:111
+msgid "Tipografia"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:21
+#: resources/views/styleguide.blade.php:145
+msgid "Titoli"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:22
+#: resources/views/styleguide.blade.php:161
+msgid "Link e focus"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:33
+msgid "Testo di esempio per la styleguide del tema."
+msgstr ""
+
+#: resources/views/styleguide.blade.php:35
+msgid "Token non disponibili: esegui npm run build per generare public/build/assets/theme.json."
+msgstr ""
+
+#: resources/views/styleguide.blade.php:38
+msgid "Su bianco"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:39
+msgid "Su nero"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:44
+msgid "Sezione"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:45
+msgid "Pagina corrente"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:57
+msgid "Token e componenti del tema. Pagina disponibile solo in sviluppo (WP_ENV development), esclusa dai motori di ricerca."
+msgstr ""
+
+#: resources/views/styleguide.blade.php:60
+msgid "Sezioni della styleguide"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:73
+msgid "Rapporto di contrasto WCAG 2.2 di ogni colore con bianco e nero. Testo normale: AA da 4.5:1, AAA da 7:1; testo grande (da 24px, o 18.66px in grassetto): AA da 3:1, AAA da 4.5:1. I colori oklch sono convertiti in sRGB."
+msgstr ""
+
+#: resources/views/styleguide.blade.php:90
+msgid "normale"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:90
+#: resources/views/styleguide.blade.php:91
+msgid "no"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:91
+msgid "grande"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:97
+msgid "Contrasto"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:98
+msgid "formato colore non supportato"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:114
+msgid "Famiglie"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:125
+msgid "Dimensioni"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:127
+msgid "Alcune dimensioni possono avere lo stesso valore (es. sm e small, 0.875rem): small è il token del tema, sm il default di Tailwind."
+msgstr ""
+
+#: resources/views/styleguide.blade.php:147
+msgid "Elementi h1–h6 senza classi, come li stampa il contenuto. Sono esempi con role=\"presentation\": non fanno parte della struttura dei titoli della pagina."
+msgstr ""
+
+#: resources/views/styleguide.blade.php:151
+msgid "Titolo h1"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:152
+msgid "Titolo h2"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:153
+msgid "Titolo h3"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:154
+msgid "Titolo h4"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:155
+msgid "Titolo h5"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:156
+msgid "Titolo h6"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:162
+msgid "Premi Tab per vedere il focus visibile su link e pulsanti."
+msgstr ""
+
+#: resources/views/styleguide.blade.php:164
+msgid "Link di esempio nel testo"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:167
+msgid "Link visitato (questa pagina)"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:168
+msgid "– il tema non definisce uno stile :visited."
+msgstr ""
+
+#: resources/views/styleguide.blade.php:171
+msgid "Link con no-underline"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:173
+msgid "– la sottolineatura è nel layer base: senza, il link va distinto in altro modo (WCAG 1.4.1)."
+msgstr ""
+
+#: resources/views/styleguide.blade.php:181
+msgid "Primario"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:182
+#: resources/views/styleguide.blade.php:190
+msgid "Secondario"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:183
+msgid "Nero"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:184
+msgid "Nuova scheda"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:185
+#: resources/views/styleguide.blade.php:191
+msgid "Disabilitato"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:189
+msgid "Bianco"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:207
+msgid "Informazione (default)."
+msgstr ""
+
+#: resources/views/styleguide.blade.php:208
+msgid "Operazione completata."
+msgstr ""
+
+#: resources/views/styleguide.blade.php:209
+msgid "Attenzione: controlla i dati."
+msgstr ""
+
+#: resources/views/styleguide.blade.php:210
+msgid "Errore: operazione non riuscita."
+msgstr ""
+
+#: resources/views/styleguide.blade.php:212
+msgid "role=\"status\" è il default. role=\"alert\" (live region assertiva) va passato solo per messaggi inseriti dinamicamente:"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:223
+msgid "Senza immagine: fallback del tema."
 msgstr ""
 
 #: resources/views/blocks/only-text/block.json

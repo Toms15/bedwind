@@ -29,9 +29,9 @@
     @endif
 
     @if ($closed())
-      <x-alert type="warning">
+      <x-ui.alert type="warning">
         {{ __('I commenti sono chiusi.', 'sage') }}
-      </x-alert>
+      </x-ui.alert>
     @endif
 
     @php(comment_form())

@@ -63,3 +63,25 @@ if (! class_exists('WP_Block_Type_Registry')) {
         }
     }
 }
+
+if (! class_exists('WP_Query')) {
+    class WP_Query
+    {
+        public bool $is_home = true;
+
+        public bool $is_404 = false;
+
+        /** @param array<string, mixed> $vars */
+        public function __construct(public array $vars = [], public bool $main = true) {}
+
+        public function get(string $var): mixed
+        {
+            return $this->vars[$var] ?? '';
+        }
+
+        public function is_main_query(): bool
+        {
+            return $this->main;
+        }
+    }
+}

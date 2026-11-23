@@ -11,7 +11,7 @@
     @php(the_content())
   </div>
 
-  <x-share class="mt-8" :link="get_permalink()" :title="get_the_title()" />
+  <x-content.share class="mt-8" :link="get_permalink()" :title="get_the_title()" />
 
   @if ($pagination())
     <footer>

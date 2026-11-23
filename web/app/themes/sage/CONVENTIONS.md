@@ -9,6 +9,7 @@ Conventions decided for this theme. Tooling (build, lint, PHP quality, translati
 - [PHP](#php)
 - [Security and escaping](#security-and-escaping)
 - [Components](#components)
+- [Styleguide](#styleguide)
 - [Renaming the theme](#renaming-the-theme)
 
 ## ACF blocks
@@ -58,7 +59,7 @@ ACF blocks are allowed in every editor; core blocks only in the post types of `s
   @if ($section_style) style="{{ $section_style }}" @endif>
   <div class="container mx-auto px-6 3xl:px-0">
     @if ($contents['title'])
-      <x-title :tag="$contents['title_tag']" class="mb-6">{{ $contents['title'] }}</x-title>
+      <x-ui.title :tag="$contents['title_tag']" class="mb-6">{{ $contents['title'] }}</x-ui.title>
     @endif
     ...
   </div>
@@ -68,7 +69,7 @@ ACF blocks are allowed in every editor; core blocks only in the post types of `s
 - `id`: `settings.id` is the block **anchor** when set, otherwise the ACF block id (`block_…`), so every section has an id;
 - the outer `<section>` always has `w-full overflow-x-clip` plus the padding/margin classes of the block; the content sits in `<div class="container mx-auto px-6 3xl:px-0">`;
 - classes are composed with `@class(array_filter([...]))` (empty presets are dropped); a multi-line `@class` is wrapped in the blade-formatter markers, inside the tag, with the array at 2 spaces;
-- headings: the block title uses `<x-title :tag="$contents['title_tag']">` (ACF `title_formatting`, h1–h6/p, default `h2`); child headings (subtitles, card titles) use `$contents['next_heading']`, from `\App\get_next_heading_level($title_tag)` (one level down, `p` after `h6`). Pass `next_heading` further down with `\App\get_next_heading_level($contents['next_heading'])` for nested levels.
+- headings: the block title uses `<x-ui.title :tag="$contents['title_tag']">` (ACF `title_formatting`, h1–h6/p, default `h2`); child headings (subtitles, card titles) use `$contents['next_heading']`, from `\App\get_next_heading_level($title_tag)` (one level down, `p` after `h6`). Pass `next_heading` further down with `\App\get_next_heading_level($contents['next_heading'])` for nested levels.
 
 **Field groups** live in `acf-json/` (ACF local JSON, saved there by `acf/settings/save_json` in `app/setup.php`). Labels, instructions and choices are in **Italian** (translated at runtime, see [Internationalization](#internationalization)). Two kinds of groups:
 
@@ -99,7 +100,7 @@ Example slug: `cards`. Copy from `only-text` where possible.
 2. **Fields**: locally, in _ACF → Field Groups_ create a group named after the block (e.g. _Blocco: Card_) with Italian labels, location _Block is equal to_ the new block (`acf/cards`) and order 0. Spacings and colors come from the shared _Impostazioni blocco_ group: do not add them. For a title, text or buttons use the names `title`, `title_formatting`, `content`, `buttons` (read by `BlockRenderer::data()`). Saving writes `acf-json/group_*.json`: commit it. Never change the key or name of fields already used by saved blocks (see [ACF blocks](#acf-blocks)).
 3. **Block view**: create `resources/views/blocks/cards/cards.blade.php`: `BlockRenderer::data($block)`, read and validate the block fields, sanitize URLs (`sanitize_url()`) and colors (`sanitize_hex_color()`), then `@include('modules.cards', [...])`.
 4. **Assets (optional)**: only if the block needs its own JS or CSS, add `resources/views/blocks/cards/view.js` and/or `style.css` (see [Block assets](#block-assets)), then restart `npm run dev`.
-5. **Module**: create `resources/views/modules/cards.blade.php` with the `@var` header, the `<section id … class="w-full overflow-x-clip …">` and `<div class="container mx-auto px-6 3xl:px-0">` markup, `<x-title :tag>` for the title and `next_heading` for the child headings. Use the [components](#components) for buttons, images and titles.
+5. **Module**: create `resources/views/modules/cards.blade.php` with the `@var` header, the `<section id … class="w-full overflow-x-clip …">` and `<div class="container mx-auto px-6 3xl:px-0">` markup, `<x-ui.title :tag>` for the title and `next_heading` for the child headings. Use the [components](#components) for buttons, images and titles.
 6. **Strings**: every visible string in Italian with the `sage` text domain (`{{ __('Leggi di più', 'sage') }}`).
 7. **Logic and tests**: move non-trivial data preparation (queries, mapping) to a class in `app/` (e.g. `App\Queries\…` or a static method in `App\Blocks\`), with a Pest test in `tests/Unit/` that mocks `get_field()` with Brain Monkey (see `tests/Unit/BlockRendererTest.php`). Run `composer test` and `composer analyse`.
 8. **Translations**: `npm run translate` (block.json, Blade and the new ACF group end up in `sage.pot` and in the `.po` files), translate the new entries in `resources/lang/en_US.po`, then `npm run translate:compile`.
@@ -121,7 +122,8 @@ Example slug: `cards`. Copy from `only-text` where possible.
   - `App\Queries\*`: static query methods returning plain arrays for the views (`Posts::latest()`, `Posts::paginated()`, `Pages::children()`);
   - `App\Blocks\*`: block rendering and shared block data (`BlockRenderer`), per-block assets (`BlockAssets`);
   - `App\Navigation\*`: navigation helpers (`Breadcrumbs`);
-  - `App\View\Composers\*`: Acorn view composers.
+  - `App\View\Composers\*`: Acorn view composers;
+  - `App\Styleguide`: the development-only `/styleguide/` route (see [Styleguide](#styleguide)).
 - Hooks and functions without a class are in the files loaded by `functions.php` (`setup`, `filters`, `blocks`, `helpers`, `svg`, `rewrites`). Helper functions live in `app/helpers.php`, namespace `App`, and are called in Blade with the fully qualified name: `\App\get_next_heading_level()`, `\App\get_trimmed_excerpt()`, `\App\random_string_for_id()`, `\App\get_fallback_image_url()`.
 - Theme filters are prefixed `sage/` (list in the [README](README.md#theme-filters)).
 - Types: native types where WordPress calls with known types, PHPDoc array shapes elsewhere. PHPStan level 6 must pass (`composer analyse`); unit tests with Pest and Brain Monkey (`composer test`). Pint (preset `laravel`) formats `app/` (`composer lint:fix`).
@@ -130,25 +132,45 @@ Example slug: `cards`. Copy from `only-text` where possible.
 
 - Blade `{{ }}` escapes with `htmlspecialchars()`: inside it use `sanitize_url()` for URLs, **not** `esc_url()` (which would encode `&` as `&#038;`, escaped a second time by Blade). `esc_url()`/`esc_attr()` are for PHP that prints directly (`printf` in `app/`).
 - Colors from ACF or props go through `sanitize_hex_color()`; invalid values become `''`/`null` and nothing is printed.
-- Link targets are whitelisted (`_self`/`_blank`); `_blank` adds `rel="noopener noreferrer"` (`<x-button>`).
+- Link targets are whitelisted (`_self`/`_blank`); `_blank` adds `rel="noopener noreferrer"` (`<x-ui.button>`).
 - `{!! !!}` only for trusted HTML: the ACF wysiwyg content, already filtered by WordPress, or markup built by the theme.
-- Heading and title tags are whitelisted (`<x-title>`, `BlockRenderer::data()`), never printed from raw input.
+- Heading and title tags are whitelisted (`<x-ui.title>`, `BlockRenderer::data()`), never printed from raw input.
 - SVG uploads are sanitized with `enshrined/svg-sanitize` and limited to `sage/svg_upload_capability` (`app/svg.php`).
 
 ## Components
 
-Anonymous Blade components in `resources/views/components/`; the full prop documentation is in the comment at the top of each file. Extra attributes (`class`, `id`, `data-*`) are merged into the root element.
+Anonymous Blade components in `resources/views/components/`, grouped by folder (the folder is the prefix of the tag: `components/ui/button.blade.php` → `<x-ui.button>`); the full prop documentation is in the comment at the top of each file. Extra attributes (`class`, `id`, `data-*`) are merged into the root element.
 
-| Component                 | Use                                                                              | Main props                                                                                                                 |
-| ------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `<x-button>`              | Link or disabled button; renders nothing if `link` is invalid and not `disabled` | `link`, `target` (`_self`/`_blank`), `type` (`primary`, `secondary`, `white`, `black`), `label`, `disabled`, `customColor` |
-| `<x-title>`               | Heading with a whitelisted tag                                                   | `tag` (h1–h6, `p`, `span`; default `h2`), `textColor`                                                                      |
-| `<x-alert>`               | Notice box, nothing without content                                              | `type` (`success`, `caution`, `warning`, default info), `message` (or the slot), `role` (`status`/`alert`)                 |
-| `<x-share>`               | Social share links + Web Share API button                                        | `title`, `link` (default: current post), `facebook`, `twitter` (X), `linkedin`, `whatsapp`                                 |
-| `<x-image>`               | Attachment image (`wp_get_attachment_image()`)                                   | `id`, `size` (default `large`), `sizes`, `eager`, `alt`, `fallback`, `img-id`                                              |
-| `<x-breadcrumbs>`         | Breadcrumbs with JSON-LD                                                         | `items` (default `Breadcrumbs::items()`), `jsonld` (default `true`)                                                        |
-| `<x-acf.placeholder>`     | Editor placeholder of ACF blocks (used by `BlockRenderer`)                       | `block`, `title`, `message`                                                                                                |
-| `<x-carousel-navigation>` | Previous/next buttons for a carousel                                             | `id` (prefix of the `-prev`/`-next` classes)                                                                               |
+| Folder     | Contents                                                     |
+| ---------- | ------------------------------------------------------------ |
+| `ui/`      | Generic building blocks, with no knowledge of the content    |
+| `content/` | Pieces tied to the current content, page or post (or a list) |
+| `acf/`     | ACF block helpers used by `BlockRenderer`                    |
+
+| Component                         | Use                                                                              | Main props                                                                                                                 |
+| --------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `<x-ui.button>`                   | Link or disabled button; renders nothing if `link` is invalid and not `disabled` | `link`, `target` (`_self`/`_blank`), `type` (`primary`, `secondary`, `white`, `black`), `label`, `disabled`, `customColor` |
+| `<x-ui.title>`                    | Heading with a whitelisted tag                                                   | `tag` (h1–h6, `p`, `span`; default `h2`), `textColor`                                                                      |
+| `<x-ui.alert>`                    | Notice box, nothing without content                                              | `type` (`success`, `caution`, `warning`, default info), `message` (or the slot), `role` (`status`/`alert`)                 |
+| `<x-ui.image>`                    | Attachment image (`wp_get_attachment_image()`)                                   | `id`, `size` (default `large`), `sizes`, `eager`, `alt`, `fallback`, `img-id`                                              |
+| `<x-content.share>`               | Social share links + Web Share API button                                        | `title`, `link` (default: current post), `facebook`, `twitter` (X), `linkedin`, `whatsapp`                                 |
+| `<x-content.breadcrumbs>`         | Breadcrumbs with JSON-LD                                                         | `items` (default `Breadcrumbs::items()`), `jsonld` (default `true`)                                                        |
+| `<x-content.carousel-navigation>` | Previous/next buttons for a carousel                                             | `id` (prefix of the `-prev`/`-next` classes)                                                                               |
+| `<x-acf.placeholder>`             | Editor placeholder of ACF blocks (used by `BlockRenderer`)                       | `block`, `title`, `message`                                                                                                |
+
+A new component goes in the folder that matches its role (no components in the root of `components/`), is documented in its header comment and in this table, and gets an example in the [styleguide](#styleguide).
+
+## Styleguide
+
+`/styleguide/` shows the design tokens (colors, font families and sizes, read from `public/build/assets/theme.json`, generated by the build from the `@theme` of `resources/css/theme.css`), the h1–h6 headings, links and focus, and every component with its main variants on static sample data. View: `resources/views/styleguide.blade.php`; logic: `App\Styleguide` (`app/Styleguide.php`), hooked by `ThemeServiceProvider::boot()`.
+
+- **Development only**: the rewrite rule, the `sage_styleguide` query var and the template are registered only with `WP_ENV === 'development'` (no filter to turn it on elsewhere). In every other environment `/styleguide/` is a regular 404 and `?sage_styleguide=1` is ignored.
+- **No database page**: a rewrite rule (`^styleguide/?$`) renders the view with the theme layout; the main query runs no posts query, the page is `noindex, nofollow` (`wp_robots`), titled _Styleguide_ and has the `styleguide` body class. Nothing on the site links to it.
+- **Rewrite rules**: they are stored in the database, so they are not flushed on every request. On `init` the theme compares the stored rules with the environment and flushes once when they disagree: the first request in development adds the rule, the first request (or WP-CLI command) in another environment removes a rule left there, e.g. by a database copied from development. The option `sage_styleguide_rewrite` remembers the last flush, so a rule removed by something else is not flushed on every request. With plain permalinks there are no stored rules: use `/?sage_styleguide=1`. If the page is a 404 in development, run `wp rewrite flush`.
+- **Own stylesheet**: the utilities used only by the view are compiled in `resources/css/styleguide.css` (a Vite entry with `tailwindcss/utilities` and `@source` on the view only), enqueued by `Styleguide::enqueueAssets()` only on the styleguide. `app.css` and `editor.css` exclude the view (`@source not '../views/styleguide.blade.php'`), so its classes never reach the production stylesheets. The components shown keep using the classes compiled in `app.css`. Both also exclude `resources/lang/`: translations are text, and an English word that is also a utility name would add it to the stylesheets.
+- **Headings**: the sample headings (h1–h6 and `<x-ui.title>`) have `role="presentation"`, so the heading structure of the page is one h1 and one h2 per section.
+- **Contrast**: every palette color shows its WCAG 2.2 contrast with white and black and the level met (AA/AAA, normal and large text), from `Styleguide::contrasts()` (hex and the oklch of `theme.json`, converted to sRGB). The page runs no content query: `<x-ui.image>` shows the theme fallback.
+- When adding or changing a component or a token, update the styleguide: it is the quick visual check of the theme (`npm run dev`, then `https://<site>/styleguide/`).
 
 ## Renaming the theme
 

@@ -1,7 +1,7 @@
 {{--
   Breadcrumb del contenuto corrente, con JSON-LD BreadcrumbList.
 
-  Uso: <x-breadcrumbs /> in qualsiasi template, layout o blocco.
+  Uso: <x-content.breadcrumbs /> in qualsiasi template, layout o blocco.
 
   Props:
   - items (array|null) Voci [['label' => string, 'url' => ?string], ...].

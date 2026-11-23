@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\PostTypes\Faq;
+use App\Styleguide;
 use Roots\Acorn\Sage\SageServiceProvider;
 
 class ThemeServiceProvider extends SageServiceProvider
@@ -54,5 +55,9 @@ class ThemeServiceProvider extends SageServiceProvider
         foreach ([...$this->taxonomies, ...$this->postTypes] as $class) {
             add_action('init', [$class, 'register']);
         }
+
+        // /styleguide/ only in development; elsewhere it only removes a
+        // leftover rewrite rule (see App\Styleguide).
+        Styleguide::register();
     }
 }

@@ -4,9 +4,9 @@
   @include('partials.page-header')
 
   @if (!have_posts())
-    <x-alert type="warning">
+    <x-ui.alert type="warning">
       {{ __('Spiacenti, la pagina che stai cercando non esiste.', 'sage') }}
-    </x-alert>
+    </x-ui.alert>
 
     {!! get_search_form(false) !!}
   @endif

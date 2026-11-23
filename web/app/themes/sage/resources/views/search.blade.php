@@ -4,9 +4,9 @@
   @include('partials.page-header')
 
   @if (!have_posts())
-    <x-alert type="warning">
+    <x-ui.alert type="warning">
       {{ __('Spiacenti, nessun risultato trovato.', 'sage') }}
-    </x-alert>
+    </x-ui.alert>
 
     {!! get_search_form(false) !!}
   @endif

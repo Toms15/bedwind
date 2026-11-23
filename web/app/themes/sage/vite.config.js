@@ -115,6 +115,7 @@ export default defineConfig(({ mode }) => {
         input: [
           'resources/css/app.css',
           'resources/css/editor.css',
+          'resources/css/styleguide.css',
           'resources/js/app.js',
           'resources/js/editor.js',
           ...blockAssets,

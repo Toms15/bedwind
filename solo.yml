@@ -1,0 +1,36 @@
+# Visit https://soloterm.com to learn more
+# Processi del progetto (formato: help(topic="solo.yml") via Solo MCP).
+# I comandi nuovi o modificati vanno approvati ("trusted") nella UI di Solo prima di partire.
+name: sage
+icon_initials: SG
+processes:
+  # Dev server Vite del tema (HTTPS su :5173, scrive public/hot e lo rimuove all'uscita).
+  # Avvio automatico: senza dev server o build il sito non ha asset.
+  # Si riavvia se cambia la configurazione di Vite o le dipendenze.
+  Vite:
+    command: npm run dev
+    working_dir: web/app/themes/sage
+    auto_start: true
+    restart_when_changed:
+      - web/app/themes/sage/vite.config.js
+      - web/app/themes/sage/package-lock.json
+
+  # Segue logs/debug.log (WP_DEBUG_LOG in development); -F aspetta il file se non esiste ancora.
+  Debug log:
+    command: tail -n 0 -F logs/debug.log
+    auto_start: true
+
+  # Comandi on-demand: si avviano a mano dalla sidebar di Solo.
+  Lint frontend:
+    command: npm run lint
+    working_dir: web/app/themes/sage
+    auto_start: false
+
+  Build tema:
+    command: npm run build
+    working_dir: web/app/themes/sage
+    auto_start: false
+
+  Check PHP:
+    command: composer check
+    auto_start: false

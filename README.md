@@ -12,92 +12,142 @@ This project uses [Bedrock](https://roots.io/bedrock/) as a WordPress boilerplat
 - Node.js 22 (see `web/app/themes/sage/.nvmrc`; `engines`: `^22.22.2 || ^24.15.0 || >=26`, the minimum required by Stylelint 18)
 - npm
 
-## Initial Setup
+## Local development with Herd
 
-### 1. Clone the repository
+The local environment is [Laravel Herd](https://herd.laravel.com) (macOS/Windows): nginx + PHP, with HTTPS certificates for `*.test` sites. There is no Docker/DDEV/Lando setup. The examples use the site name `project-name`, served at `https://project-name.test`.
+
+### Requirements
+
+- **Herd**, which ships PHP and Composer (use PHP 8.3 or newer for the site: see Requirements above). The site's PHP version can be pinned with `herd isolate 8.3`
+- **MySQL**: the MySQL service of Herd Pro, [DBngin](https://dbngin.com), or any local MySQL/MariaDB server
+- **Node.js** via [nvm](https://github.com/nvm-sh/nvm): `nvm use` in the theme reads `web/app/themes/sage/.nvmrc`
+- **WP-CLI** (`wp`), for installing WordPress, the salts and the theme translation scripts
+- An **ACF Pro** license (see step 2)
+
+### 1. Clone and link the site
 
 ```bash
 git clone <repository-url> project-name
 cd project-name
+
+# Serve the folder as https://project-name.test (Herd detects Bedrock and uses web/ as docroot)
+herd link project-name
+herd secure project-name
 ```
 
-### 2. Install PHP dependencies
+If the folder is inside a path parked by Herd (e.g. `~/Herd`), `herd link` is not needed: the site is already served as `<folder>.test`. `herd secure` is required anyway: the Vite dev server reuses the Herd certificate of the site to serve the assets over HTTPS.
 
-```bash
-composer install
-```
+### 2. ACF Pro credentials
 
-#### Premium credentials (ACF Pro)
-
-ACF Pro is installed from `https://connect.advancedcustomfields.com`, which requires a license. Before running `composer install`, create a local `auth.json` (gitignored, never commit it):
+ACF Pro is installed from `https://connect.advancedcustomfields.com`, which requires a license. Before running `composer install`, create a local `auth.json` in the project root (gitignored, never commit it):
 
 ```bash
 # username = ACF Pro license key, password = the site URL the license is activated for
 composer config --auth http-basic.connect.advancedcustomfields.com <license_key> <site_url>
 ```
 
-In CI, pass the same credentials through the `COMPOSER_AUTH` environment variable (stored as a secret):
+The resulting file has this shape:
 
-```bash
-COMPOSER_AUTH='{"http-basic":{"connect.advancedcustomfields.com":{"username":"<license_key>","password":"<site_url>"}}}'
+```json
+{
+    "http-basic": {
+        "connect.advancedcustomfields.com": {
+            "username": "<license_key>",
+            "password": "<site_url>"
+        }
+    }
+}
 ```
 
-### 3. Configure environment
+In CI, pass the same JSON through the `COMPOSER_AUTH` environment variable (stored as a secret, see "Continuous integration").
 
-Copy the example configuration file and customize it:
+### 3. Configure `.env`
 
 ```bash
 cp .env.example .env
 ```
 
-Edit the `.env` file with your configurations:
+Set at least:
 
-```env
-DB_NAME='database_name'
-DB_USER='db_user'
-DB_PASSWORD='db_password'
-DB_HOST='localhost'
+| Key | Value |
+| --- | --- |
+| `DB_NAME`, `DB_USER`, `DB_PASSWORD` | the local database (create it first, e.g. `mysql -u root -e "CREATE DATABASE project_name"`) |
+| `DB_HOST` | uncomment it only if the server is not on `localhost` (e.g. `127.0.0.1:3307` for a second DBngin instance) |
+| `WP_ENV` | `development` (loads `config/environments/development.php`: debug on, `logs/debug.log`, indexing disabled, plugin installs from the admin allowed) |
+| `WP_HOME` | `https://project-name.test`: it must match the Herd site, the Vite dev server reads it to pick the certificate |
+| `WP_SITEURL` | leave `"${WP_HOME}/wp"` |
+| salts (`AUTH_KEY` … `NONCE_SALT`) | unique random values |
 
-WP_ENV='development'
-WP_HOME='https://project-name.test'
-WP_SITEURL="${WP_HOME}/wp"
-WP_HOME_DOMAIN='project-name.test'
+Generate the salts with the [WP-CLI dotenv command](https://github.com/aaemnnosttv/wp-cli-dotenv-command) or paste them from the [Roots generator](https://roots.io/salts.html):
 
-# Generate secure keys at https://roots.io/salts.html
-AUTH_KEY='generate-secure-key'
-SECURE_AUTH_KEY='generate-secure-key'
-LOGGED_IN_KEY='generate-secure-key'
-NONCE_KEY='generate-secure-key'
-AUTH_SALT='generate-secure-key'
-SECURE_AUTH_SALT='generate-secure-key'
-LOGGED_IN_SALT='generate-secure-key'
-NONCE_SALT='generate-secure-key'
+```bash
+wp package install aaemnnosttv/wp-cli-dotenv-command
+wp dotenv salts regenerate
 ```
 
-### 4. Sage theme setup
+The optional keys (`WP_DEBUG`, `WP_DEBUG_DISPLAY`, `WP_DEBUG_LOG`, `DB_PREFIX`, `DATABASE_URL`, …) are documented in `.env.example`. Personal overrides that should not touch the shared `.env` can go in `.env.local` (gitignored).
 
-Navigate to the theme folder and install Node.js dependencies (`nvm use` picks the Node version from the theme's `.nvmrc`):
+### 4. Install dependencies
+
+```bash
+# Root: WordPress, plugins, ACF Pro, WordPress translations
+composer install
+
+# Theme: Acorn (PHP) and the Vite/Tailwind toolchain (Node)
+cd web/app/themes/sage
+composer install
+nvm use
+npm ci
+cd -
+```
+
+### 5. Install WordPress (or import a database)
+
+Fresh install:
+
+```bash
+wp core install --url=https://project-name.test --title="Project name" \
+  --admin_user=admin --admin_email=admin@example.test --prompt=admin_password
+wp theme activate sage
+wp site switch-language it_IT
+wp rewrite structure '/%postname%/'
+```
+
+Or import an existing dump and adapt the URLs:
+
+```bash
+wp db import dump.sql
+wp search-replace 'https://www.example.com' 'https://project-name.test' --all-tables --precise
+wp rewrite flush
+```
+
+ACF field groups are loaded from `web/app/themes/sage/acf-json/`: nothing to import.
+
+### 6. Start the theme dev server
 
 ```bash
 cd web/app/themes/sage
-nvm use
-composer install
-npm install
-```
-
-### 5. Theme development
-
-To start development compilation (with hot reload):
-
-```bash
 npm run dev
 ```
 
-To compile assets for production:
+Vite serves the assets with hot reload on `https://project-name.test:5173` and writes `public/hot`, which tells the theme to load the assets from the dev server; the file is removed when Vite stops (Ctrl+C), and the site falls back to the build in `public/build` (`npm run build`). Without either, the site has no CSS/JS.
 
-```bash
-npm run build
-```
+With [Solo](https://soloterm.com), `solo.yml` defines the project processes (approve them once in the Solo UI, new or changed commands need to be trusted):
+
+| Process | Command | Starts automatically |
+| --- | --- | --- |
+| **Vite** | `npm run dev` in the theme (restarted when `vite.config.js` or `package-lock.json` change) | yes |
+| **Debug log** | `tail -F logs/debug.log` (new lines only) | yes |
+| **Lint frontend** | `npm run lint` in the theme | no, start it from the sidebar |
+| **Build tema** | `npm run build` in the theme | no |
+| **Check PHP** | `composer check` (root and theme) | no |
+
+### Access URLs
+
+- **Frontend**: `https://project-name.test`
+- **Admin**: `https://project-name.test/wp/wp-admin`
+
+In development PHP errors are shown on the page and written to `logs/debug.log` (outside the webroot).
 
 ## Translations
 
@@ -177,6 +227,7 @@ project-name/
 │   │   └── uploads/        # Uploaded files
 │   ├── wp-config.php       # WordPress config
 │   └── index.php           # Entry point
+├── logs/                   # debug.log in development (outside the webroot, not versioned)
 ├── vendor/                 # Composer dependencies
 ├── .env                    # Environment configuration (do not commit!)
 └── composer.json           # PHP dependencies
@@ -255,26 +306,88 @@ If `COMPOSER_AUTH` is missing the root job fails with an explicit error, except 
 
 `.github/dependabot.yml` checks every Monday (Europe/Rome) Composer in `/` and in `web/app/themes/sage`, npm in `web/app/themes/sage` and the GitHub Actions used by the workflow. Minor and patch updates are grouped (dev and production separately for Composer), with at most 5 open PRs per ecosystem. WordPress core (`roots/wordpress`) only gets patch updates: moving to a new x.y release stays a manual decision. `roave/security-advisories` is ignored.
 
-## Database
-
-Make sure to create the database specified in `DB_NAME` in the `.env` file before accessing the site.
-
-## Access URLs
-
-- **Frontend**: `https://project-name.test`
-- **Admin**: `https://project-name.test/wp/wp-admin`
-
 ## Deployment
 
-For production deployment:
+There is no deploy script: the steps below work for any target (a build on the server, a CI artifact uploaded via rsync/SFTP, etc.). The server needs PHP >= 8.2, MySQL, a web server with the docroot on **`web/`** (not the project root) and HTTPS.
 
-1. Change `WP_ENV` from `development` to `production` in the `.env` file
-2. Update `WP_HOME` with the production URL
-3. Run `npm run build` to compile optimized assets
-4. Upload files to server excluding:
-   - `node_modules/`
-   - `.env` (create new configuration on server)
-   - Development files (`.git`, `.gitignore`, etc.)
+### 1. Build
+
+From the project root (on the server or in CI, with the ACF Pro credentials available, see below):
+
+```bash
+composer install --no-dev --optimize-autoloader --no-interaction
+
+cd web/app/themes/sage
+composer install --no-dev --optimize-autoloader --no-interaction
+npm ci
+npm run build
+```
+
+- `--no-dev` drops Pint, PHPStan, Pest and the other dev tools (production then only needs PHP 8.2).
+- `--optimize-autoloader` (`-o`, already the default in both `composer.json`) generates a classmap. `--classmap-authoritative` also works with Acorn (the theme classes in `app/` and the vendor classes are all in the classmap), but then every new class requires a new `composer install`/`dump-autoload`: use it only if the build always runs on deploy.
+- The root `composer install` also downloads the WordPress translations into `web/app/languages/` and installs ACF Pro, so it needs the ACF credentials where it runs: an `auth.json` on the server (outside the webroot, never in the repository) or `COMPOSER_AUTH` as a CI secret when the build is done in CI.
+- `npm run build` writes `web/app/themes/sage/public/build/` (hashed assets + `manifest.json`). Node is not needed on the server if the build is done elsewhere.
+
+### 2. What to upload
+
+Upload the whole project (root included, not only `web/`): `config/`, `vendor/`, `web/` (with `web/wp`, `web/app/plugins`, `web/app/languages` generated by Composer), `composer.json`/`composer.lock`, `wp-cli.yml`, the theme with `vendor/` and `public/build/`.
+
+Do **not** upload:
+
+- `.git/`, `.github/`, `.idea/`, `MIGLIORIE.md` and other development files;
+- `web/app/themes/sage/node_modules/` (never used at runtime). Keep `resources/`: Blade views, blocks, `lang/` and the font/image files checked by the theme are read at runtime;
+- `web/app/themes/sage/public/hot` (if it exists the theme tries to load the assets from the Vite dev server);
+- the local `.env`, `.env.local`, `auth.json`;
+- `logs/*.log`, `web/app/uploads/` (synced separately, never overwritten by a deploy), `web/app/cache/`;
+- tests and tool configs: `web/app/themes/sage/tests/`, `phpunit.xml`, `phpstan.neon.dist`, `pint.json` (root and theme), `eslint.config.js`, `.prettierrc.json`, `.prettierignore`, `.stylelintrc.json`, `.bladeformatterrc.json`, `.bladeignore`, `solo.yml`.
+
+`wp-translation-downloader.lock` is only useful together with `web/app/languages/`: upload both or neither, otherwise a later `composer install` on the server considers the translations installed and does not download them.
+
+### 3. `.env` on the server
+
+Create it by hand on the server (never copy the local one):
+
+```env
+DB_NAME='...'
+DB_USER='...'
+DB_PASSWORD='...'
+# DB_HOST='...'
+
+WP_ENV='production'
+WP_HOME='https://www.example.com'
+WP_SITEURL="${WP_HOME}/wp"
+
+# new salts, different from development
+AUTH_KEY='...'
+# ... SECURE_AUTH_KEY, LOGGED_IN_KEY, NONCE_KEY, AUTH_SALT, SECURE_AUTH_SALT, LOGGED_IN_SALT, NONCE_SALT
+```
+
+With `WP_ENV='production'` `config/application.php` applies the production defaults: debug, display and `debug.log` off, `DISALLOW_FILE_EDIT` and `DISALLOW_FILE_MODS` on (plugins and WordPress are updated with Composer, not from the admin), automatic updates disabled. Use `WP_ENV='staging'` for a staging copy (same settings, search engines blocked).
+
+### 4. Permissions
+
+The PHP user must be able to write:
+
+- `web/app/uploads/` (media);
+- `web/app/cache/` (Acorn: compiled Blade views and bootstrap cache in `web/app/cache/acorn/`);
+- `logs/`, only if `WP_DEBUG_LOG` is enabled on the server.
+
+Everything else can be read-only for the PHP user.
+
+### 5. After each deploy
+
+From the project root on the server:
+
+```bash
+# Clear the Acorn caches of the previous release, then rebuild them
+wp acorn optimize:clear
+wp acorn optimize        # config, events, routes and compiled Blade views
+
+# Only if rewrite rules changed (new post types/taxonomies, permalink structure)
+wp rewrite flush
+```
+
+`wp acorn optimize` caches the configuration too: after changing `.env` run `wp acorn optimize:clear` (and `wp acorn optimize` again). On the first deploy also run `wp core install` or import the database (`wp search-replace` of the URLs), activate the theme and set the permalinks as in the local setup.
 
 ## Additional Notes
 

@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace App;
 
+use Illuminate\Support\Facades\Vite;
+
 /**
  * Get the heading tag that follows a given heading level.
  *
@@ -87,7 +89,7 @@ function random_string_for_id(int $length = 5): string
 function get_fallback_image_url(int $width = 1920, int $height = 1080): string
 {
     try {
-        return \Illuminate\Support\Facades\Vite::asset('resources/images/fallback.svg');
+        return Vite::asset('resources/images/fallback.svg');
     } catch (\Throwable) {
         return '';
     }

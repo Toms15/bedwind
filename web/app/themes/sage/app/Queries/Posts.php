@@ -41,7 +41,7 @@ class Posts
         $image = $image_id ? get_the_post_thumbnail_url($post_id, 'large') : false;
 
         return [
-            'title' => html_entity_decode(get_the_title($post_id), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+            'title' => html_entity_decode((string) get_the_title($post_id), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
             'link' => get_the_permalink($post_id),
             'image' => $image ?: \App\get_fallback_image_url(1280, 720),
             'image_id' => $image_id,

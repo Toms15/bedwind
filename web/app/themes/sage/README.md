@@ -56,6 +56,10 @@ Gli strumenti PHP sono dipendenze dev di questo `composer.json` (l'autoload `App
 | `composer test`     | Pest 3 + Brain Monkey: test unitari in `tests/Unit`, senza WordPress né database                                               |
 | `composer check`    | `validate --strict`, `audit`, `lint`, `analyse`, `test` in sequenza (da usare in CI). Dalla root: anche i controlli della root |
 
+Dipendenze:
+
+- `config.platform.php` è `8.2.0`, il minimo dichiarato in `require.php`: `composer update` risolve le versioni come se girasse su PHP 8.2, anche se in locale c'è un PHP più recente. Senza, il lock prenderebbe pacchetti che richiedono PHP 8.4 (es. `symfony/clock`, `symfony/string`, `symfony/translation` 8.x) e il tema non partirebbe su 8.2/8.3. Va alzato insieme a `require.php`, e con esso si possono passare Pest e Symfony alla major successiva.
+
 PHPStan:
 
 - `szepeviktor/phpstan-wordpress` (stub di WordPress e tipi di `apply_filters()` & co.) e `php-stubs/acf-pro-stubs` (`get_field()`, ...). Niente Larastan: Acorn non è un'applicazione Laravel completa e il tema non usa Eloquent; le facade di Illuminate sono già tipizzate.

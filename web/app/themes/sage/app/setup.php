@@ -12,8 +12,6 @@ use Illuminate\Support\Facades\Vite;
 
 /**
  * Inject styles into the block editor.
- *
- * @return array
  */
 add_filter('block_editor_settings_all', function ($settings) {
     $style = Vite::asset('resources/css/editor.css');
@@ -27,8 +25,6 @@ add_filter('block_editor_settings_all', function ($settings) {
 
 /**
  * Inject scripts into the block editor.
- *
- * @return void
  */
 add_action('admin_head', function () {
     if (! get_current_screen()?->is_block_editor()) {
@@ -58,8 +54,6 @@ add_action('admin_head', function () {
  * server, so a stale entry never breaks the page. The URL is
  * the same one the compiled @font-face in fonts.css points to, so the font
  * is downloaded once.
- *
- * @return void
  */
 add_action('wp_head', function () {
     $fonts = apply_filters('sage/preload_fonts', []);
@@ -88,8 +82,6 @@ add_action('wp_head', function () {
 
 /**
  * Use the generated theme.json file.
- *
- * @return string
  */
 add_filter('theme_file_path', function ($path, $file) {
     return $file === 'theme.json'
@@ -99,8 +91,6 @@ add_filter('theme_file_path', function ($path, $file) {
 
 /**
  * Register the initial theme setup.
- *
- * @return void
  */
 add_action('after_setup_theme', function () {
     /**
@@ -184,8 +174,6 @@ add_action('after_setup_theme', function () {
 
 /**
  * Register the theme sidebars.
- *
- * @return void
  */
 add_action('widgets_init', function () {
     $config = [
@@ -260,8 +248,6 @@ add_filter('acf/settings/l10n_textdomain', function () {
  * unknown URLs fall back to the front page with a 200 status and the
  * theme's custom rewrites never match. Only applies when no structure
  * is set, so an existing configuration is never overwritten.
- *
- * @return void
  */
 add_action('after_switch_theme', function () {
     if (get_option('permalink_structure')) {

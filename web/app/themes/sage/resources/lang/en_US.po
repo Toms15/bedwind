@@ -39,305 +39,300 @@ msgstr "Roots"
 msgid "https://roots.io/"
 msgstr "https://roots.io/"
 
-#: app/blocks.php:25
+#: app/blocks.php:47
 msgid "Caroselli"
 msgstr "Carousels"
 
-#: app/blocks.php:29
+#: app/blocks.php:51
 msgid "Contenuti dinamici"
 msgstr "Dynamic content"
 
-#: app/blocks.php:33
+#: app/blocks.php:55
 msgid "Contenuti statici"
 msgstr "Static content"
 
-#: app/blocks.php:37
+#: app/blocks.php:59
 msgid "Generici"
 msgstr "General"
 
-#: app/blocks.php:41
+#: app/blocks.php:63
 msgid "Hero"
 msgstr "Heroes"
 
-#: app/blocks.php:45
+#: app/blocks.php:67
 msgid "Separatori"
 msgstr "Dividers"
 
-#: app/Navigation/Breadcrumbs.php:102
+#: app/Navigation/Breadcrumbs.php:107
 msgid "Home"
 msgstr "Home"
 
-#: app/PostTypes/Faq.php:30
-#: app/PostTypes/Faq.php:33
+#: app/PostTypes/Faq.php:32
+#: app/PostTypes/Faq.php:35
 msgctxt "post type general name"
 msgid "FAQ"
 msgstr "FAQs"
 
-#: app/PostTypes/Faq.php:34
+#: app/PostTypes/Faq.php:36
 msgctxt "post type singular name"
 msgid "FAQ"
 msgstr "FAQ"
 
-#: app/PostTypes/Faq.php:35
+#: app/PostTypes/Faq.php:37
 msgctxt "admin menu"
 msgid "FAQ"
 msgstr "FAQs"
 
-#: app/PostTypes/Faq.php:36
+#: app/PostTypes/Faq.php:38
 msgctxt "add new on admin bar"
 msgid "FAQ"
 msgstr "FAQ"
 
-#: app/PostTypes/Faq.php:37
+#: app/PostTypes/Faq.php:39
 msgctxt "faq"
 msgid "Aggiungi FAQ"
 msgstr "Add New FAQ"
 
-#: app/PostTypes/Faq.php:38
+#: app/PostTypes/Faq.php:40
 msgid "Aggiungi nuova FAQ"
 msgstr "Add New FAQ"
 
-#: app/PostTypes/Faq.php:39
+#: app/PostTypes/Faq.php:41
 msgid "Nuova FAQ"
 msgstr "New FAQ"
 
-#: app/PostTypes/Faq.php:40
+#: app/PostTypes/Faq.php:42
 msgid "Modifica FAQ"
 msgstr "Edit FAQ"
 
-#: app/PostTypes/Faq.php:41
+#: app/PostTypes/Faq.php:43
 msgid "Visualizza FAQ"
 msgstr "View FAQ"
 
-#: app/PostTypes/Faq.php:42
+#: app/PostTypes/Faq.php:44
 msgid "Tutte le FAQ"
 msgstr "All FAQs"
 
-#: app/PostTypes/Faq.php:43
+#: app/PostTypes/Faq.php:45
 msgid "Cerca FAQ"
 msgstr "Search FAQs"
 
-#: app/PostTypes/Faq.php:44
+#: app/PostTypes/Faq.php:46
 msgid "Nessuna FAQ trovata."
 msgstr "No FAQs found."
 
-#: app/PostTypes/Faq.php:45
+#: app/PostTypes/Faq.php:47
 msgid "Nessuna FAQ trovata nel cestino."
 msgstr "No FAQs found in Trash."
 
-#: app/filters.php:21
+#: app/filters.php:23
 msgid "Continua a leggere"
 msgstr "Continue reading"
 
 #. translators: %s: year, e.g. 2026.
-#: app/rewrites.php:96
+#: app/rewrites.php:98
 msgid "Archivio %s"
 msgstr "Archive %s"
 
-#: app/setup.php:129
+#: app/setup.php:121
 msgid "Navigazione principale"
 msgstr "Primary Navigation"
 
-#: app/setup.php:197
+#: app/setup.php:187
 msgid "Principale"
 msgstr "Primary"
 
-#: app/setup.php:202
+#: app/setup.php:192
 msgid "Piè di pagina"
 msgstr "Footer"
 
-#: app/svg.php:99
+#: app/svg.php:101
 msgid "I file SVG compressi (.svgz) non sono consentiti."
 msgstr "Compressed SVG files (.svgz) are not allowed."
 
-#: app/svg.php:111
+#: app/svg.php:113
 msgid "Il contenuto SVG è consentito solo nei file con estensione .svg."
 msgstr "SVG content is only allowed in files with the .svg extension."
 
-#: app/svg.php:117
+#: app/svg.php:119
 msgid "Non hai i permessi per caricare file SVG."
 msgstr "Sorry, you are not allowed to upload SVG files."
 
-#: app/svg.php:186
+#: app/svg.php:188
 msgid "I file SVG devono essere caricati dalla libreria media."
 msgstr "SVG files must be uploaded through the media library."
 
 #. translators: 1: number of comments ("Una" when 1), 2: post title.
-#: app/View/Composers/Comments.php:25
+#: app/View/Composers/Comments.php:27
 msgctxt "comments title"
 msgid "%1$s risposta a &ldquo;%2$s&rdquo;"
 msgid_plural "%1$s risposte a &ldquo;%2$s&rdquo;"
 msgstr[0] "%1$s response to &ldquo;%2$s&rdquo;"
 msgstr[1] "%1$s responses to &ldquo;%2$s&rdquo;"
 
-#: app/View/Composers/Comments.php:26
+#: app/View/Composers/Comments.php:28
 msgctxt "comments title"
 msgid "Una"
 msgstr "One"
 
-#: app/View/Composers/Comments.php:57
+#: app/View/Composers/Comments.php:59
 msgid "&larr; Commenti meno recenti"
 msgstr "&larr; Older comments"
 
-#: app/View/Composers/Comments.php:71
+#: app/View/Composers/Comments.php:73
 msgid "Commenti più recenti &rarr;"
 msgstr "Newer comments &rarr;"
 
-#: app/View/Composers/Post.php:34
+#: app/View/Composers/Post.php:36
 msgid "Ultimi articoli"
 msgstr "Latest Posts"
 
 #. translators: %s: search query.
-#: app/View/Composers/Post.php:44
+#: app/View/Composers/Post.php:46
 msgid "Risultati della ricerca per %s"
 msgstr "Search Results for %s"
 
-#: app/Navigation/Breadcrumbs.php:128
-#: app/View/Composers/Post.php:50
+#: app/Navigation/Breadcrumbs.php:133
+#: app/View/Composers/Post.php:52
 msgid "Pagina non trovata"
 msgstr "Not Found"
 
-#: app/View/Composers/Post.php:63
+#: app/View/Composers/Post.php:65
 msgid "Pagine:"
 msgstr "Pages:"
 
-#. translators: ACF "Blocco" (field group title, group_69c1778d2ba98.json)
-#: resources/lang/acf-json.php:13
-msgid "Blocco"
-msgstr "Block"
-
-#. translators: ACF "Blocco", padding (label)
-#: resources/lang/acf-json.php:15
+#. translators: ACF "Impostazioni blocco", padding (label)
+#: resources/lang/acf-json.php:17
 msgid "Padding"
 msgstr "Padding"
 
-#. translators: ACF "Blocco", padding (choice "no"); ACF "Blocco", margin (choice "no")
-#: resources/lang/acf-json.php:17
+#. translators: ACF "Impostazioni blocco", padding (choice "no"); ACF "Impostazioni blocco", margin (choice "no")
+#: resources/lang/acf-json.php:19
 msgid "Nessuno"
 msgstr "None"
 
-#. translators: ACF "Blocco", padding (choice "py"); ACF "Blocco", margin (choice "my")
-#: resources/lang/acf-json.php:19
+#. translators: ACF "Impostazioni blocco", padding (choice "py"); ACF "Impostazioni blocco", margin (choice "my")
+#: resources/lang/acf-json.php:21
 msgid "Sopra / Sotto"
 msgstr "Top / Bottom"
 
-#. translators: ACF "Blocco", padding (choice "pt"); ACF "Blocco", margin (choice "mt")
-#: resources/lang/acf-json.php:21
+#. translators: ACF "Impostazioni blocco", padding (choice "pt"); ACF "Impostazioni blocco", margin (choice "mt")
+#: resources/lang/acf-json.php:23
 msgid "Solo sopra"
 msgstr "Top only"
 
-#. translators: ACF "Blocco", padding (choice "pb"); ACF "Blocco", margin (choice "mb")
-#: resources/lang/acf-json.php:23
+#. translators: ACF "Impostazioni blocco", padding (choice "pb"); ACF "Impostazioni blocco", margin (choice "mb")
+#: resources/lang/acf-json.php:25
 msgid "Solo sotto"
 msgstr "Bottom only"
 
-#. translators: ACF "Blocco", padding_dimension (label)
-#: resources/lang/acf-json.php:25
+#. translators: ACF "Impostazioni blocco", padding_dimension (label)
+#: resources/lang/acf-json.php:27
 msgid "Dimensione padding"
 msgstr "Padding size"
 
-#. translators: ACF "Blocco", padding_dimension (choice "xl"); ACF "Blocco", margin_dimension (choice "xl")
-#: resources/lang/acf-json.php:27
+#. translators: ACF "Impostazioni blocco", padding_dimension (choice "xl"); ACF "Impostazioni blocco", margin_dimension (choice "xl")
+#: resources/lang/acf-json.php:29
 msgid "XL"
 msgstr "XL"
 
-#. translators: ACF "Blocco", padding_dimension (choice "l"); ACF "Blocco", margin_dimension (choice "l")
-#: resources/lang/acf-json.php:29
+#. translators: ACF "Impostazioni blocco", padding_dimension (choice "l"); ACF "Impostazioni blocco", margin_dimension (choice "l")
+#: resources/lang/acf-json.php:31
 msgid "L"
 msgstr "L"
 
-#. translators: ACF "Blocco", padding_dimension (choice "m"); ACF "Blocco", margin_dimension (choice "m")
-#: resources/lang/acf-json.php:31
+#. translators: ACF "Impostazioni blocco", padding_dimension (choice "m"); ACF "Impostazioni blocco", margin_dimension (choice "m")
+#: resources/lang/acf-json.php:33
 msgid "M"
 msgstr "M"
 
-#. translators: ACF "Blocco", padding_dimension (choice "s"); ACF "Blocco", margin_dimension (choice "s")
-#: resources/lang/acf-json.php:33
+#. translators: ACF "Impostazioni blocco", padding_dimension (choice "s"); ACF "Impostazioni blocco", margin_dimension (choice "s")
+#: resources/lang/acf-json.php:35
 msgid "S"
 msgstr "S"
 
-#. translators: ACF "Blocco", margin (label)
-#: resources/lang/acf-json.php:35
+#. translators: ACF "Impostazioni blocco", margin (label)
+#: resources/lang/acf-json.php:37
 msgid "Margine"
 msgstr "Margin"
 
-#. translators: ACF "Blocco", margin_dimension (label)
-#: resources/lang/acf-json.php:37
+#. translators: ACF "Impostazioni blocco", margin_dimension (label)
+#: resources/lang/acf-json.php:39
 msgid "Dimensione margine"
 msgstr "Margin size"
 
-#. translators: ACF "Blocco", text_color (label)
-#: resources/lang/acf-json.php:41
+#. translators: ACF "Impostazioni blocco", text_color (label)
+#: resources/lang/acf-json.php:43
 msgid "Colore testi"
 msgstr "Text color"
 
-#. translators: ACF "Blocco", title (label)
-#: resources/lang/acf-json.php:43
+#. translators: ACF "Blocco: Solo testo", title (label)
+#: resources/lang/acf-json.php:47
 msgid "Titolo"
 msgstr "Title"
 
-#. translators: ACF "Blocco", title_formatting (label)
-#: resources/lang/acf-json.php:45
+#. translators: ACF "Blocco: Solo testo", title_formatting (label)
+#: resources/lang/acf-json.php:49
 msgid "Formattazione"
 msgstr "Formatting"
 
-#. translators: ACF "Blocco", title_formatting (instructions)
-#: resources/lang/acf-json.php:47
+#. translators: ACF "Blocco: Solo testo", title_formatting (instructions)
+#: resources/lang/acf-json.php:51
 msgid "Nella pagina deve essere presente solamente un H1 per fini SEO."
 msgstr "For SEO purposes, the page must contain only one H1."
 
-#. translators: ACF "Blocco", title_formatting (choice "h1")
-#: resources/lang/acf-json.php:49
+#. translators: ACF "Blocco: Solo testo", title_formatting (choice "h1")
+#: resources/lang/acf-json.php:53
 msgid "H1"
 msgstr "H1"
 
-#. translators: ACF "Blocco", title_formatting (choice "h2")
-#: resources/lang/acf-json.php:51
+#. translators: ACF "Blocco: Solo testo", title_formatting (choice "h2")
+#: resources/lang/acf-json.php:55
 msgid "H2"
 msgstr "H2"
 
-#. translators: ACF "Blocco", title_formatting (choice "h3")
-#: resources/lang/acf-json.php:53
+#. translators: ACF "Blocco: Solo testo", title_formatting (choice "h3")
+#: resources/lang/acf-json.php:57
 msgid "H3"
 msgstr "H3"
 
-#. translators: ACF "Blocco", title_formatting (choice "h4")
-#: resources/lang/acf-json.php:55
+#. translators: ACF "Blocco: Solo testo", title_formatting (choice "h4")
+#: resources/lang/acf-json.php:59
 msgid "H4"
 msgstr "H4"
 
-#. translators: ACF "Blocco", title_formatting (choice "h5")
-#: resources/lang/acf-json.php:57
+#. translators: ACF "Blocco: Solo testo", title_formatting (choice "h5")
+#: resources/lang/acf-json.php:61
 msgid "H5"
 msgstr "H5"
 
-#. translators: ACF "Blocco", title_formatting (choice "h6")
-#: resources/lang/acf-json.php:59
+#. translators: ACF "Blocco: Solo testo", title_formatting (choice "h6")
+#: resources/lang/acf-json.php:63
 msgid "H6"
 msgstr "H6"
 
-#. translators: ACF "Blocco", title_formatting (choice "p")
-#: resources/lang/acf-json.php:61
+#. translators: ACF "Blocco: Solo testo", title_formatting (choice "p")
+#: resources/lang/acf-json.php:65
 msgid "Testo"
 msgstr "Text"
 
-#. translators: ACF "Blocco", content (label)
-#: resources/lang/acf-json.php:63
+#. translators: ACF "Blocco: Solo testo", content (label)
+#: resources/lang/acf-json.php:67
 msgid "Contenuto"
 msgstr "Content"
 
-#. translators: ACF "Blocco", buttons (label)
-#: resources/lang/acf-json.php:65
+#. translators: ACF "Blocco: Solo testo", buttons (label)
+#: resources/lang/acf-json.php:69
 msgid "Pulsanti"
 msgstr "Buttons"
 
-#. translators: ACF "Blocco", buttons (button_label)
-#: resources/lang/acf-json.php:67
+#. translators: ACF "Blocco: Solo testo", buttons (button_label)
+#: resources/lang/acf-json.php:71
 msgid "Aggiungi pulsante"
 msgstr "Add button"
 
-#. translators: ACF "Blocco", buttons › button (label)
-#: resources/lang/acf-json.php:69
+#. translators: ACF "Blocco: Solo testo", buttons › button (label)
+#: resources/lang/acf-json.php:73
 msgid "Pulsante"
 msgstr "Button"
 
@@ -349,28 +344,28 @@ msgstr "Custom Template"
 msgid "Spiacenti, la pagina che stai cercando non esiste."
 msgstr "Sorry, but the page you are trying to view does not exist."
 
-#: resources/views/components/acf/placeholder.blade.php:62
+#: resources/views/components/acf/placeholder.blade.php:55
 msgid "Modifica blocco"
 msgstr "Edit Block"
 
-#: resources/views/components/acf/placeholder.blade.php:25
+#: resources/views/components/acf/placeholder.blade.php:22
 msgid "Nessun titolo impostato per questa sezione."
 msgstr "No title has been set for this section."
 
-#: resources/views/components/carousel-navigation.blade.php:9
+#: resources/views/components/carousel-navigation.blade.php:11
 msgid "Slide precedente"
 msgstr "Previous slide"
 
-#: resources/views/components/carousel-navigation.blade.php:26
+#: resources/views/components/carousel-navigation.blade.php:28
 msgid "Slide successiva"
 msgstr "Next slide"
 
 #. translators: %s: social network name, e.g. Facebook.
-#: resources/views/components/share.blade.php:37
+#: resources/views/components/share.blade.php:38
 msgid "Condividi su %s"
 msgstr "Share on %s"
 
-#: resources/views/components/share.blade.php:69
+#: resources/views/components/share.blade.php:71
 msgctxt "share label"
 msgid "Condividi su"
 msgstr "Share on"
@@ -385,7 +380,7 @@ msgctxt "placeholder"
 msgid "Cerca &hellip;"
 msgstr "Search &hellip;"
 
-#: resources/views/forms/search.blade.php:16
+#: resources/views/forms/search.blade.php:15
 msgctxt "submit button"
 msgid "Cerca"
 msgstr "Search"
@@ -395,7 +390,7 @@ msgstr "Search"
 msgid "Spiacenti, nessun risultato trovato."
 msgstr "Sorry, no results were found."
 
-#: resources/views/layouts/app.blade.php:19
+#: resources/views/layouts/app.blade.php:20
 msgid "Vai al contenuto"
 msgstr "Skip to content"
 
@@ -442,34 +437,49 @@ msgctxt "block keyword"
 msgid "testo"
 msgstr "text"
 
-#: app/svg.php:129
+#: app/svg.php:131
 msgid "Non è stato possibile ripulire questo file SVG, che è stato quindi rifiutato."
 msgstr "This SVG file could not be sanitized and was rejected."
 
-#. translators: ACF "Blocco", background_color (label)
-#: resources/lang/acf-json.php:39
+#. translators: ACF "Impostazioni blocco", background_color (label)
+#: resources/lang/acf-json.php:41
 msgid "Colore di sfondo"
 msgstr "Background color"
 
-#: resources/views/components/share.blade.php:95
+#: resources/views/components/share.blade.php:100
 msgid "Condividi"
 msgstr "Share"
 
 #. translators: %s: search terms.
-#: app/Navigation/Breadcrumbs.php:124
+#: app/Navigation/Breadcrumbs.php:129
 msgid "Risultati per “%s”"
 msgstr "Results for “%s”"
 
 #. translators: %d: page number.
-#: app/Navigation/Breadcrumbs.php:136
+#: app/Navigation/Breadcrumbs.php:141
 msgid "Pagina %d"
 msgstr "Page %d"
 
-#: resources/views/components/breadcrumbs.blade.php:82
+#: resources/views/components/breadcrumbs.blade.php:86
 msgid "Percorso di navigazione"
 msgstr "Breadcrumb"
 
-#: app/Navigation/Breadcrumbs.php:158
-#: app/Navigation/Breadcrumbs.php:171
+#: app/Navigation/Breadcrumbs.php:163
+#: app/Navigation/Breadcrumbs.php:176
 msgid "Autore"
 msgstr "Author"
+
+#. translators: ACF "Impostazioni blocco" (field group title, group_69c1778d2ba98.json)
+#: resources/lang/acf-json.php:13
+msgid "Impostazioni blocco"
+msgstr "Block settings"
+
+#. translators: ACF "Impostazioni blocco", field_6b0457c69122c (label)
+#: resources/lang/acf-json.php:15
+msgid "Spaziature e colori"
+msgstr "Spacing and colors"
+
+#. translators: ACF "Blocco: Solo testo" (field group title, group_6b0457c69122b.json)
+#: resources/lang/acf-json.php:45
+msgid "Blocco: Solo testo"
+msgstr "Block: Text only"

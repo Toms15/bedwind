@@ -22,56 +22,93 @@ Sage brings proper PHP templating and modern JavaScript tooling to WordPress the
 
 [Read the docs to get started](https://roots.io/sage/docs/installation/)
 
-## Lint e formattazione
+## This theme
 
-Node 22 (`.nvmrc` in questa cartella, dove si eseguono gli script npm: `nvm use`). `engines`: `^22.22.2 || ^24.15.0 || >=26`, cioè l'intersezione di Stylelint 18 e `stylelint-config-standard` 41 (`^22.22.2 || ^24.15.0 || >=26.0.0`), ESLint 10 (`^20.19.0 || ^22.13.0 || >=24`), Vite 8 (`^20.19.0 || >=22.12.0`) ed `editorconfig` 4 (`>=22`, vedi override sotto). Il vincolo più stretto è quello di Stylelint: serve Node 22.22.2 o successivo (`nvm install 22` se la 22 locale è più vecchia).
+This README covers **theme development**. The project setup (Herd, ACF Pro credentials, `.env`, environments, CI, deploy) is in the [project README](../../../../README.md); the coding conventions (blocks, i18n, PHP, escaping, components, renaming the theme) and the **new block checklist** are in [CONVENTIONS.md](CONVENTIONS.md).
 
-| Script                 | Cosa fa                                                                                     |
-| ---------------------- | ------------------------------------------------------------------------------------------- |
-| `npm run lint`         | Tutti i controlli sotto, in sequenza (da usare in CI)                                       |
-| `npm run lint:js`      | ESLint 10, flat config in `eslint.config.js`                                                |
-| `npm run lint:css`     | Stylelint con `stylelint-config-standard` e le at-rule di Tailwind v4 (`.stylelintrc.json`) |
-| `npm run lint:blade`   | `blade-formatter --check-formatted` sulle viste                                             |
-| `npm run format:check` | `prettier --check .`                                                                        |
-| `npm run format`       | Scrive: Prettier (JS, CSS, JSON, Markdown) + blade-formatter                                |
-| `npm run format:blade` | Solo blade-formatter                                                                        |
+All commands below run from this folder (`web/app/themes/sage`) unless stated otherwise.
 
-- Prettier usa `prettier-plugin-tailwindcss` con `tailwindStylesheet: ./resources/css/app.css`: ordina le classi in JS e negli `@apply`.
-- Nelle Blade l'ordinamento delle classi è **disattivato**: blade-formatter usa internamente Tailwind 3 e con v4 darebbe un ordine sbagliato.
-- blade-formatter riformatterebbe il PHP di `@props`/`@php` a 4 spazi (non configurabile): i preamboli PHP dei componenti sono racchiusi tra `{{-- blade-formatter-disable --}}` e `{{-- blade-formatter-enable --}}`.
-- Lo stesso vale per gli array multilinea di `@class(...)`: blade-formatter li reindenta con il proprio stile. Si racchiude il solo `@class` tra i due commenti, dentro il tag (vedi `components/share.blade.php` e `modules/only-text.blade.php`), con l'array a 2 spazi.
-- Lo stile del PHP inline nelle Blade (`!$x`) differisce da quello di Pint in `app/` (`! $x`): blade-formatter non è configurabile su questo.
-- `overrides` in `package.json` (`blade-formatter` → `glob ^14.0.6`, `editorconfig ^4.0.1`): portano `npm audit` a 0 vulnerabilità (ReDoS di `minimatch` e `glob` nelle dipendenze di blade-formatter/js-beautify). Rimuoverli quando blade-formatter aggiornerà le proprie dipendenze; `editorconfig` 4 richiede Node >= 22.
-- Esclusi dalla formattazione: `acf-json/` (lo riscrive ACF), `resources/lang/`, lock file, `composer.json`, `pint.json`, `public/`, `vendor/`. Il PHP di `app/` resta a Pint (`composer lint`, vedi sotto).
+- [Node version](#node-version)
+- [Build](#build)
+- [Lint and formatting](#lint-and-formatting)
+- [PHP quality](#php-quality)
+- [Translations](#translations)
+- [Fonts and images](#fonts-and-images)
+- [Breadcrumbs](#breadcrumbs)
+- [Theme filters](#theme-filters)
 
-## Qualità PHP
+## Node version
 
-Gli strumenti PHP sono dipendenze dev di questo `composer.json` (l'autoload `App\` è qui). Gli script si lanciano dalla cartella del tema o dalla root del progetto, che li delega con `composer --working-dir=web/app/themes/sage`.
+`engines` in `package.json` is `^22.22.2 || ^24.15.0 || >=26`, the intersection of Stylelint 18 and `stylelint-config-standard` 41 (`^22.22.2 || ^24.15.0 || >=26.0.0`), ESLint 10 (`^20.19.0 || ^22.13.0 || >=24`), Vite 8 (`^20.19.0 || >=22.12.0`) and `editorconfig` 4 (`>=22`, see the overrides in [Lint and formatting](#lint-and-formatting)). The tightest constraint is Stylelint's: Node 22 needs at least 22.22.2.
 
-| Script              | Cosa fa                                                                                                                        |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `composer lint`     | `pint --test`, preset `laravel` (`pint.json`). Dalla root controlla anche la root (preset `per`)                               |
-| `composer lint:fix` | Pint in scrittura                                                                                                              |
-| `composer analyse`  | PHPStan 2, livello 6, su `app/` e `functions.php` (`phpstan.neon.dist`)                                                        |
-| `composer test`     | Pest 3 + Brain Monkey: test unitari in `tests/Unit`, senza WordPress né database                                               |
-| `composer check`    | `validate --strict`, `audit`, `lint`, `analyse`, `test` in sequenza (da usare in CI). Dalla root: anche i controlli della root |
+`.nvmrc` says `22` (nvm does not accept ranges, and a pinned `22.22.2` would force everyone onto that exact patch). In CI `actions/setup-node` resolves it to the latest 22.x. Locally:
 
-Dipendenze:
+- `nvm install` reads `.nvmrc`, installs the latest 22.x if it is missing and uses it: prefer it to `nvm use`;
+- `nvm use` picks the newest 22.x **already installed**, which may be older than 22.22.2 (`npm ci` then warns with `EBADENGINE` and Stylelint can fail): check with `node -v`;
+- [Solo](https://soloterm.com) processes do not run `nvm use`, they use the nvm default: `nvm alias default 22`.
 
-- `config.platform.php` è `8.2.0`, il minimo dichiarato in `require.php`: `composer update` risolve le versioni come se girasse su PHP 8.2, anche se in locale c'è un PHP più recente. Senza, il lock prenderebbe pacchetti che richiedono PHP 8.4 (es. `symfony/clock`, `symfony/string`, `symfony/translation` 8.x) e il tema non partirebbe su 8.2/8.3. Va alzato insieme a `require.php`, e con esso si possono passare Pest e Symfony alla major successiva.
+## Build
+
+| Script          | What it does                                                                     |
+| --------------- | -------------------------------------------------------------------------------- |
+| `npm run dev`   | Vite dev server with hot reload (HTTPS on port 5173 with the Herd certificate)   |
+| `npm run build` | Production build in `public/build/` (hashed assets, `manifest.json`, theme.json) |
+
+- `npm run dev` writes `public/hot` and removes it when Vite stops: while the file exists the theme loads the assets from the dev server, otherwise from `public/build/`. Without either the site has no CSS/JS.
+- Entry points (`vite.config.js`): `resources/css/app.css`, `resources/js/app.js` (frontend, `@vite` in `layouts/app.blade.php`), `resources/css/editor.css`, `resources/js/editor.js` (block editor, `app/setup.php`). Aliases: `@scripts`, `@styles`, `@fonts`, `@images`.
+- `public/build/assets/theme.json` is generated by `@roots/vite-plugin` from `theme.json` and the Tailwind tokens in `resources/css/theme.css` (colors, fonts, font sizes).
+- The dev server URL comes from `WP_HOME` in the project `.env` (only `WP_HOME` and `APP_URL` are read from it): it sets the CORS allowlist and the TLS host. The certificate is the Herd/Valet one of that host, if it exists; otherwise the dev server falls back to Vite's default detection.
+- Shell variables (not read from `.env`): `APP_URL` overrides `WP_HOME` for the dev server; `VITE_THEME_SLUG` overrides the theme folder name used in the asset base URL (`/app/themes/<slug>/public/build/`). It is only needed when the theme is a **symlink** whose target folder has a different name from the one WordPress uses, e.g. `VITE_THEME_SLUG=sage npm run build`. A renamed theme folder works without it.
+
+## Lint and formatting
+
+| Script                 | What it does                                                                                  |
+| ---------------------- | --------------------------------------------------------------------------------------------- |
+| `npm run lint`         | Every check below, in sequence (used in CI)                                                   |
+| `npm run lint:js`      | ESLint 10, flat config in `eslint.config.js`                                                  |
+| `npm run lint:css`     | Stylelint with `stylelint-config-standard` and the Tailwind v4 at-rules (`.stylelintrc.json`) |
+| `npm run lint:blade`   | `blade-formatter --check-formatted` on the views                                              |
+| `npm run format:check` | `prettier --check .`                                                                          |
+| `npm run format`       | Writes: Prettier (JS, CSS, JSON, Markdown) + blade-formatter                                  |
+| `npm run format:blade` | blade-formatter only                                                                          |
+
+- Prettier uses `prettier-plugin-tailwindcss` with `tailwindStylesheet: ./resources/css/app.css`: it sorts the classes in JS and in `@apply`.
+- In Blade class sorting is **off**: blade-formatter uses Tailwind 3 internally and with v4 it would produce a wrong order.
+- blade-formatter would reformat the PHP of `@props`/`@php` with 4 spaces (not configurable): the PHP preambles of the components are wrapped in `{{-- blade-formatter-disable --}}` and `{{-- blade-formatter-enable --}}`.
+- The same applies to multi-line `@class(...)` arrays, which blade-formatter re-indents with its own style: only the `@class` is wrapped in the two comments, inside the tag (see `components/share.blade.php` and `modules/only-text.blade.php`), with the array at 2 spaces.
+- The style of inline PHP in Blade (`!$x`) differs from Pint's in `app/` (`! $x`): blade-formatter cannot be configured for this.
+- `overrides` in `package.json` (`blade-formatter` → `glob ^14.0.6`, `editorconfig ^4.0.1`) bring `npm audit` to 0 vulnerabilities (ReDoS in `minimatch` and `glob` among the blade-formatter/js-beautify dependencies). Remove them when blade-formatter updates its own dependencies; `editorconfig` 4 requires Node >= 22.
+- Excluded from Prettier (`.prettierignore`): `acf-json/` (rewritten by ACF), `resources/lang/`, lock files, `composer.json`, `pint.json`, `public/`, `vendor/`, `node_modules/` and `*.blade.php` (blade-formatter). The PHP of `app/` is left to Pint (`composer lint`, see below). Markdown is formatted with `proseWrap: preserve`.
+
+## PHP quality
+
+The PHP tools are dev dependencies of this `composer.json` (the `App\` autoload is here). The scripts run from this folder or from the project root, which delegates them with `composer --working-dir=web/app/themes/sage`.
+
+| Script              | What it does                                                                                                     |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `composer lint`     | `pint --test`, preset `laravel` (`pint.json`). From the root it also checks the root (preset `per`)              |
+| `composer lint:fix` | Pint, writing                                                                                                    |
+| `composer analyse`  | PHPStan 2, level 6, on `app/` and `functions.php` (`phpstan.neon.dist`)                                          |
+| `composer test`     | Pest 3 + Brain Monkey: unit tests in `tests/Unit`, without WordPress or a database                               |
+| `composer check`    | `validate --strict`, `audit`, `lint`, `analyse`, `test` in sequence (used in CI). From the root: root checks too |
+
+Dependencies:
+
+- `config.platform.php` is `8.2.0`, the minimum declared in `require.php`: `composer update` resolves versions as if it ran on PHP 8.2, even with a newer local PHP. Without it the lock would pick packages that require PHP 8.4 (e.g. `symfony/clock`, `symfony/string`, `symfony/translation` 8.x) and the theme would not start on 8.2/8.3. Raise it together with `require.php`; with it Pest and Symfony can move to the next major.
+- Because of `config.platform.php`, `composer install`/`update` **do not check the real PHP version** of the machine (Composer believes it is 8.2.0): installing on PHP 8.1 succeeds. The check only happens at runtime, in `vendor/composer/platform_check.php`, which stops the site on PHP < 8.2.
 
 PHPStan:
 
-- `szepeviktor/phpstan-wordpress` (stub di WordPress e tipi di `apply_filters()` & co.) e `php-stubs/acf-pro-stubs` (`get_field()`, ...). Niente Larastan: Acorn non è un'applicazione Laravel completa e il tema non usa Eloquent; le facade di Illuminate sono già tipizzate.
-- `stubs/acorn.php` dichiara gli helper Laravel che Acorn carica all'avvio e che PHPStan non vede (`public_path()`).
-- Per un livello più alto: `vendor/bin/phpstan analyse --level=7`. Niente baseline: gli errori si correggono, e le rare eccezioni hanno un `@phpstan-ignore <identificatore>` con il motivo accanto.
-- I file di `app/` dichiarano `declare(strict_types=1)`: vale solo per le chiamate fatte da quei file, non per le callback chiamate da WordPress.
+- `szepeviktor/phpstan-wordpress` (WordPress stubs and the types of `apply_filters()` & co.) and `php-stubs/acf-pro-stubs` (`get_field()`, ...). No Larastan: Acorn is not a full Laravel application and the theme does not use Eloquent; the Illuminate facades are already typed.
+- `stubs/acorn.php` declares the Laravel helpers that Acorn loads at boot and PHPStan cannot see (`public_path()`). It is only read by PHPStan: not needed in production.
+- For a higher level: `vendor/bin/phpstan analyse --level=7`. No baseline: errors are fixed, and the rare exceptions have a `@phpstan-ignore <identifier>` with the reason next to it.
+- The files in `app/` declare `declare(strict_types=1)`: it only applies to the calls made from those files, not to the callbacks called by WordPress.
 
-Scrivere un test:
+Writing a test:
 
-- Un file `tests/Unit/*Test.php`; `tests/Pest.php` usa `Tests\TestCase` (`Monkey\setUp()`/`Monkey\tearDown()`) e carica `app/helpers.php`. Le classi di `app/` arrivano dall'autoload.
-- Le funzioni di WordPress e ACF si simulano con Brain Monkey: `Functions\when('get_field')->justReturn('...')`, `->alias(fn ...)`, oppure `Functions\expect('get_field')->once()->with('excerpt', 42)->andReturn('...')` per verificare la chiamata.
-- Si testa il comportamento pubblico: per i preset di spaziatura dei blocchi si passa da `BlockRenderer::data()` (vedi `tests/Unit/BlockRendererTest.php`), senza rendere pubblici i metodi privati.
+- One `tests/Unit/*Test.php` file; `tests/Pest.php` uses `Tests\TestCase` (`Monkey\setUp()`/`Monkey\tearDown()`) and loads `app/helpers.php`. The classes in `app/` come from the autoload.
+- WordPress and ACF functions are mocked with Brain Monkey: `Functions\when('get_field')->justReturn('...')`, `->alias(fn ...)`, or `Functions\expect('get_field')->once()->with('excerpt', 42)->andReturn('...')` to verify the call.
+- Test the public behaviour: the block spacing presets go through `BlockRenderer::data()` (see `tests/Unit/BlockRendererTest.php`), without making private methods public. Blade views are not rendered in the unit tests: keep the logic worth testing in `app/`.
 
 ```php
 use App\Blocks\BlockRenderer;
@@ -86,9 +123,66 @@ it('maps the padding preset to Tailwind classes', function () {
 });
 ```
 
-## Breadcrumb
+## Translations
 
-Componente pronto, non incluso in nessun template: aggiungerlo dove serve.
+The source language of the theme is **Italian**: every string in `app/`, `resources/views/` (Blade, `block.json`), the ACF field groups in `acf-json/`, `theme.json` and the `style.css` header is written in Italian and uses the `sage` text domain (`__('Continua a leggere', 'sage')`, `{{ __('Vai al contenuto', 'sage') }}`). With the site in Italian no translation file is loaded; `resources/lang/en_US.po` provides the English translation, so the project can be switched to English by changing the site language (`wp site switch-language en_US`, or _Settings → General → Site Language_).
+
+Files in `resources/lang/` (versioned, the theme is deployed as is):
+
+- `sage.pot`: template with every string of the theme;
+- `{locale}.po`: translation, edited by hand or with Poedit;
+- `{locale}.mo` and `{locale}.l10n.php`: compiled files loaded by WordPress (since 6.5 the `.l10n.php` file is preferred);
+- `acf-json.php`: generated by `npm run translate:acf`, not versioned (see below).
+
+The path is registered with `load_theme_textdomain()` in `app/setup.php` (also declared as `Domain Path` in `style.css`). ACF labels are translated at runtime through `acf/settings/l10n_textdomain` (disabled while editing field groups, so acf-json always stays in Italian); `wp i18n make-pot` does not read acf-json, so `npm run translate:acf` extracts those strings into `resources/lang/acf-json.php` before the `.pot` is built.
+
+Scripts (they require WP-CLI):
+
+| Script                      | What it does                                                                                                    |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `npm run translate`         | `translate:pot` + `translate:update`: run it after adding or changing strings                                   |
+| `npm run translate:acf`     | Extracts the ACF strings into `resources/lang/acf-json.php` (`resources/scripts/acf-strings.js`)                |
+| `npm run translate:pot`     | `translate:acf`, then `wp i18n make-pot` on `app`, `resources/views`, `acf-json.php`, `theme.json`, `style.css` |
+| `npm run translate:update`  | `wp i18n update-po`: merges `sage.pot` into every `.po`                                                         |
+| `npm run translate:compile` | `translate:mo` + `translate:php` + `translate:js`: run it after translating the `.po` files                     |
+| `npm run translate:mo`      | `wp i18n make-mo`                                                                                               |
+| `npm run translate:php`     | `wp i18n make-php` (`.l10n.php`)                                                                                |
+| `npm run translate:js`      | `wp i18n make-json` (JSON for JS strings, if any)                                                               |
+
+To add a language (e.g. `de_DE`): copy `sage.pot` to `resources/lang/de_DE.po`, set the `Language` and `Plural-Forms` headers, translate it and run `npm run translate:compile`. For WordPress core and plugin strings see [WordPress translations](../../../../README.md#wordpress-translations) in the project README.
+
+## Fonts and images
+
+The theme ships **no webfont**: text uses the system stack in `--font-body` (`resources/css/theme.css`).
+
+To add a webfont:
+
+1. Copy the `.woff2` files into `resources/fonts/`.
+2. Uncomment and adapt the `@font-face` example in `resources/css/fonts.css` (imported by `app.css` and `editor.css`): `font-display: swap`, a `font-weight` range for variable fonts, optional `unicode-range`. Keep the relative `url("../fonts/...")` path.
+3. Put the family first in `--font-body`, keeping the system stack as fallback: `--font-body: "Inter", ui-sans-serif, system-ui, sans-serif;`.
+4. Optionally preload the font used above the fold (1–2 files at most):
+
+   ```php
+   add_filter('sage/preload_fonts', fn () => ['resources/fonts/inter-var.woff2']);
+   ```
+
+   `app/setup.php` prints `<link rel="preload" as="font" type="font/woff2" crossorigin>` in `wp_head` for every listed file that exists in the theme (missing files are skipped, in build and with the dev server). The URL comes from `Vite::asset()` and matches the one in the compiled `@font-face`, so the font is downloaded once. Files under Vite's `assetsInlineLimit` (4 KB) would be inlined in the CSS as data URIs: real fonts are always larger.
+
+For attachment images use the `<x-image>` component (`resources/views/components/image.blade.php`), a wrapper around `wp_get_attachment_image()`:
+
+```blade
+<x-image :id="$post['image_id']" />                                  {{-- large, lazy handled by WP --}}
+<x-image :id="$hero_id" size="full" sizes="100vw" eager class="w-full" /> {{-- LCP image: eager + fetchpriority high --}}
+<x-image :id="$id" alt="" :fallback="false" />                        {{-- decorative, nothing printed without image --}}
+```
+
+WordPress adds `srcset`, `sizes`, `width`/`height`, `decoding="async"` and picks `loading`/`fetchpriority` itself (prefixing `sizes` with `auto,` on lazy images); `eager` forces `loading="eager" fetchpriority="high"` for a single above-the-fold image. With an empty or non-image ID the local `resources/images/fallback.svg` is printed (alt `""`, lazy) unless `:fallback="false"`.
+
+SVG uploads are allowed only to users with `edit_others_posts` (filter `sage/svg_upload_capability`) and are sanitized with `enshrined/svg-sanitize` before WordPress stores them (`app/svg.php`).
+
+## Breadcrumbs
+
+Ready-made component, not included in any template: add it where needed.
 
 ```blade
 <x-breadcrumbs />
@@ -96,18 +190,28 @@ Componente pronto, non incluso in nessun template: aggiungerlo dove serve.
 <x-breadcrumbs :items="[['label' => 'Home', 'url' => home_url('/')], ['label' => 'Contatti', 'url' => null]]" />
 ```
 
-- Voci calcolate da `App\Navigation\Breadcrumbs::items()` sulla query principale: pagine con genitori, articoli (pagina degli articoli → prima categoria con i genitori → titolo), CPT con archivio, tassonomie, archivi per data (anno su `news/archivio/YYYY/`), autore, ricerca, 404 e paginazione. In home page non stampa nulla.
-- Markup: `<nav aria-label="Percorso di navigazione">` con `<ol>`, separatori `aria-hidden` e `aria-current="page"` sull'ultima voce.
-- JSON-LD `BreadcrumbList` (prop `jsonld`, default `true`): disattivarlo se un plugin SEO lo genera già.
+- Items computed by `App\Navigation\Breadcrumbs::items()` from the main query: pages with parents, posts (posts page → first category with its parents → title), CPTs with an archive, taxonomies, date archives (year on `news/archivio/YYYY/`), author, search, 404 and pagination. Nothing is printed on the front page.
+- Markup: `<nav aria-label="Percorso di navigazione">` with `<ol>`, `aria-hidden` separators and `aria-current="page"` on the last item.
+- JSON-LD `BreadcrumbList` (prop `jsonld`, default `true`): turn it off if an SEO plugin already outputs one.
 
-Le voci (`label` in testo semplice, `url` o `null`; l'ultima è la pagina corrente) si modificano con il filtro `sage/breadcrumbs`:
+The items (`label` as plain text, `url` or `null`; the last one is the current page) can be changed with the `sage/breadcrumbs` filter:
 
 ```php
 add_filter('sage/breadcrumbs', function (array $items): array {
-    // Es.: togliere la voce "Home".
+    // E.g. remove the "Home" item.
     return array_slice($items, 1);
 });
 ```
+
+## Theme filters
+
+| Filter                        | Default               | Where                                                                                  |
+| ----------------------------- | --------------------- | -------------------------------------------------------------------------------------- |
+| `sage/breadcrumbs`            | computed items        | `App\Navigation\Breadcrumbs::items()`                                                  |
+| `sage/core_blocks_post_types` | `['post', 'faq']`     | `app/blocks.php`: post types where core blocks are allowed (elsewhere: ACF only)       |
+| `sage/preload_fonts`          | `[]`                  | `app/setup.php`: fonts to preload                                                      |
+| `sage/svg_upload_capability`  | `'edit_others_posts'` | `app/svg.php`: capability required to upload SVGs                                      |
+| `sage/yearly_archive_base`    | `'news/archivio'`     | `app/rewrites.php`: base of the yearly archives (`wp rewrite flush` after changing it) |
 
 ## Sponsors
 

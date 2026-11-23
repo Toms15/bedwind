@@ -49,7 +49,7 @@
 | M36 | ✅ | Lint e format frontend + `.nvmrc` | Qualità | 🟠 | M | – |
 | M37 | ✅ | CI su GitHub Actions + Dependabot | DX | 🟠 | M | M10, M35, M36 |
 | M38 | ✅ | Ambiente locale riproducibile, deploy, `solo.yml` | DX | 🟠 | M | – |
-| M39 | ⬜ | README e documentazione delle convenzioni | Docs | 🟠 | S | M10, M38 |
+| M39 | ✅ | README e documentazione delle convenzioni | Docs | 🟠 | S | M10, M38 |
 | M40 | ✅ | Permalink di default nel setup (404 e rewrite non funzionano) | Config | 🟠 | S | – |
 | M41 | ⬜ | URL inesistenti a più segmenti rispondono 200 in locale (Valet/Herd PHP_SELF) | Ambiente | 🟢 | S | – |
 | M42 | ✅ | `composer update` del tema (27 advisory → 0, Acorn 5.1, platform PHP 8.2) | Dipendenze | 🔴 | S | M35 |

@@ -209,6 +209,7 @@ add_filter('sage/breadcrumbs', function (array $items): array {
 | ----------------------------- | --------------------- | -------------------------------------------------------------------------------------- |
 | `sage/breadcrumbs`            | computed items        | `App\Navigation\Breadcrumbs::items()`                                                  |
 | `sage/core_blocks_post_types` | `['post', 'faq']`     | `app/blocks.php`: post types where core blocks are allowed (elsewhere: ACF only)       |
+| `sage/extra_blocks`           | `[]`                  | `app/blocks.php`: other blocks (e.g. third-party `my-plugin/form`) allowed everywhere  |
 | `sage/preload_fonts`          | `[]`                  | `app/setup.php`: fonts to preload                                                      |
 | `sage/svg_upload_capability`  | `'edit_others_posts'` | `app/svg.php`: capability required to upload SVGs                                      |
 | `sage/yearly_archive_base`    | `'news/archivio'`     | `app/rewrites.php`: base of the yearly archives (`wp rewrite flush` after changing it) |

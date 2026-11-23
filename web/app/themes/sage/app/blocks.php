@@ -60,6 +60,11 @@ add_filter('block_categories_all', function ($categories) {
  * non-content editors (widgets, Customizer widgets, site editor). Every other
  * post type (e.g. pages) gets ACF blocks only.
  *
+ * Blocks of other namespaces (e.g. third-party plugins) are excluded, unless
+ * their full names (e.g. 'my-plugin/form') are returned by the
+ * `sage/extra_blocks` filter (default: none): those are allowed in every
+ * editor, like the ACF blocks.
+ *
  * Synced patterns (`core/block`) are a core block and follow the same rule:
  * they are not allowed where only ACF blocks are, because a synced pattern can
  * contain core blocks and would bypass the restriction.
@@ -86,6 +91,7 @@ function allowed_block_types(bool|array $allowed_blocks, \WP_Block_Editor_Contex
 
     $core_contexts = ['core/edit-widgets', 'core/customize-widgets', 'core/edit-site'];
     $core_post_types = (array) apply_filters('sage/core_blocks_post_types', ['post', 'faq']);
+    $extra_blocks = (array) apply_filters('sage/extra_blocks', []);
 
     $allow_core = in_array($editor_context->name, $core_contexts, true)
         || ($editor_context->post instanceof \WP_Post
@@ -94,7 +100,9 @@ function allowed_block_types(bool|array $allowed_blocks, \WP_Block_Editor_Contex
     return array_values(array_filter(
         $candidates,
         fn ($name) => is_string($name)
-            && (str_starts_with($name, 'acf/') || ($allow_core && str_starts_with($name, 'core/')))
+            && (str_starts_with($name, 'acf/')
+                || ($allow_core && str_starts_with($name, 'core/'))
+                || in_array($name, $extra_blocks, true))
     ));
 }
 

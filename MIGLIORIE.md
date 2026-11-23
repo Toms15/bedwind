@@ -32,7 +32,7 @@
 | M19 | ✅ | CPT `faq`: configurazione coerente | PHP | 🟠 | S | – |
 | M20 | ✅ | `wp-embed` deregistrato male | PHP | 🟠 | S | – |
 | M21 | ✅ | Filtro `allowed_block_types_all` | Blocchi | 🟠 | S | – |
-| M22 | ⬜ | `BlockRenderer::render` (ex `render_acf_block`): pulizia e tipizzazione | Blocchi | 🟢 | S | M01 |
+| M22 | ✅ | `BlockRenderer::render` (ex `render_acf_block`): pulizia e tipizzazione | Blocchi | 🟢 | S | M01 |
 | M23 | ✅ | Query dei post: N+1, dimensione immagini, date | Performance | 🟠 | S | – |
 | M24 | ✅ | Componenti `x-alert`, `x-share`, `x-title`, placeholder ACF | Frontend | 🟠 | M | M05 |
 | M25 | ✅ | Breadcrumb: Composer + componente + JSON-LD | SEO/A11y | 🟠 | M | M28 |

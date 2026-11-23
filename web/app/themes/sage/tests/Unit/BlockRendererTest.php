@@ -2,6 +2,8 @@
 
 use App\Blocks\BlockRenderer;
 use Brain\Monkey\Functions;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 
 /**
  * Mock get_field() with the given block field values (missing fields: null)
@@ -87,5 +89,75 @@ describe('contents', function () {
 
         fake_block_fields(['buttons' => false]);
         expect(BlockRenderer::data([])['contents']['buttons'])->toBe([]);
+    });
+});
+
+/**
+ * Mock the Acorn view factory (resolved by view() through app()): the given
+ * views exist and render as "<name>|<json of the data>"; the others do not exist.
+ *
+ * @param  list<string>  $views
+ */
+function fake_views(array $views): void
+{
+    $factory = Mockery::mock(Factory::class);
+    $factory->shouldReceive('exists')->andReturnUsing(fn (string $name) => in_array($name, $views, true));
+    $factory->shouldReceive('make')->andReturnUsing(function (string $name, array $data) {
+        $view = Mockery::mock(View::class);
+        $view->shouldReceive('render')->andReturn($name.'|'.json_encode($data));
+
+        return $view;
+    });
+    $factory->shouldNotReceive('file');
+
+    Functions\when('app')->justReturn($factory);
+}
+
+/**
+ * Output of BlockRenderer::render().
+ *
+ * @param  array<string, mixed>  $block
+ */
+function render_block(array $block, bool $is_preview = false): string
+{
+    ob_start();
+    BlockRenderer::render($block, '<p>inner blocks</p>', $is_preview);
+
+    return (string) ob_get_clean();
+}
+
+describe('render', function () {
+    it('renders the block view by name, with the block and its slug only', function () {
+        fake_views(['blocks.only-text.only-text']);
+
+        expect(render_block(['name' => 'acf/only-text', 'id' => 'block_1']))
+            ->toBe('blocks.only-text.only-text|'.json_encode(['block' => ['name' => 'acf/only-text', 'id' => 'block_1', 'slug' => 'only-text']]));
+    });
+
+    it('strips only the leading acf/ prefix', function () {
+        // A namespace ending in "acf" (e.g. a third-party "my-acf/cards"):
+        // removing "acf/" anywhere would turn it into "my-cards".
+        fake_views(['blocks.cards.cards', 'blocks.my-cards.my-cards']);
+
+        expect(render_block(['name' => 'acf/cards']))->toStartWith('blocks.cards.cards|')
+            ->and(render_block(['name' => 'my-acf/cards']))->toBe('');
+    });
+
+    it('renders nothing when the view does not exist', function () {
+        fake_views([]);
+
+        expect(render_block(['name' => 'acf/missing']))->toBe('')
+            ->and(render_block([]))->toBe('');
+    });
+
+    it('renders the placeholder with the title field in the editor', function () {
+        fake_views(['components.acf.placeholder', 'blocks.only-text.only-text']);
+        fake_block_fields(['title' => 'Intro']);
+
+        expect(render_block(['name' => 'acf/only-text'], true))
+            ->toBe('components.acf.placeholder|'.json_encode([
+                'block' => ['name' => 'acf/only-text', 'slug' => 'only-text'],
+                'title' => 'Intro',
+            ]));
     });
 });

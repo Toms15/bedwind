@@ -22,15 +22,11 @@ describe('random_string_for_id()', function () {
 });
 
 /**
- * A post with the properties read by get_trimmed_excerpt(). WordPress is not
- * loaded, so a minimal WP_Post class is declared when missing.
+ * A post with the properties read by get_trimmed_excerpt() (WP_Post stub:
+ * tests/Stubs/wordpress.php).
  */
 function fake_post(string $excerpt = '', string $content = ''): WP_Post
 {
-    if (! class_exists('WP_Post')) {
-        eval('final class WP_Post { public $ID = 0; public $post_excerpt = ""; public $post_content = ""; }');
-    }
-
     $post = new WP_Post;
     $post->ID = 42;
     $post->post_excerpt = $excerpt;

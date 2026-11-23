@@ -17,37 +17,52 @@ class BlockRenderer
      * Render callback shared by every ACF block.
      *
      * In the editor: no preview, a "Modifica blocco" placeholder for every block.
+     * On the frontend: the view blocks/<slug>/<slug> with $block (slug and
+     * block.json "name" "acf/<slug>" must match); nothing if the view is missing.
      *
-     * The parameters are typed in the PHPDoc only: ACF passes them as they come
-     * from the block (e.g. $post_id can be an int or a string like "options").
+     * ACF calls it with ($block, $content, $is_preview, $post_id, $wp_block,
+     * $context). Only the first three are declared, the others are unused:
+     * $post_id comes from get_the_ID() (int|false) and $context can be false,
+     * so declaring them would only add TypeError risks.
+     * $content is the InnerBlocks HTML: the theme blocks do not use InnerBlocks
+     * (no supports.jsx), so it is not passed to the views. Not to be confused
+     * with the ACF "content" field, read by data() with get_field().
      *
      * @param  array<string, mixed>  $block  The ACF block data (name, id, anchor, ...).
-     * @param  string  $content  The inner blocks HTML.
+     * @param  string  $content  The InnerBlocks HTML (unused).
      * @param  bool  $is_preview  Whether the block is rendered in the editor.
-     * @param  int|string  $post_id  The post being edited or viewed.
-     * @param  \WP_Block|null  $wp_block  The block instance.
-     * @param  array<string, mixed>  $context  The block context.
      */
-    public static function render($block, $content = '', $is_preview = false, $post_id = 0, $wp_block = null, $context = []): void
+    public static function render(array $block, string $content = '', bool $is_preview = false): void
     {
-        $slug = str_replace('acf/', '', $block['name']);
+        $slug = self::slug($block);
         $block['slug'] = $slug;
 
         if ($is_preview) {
             echo view('components.acf.placeholder', [
                 'block' => $block,
-                'title' => $slug === 'empty' ? null : get_field('title'),
-                'variant' => $slug === 'empty' ? 'empty' : 'default',
+                'title' => get_field('title'),
             ])->render();
 
             return;
         }
 
-        $view = get_theme_file_path("/resources/views/blocks/{$slug}/{$slug}.blade.php");
+        $view = "blocks.{$slug}.{$slug}";
 
-        if (file_exists($view)) {
+        if ($slug !== '' && view()->exists($view)) {
             echo view($view, ['block' => $block])->render();
         }
+    }
+
+    /**
+     * Block slug: the block name without the leading "acf/" (only the prefix).
+     *
+     * @param  array<string, mixed>  $block  The ACF block data.
+     */
+    private static function slug(array $block): string
+    {
+        $name = is_string($block['name'] ?? null) ? $block['name'] : '';
+
+        return str_starts_with($name, 'acf/') ? substr($name, 4) : $name;
     }
 
     /**

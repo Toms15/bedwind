@@ -21,7 +21,9 @@ uses(TestCase::class)->in('Unit');
 |
 | Classes in app/ are autoloaded (PSR-4 App\). The helper functions are not:
 | functions.php loads them with locate_template(), so require them here.
+| WordPress classes used by the tested code are stubbed in tests/Stubs.
 |
 */
 
+require_once __DIR__.'/Stubs/wordpress.php';
 require_once dirname(__DIR__).'/app/helpers.php';

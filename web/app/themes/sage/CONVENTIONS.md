@@ -23,11 +23,13 @@ Every block is an ACF block (`acf/<slug>`) split in three files. Reference imple
 **`block.json`**
 
 - `"name": "acf/<slug>"`, `"textdomain": "sage"`, `title`, `description` and `keywords` in Italian;
-- `"supports": { "anchor": true, "jsx": true }`;
-- `"acf": { "blockVersion": 3, "renderCallback": "App\\Blocks\\BlockRenderer::render" }`: one render callback for every block. In the editor it shows the `<x-acf.placeholder>` (block name, description, title field) instead of a preview; on the frontend it renders `blocks/<slug>/<slug>.blade.php` with `$block` (the file name must match the slug);
+- `"supports": { "anchor": true, "align": false }`:
+  - `align: false`: the theme blocks do not use the block alignment (the section is already `w-full` with its `container`), so the alignment toolbar is hidden (ACF registers `align: true` by default);
+  - the theme blocks do not use InnerBlocks, so no `supports.jsx` in `block.json`: ACF still registers it as `true` by default, but with `blockVersion` 3 the editor ignores it, so do not declare it (not even as `false`). The render callback does not pass the InnerBlocks `$content` to the views; the ACF `content` field is unrelated and read with `get_field()`;
+- `"acf": { "blockVersion": 3, "renderCallback": "App\\Blocks\\BlockRenderer::render" }`: one render callback for every block. In the editor it shows the `<x-acf.placeholder>` (block name, description, title field) instead of a preview; on the frontend it renders the view `blocks.<slug>.<slug>` (`blocks/<slug>/<slug>.blade.php`) with `$block` (the file name must match the slug, the `acf/` prefix of `name` is stripped), nothing if the view is missing;
 - `category`: one of the theme categories registered in `app/blocks.php` (`carousels`, `dynamic-content`, `static-content`, `commons`, `heroes`, `dividers`), shown first in the inserter.
 
-ACF blocks are allowed in every editor; core blocks only in the post types of `sage/core_blocks_post_types` (`post`, `faq`) and in the widget/site editors (`app/blocks.php`).
+ACF blocks are allowed in every editor; core blocks only in the post types of `sage/core_blocks_post_types` (`post`, `faq`) and in the widget/site editors; other blocks (e.g. third-party) only if listed by `sage/extra_blocks` (`app/blocks.php`).
 
 **Block view** (`blocks/<slug>/<slug>.blade.php`): a single `@php` block, wrapped in `{{-- blade-formatter-disable --}}`/`{{-- blade-formatter-enable --}}`, that
 
@@ -68,7 +70,7 @@ ACF blocks are allowed in every editor; core blocks only in the post types of `s
 
 Example slug: `cards`. Copy from `only-text` where possible.
 
-1. **Metadata**: create `resources/views/blocks/cards/block.json` with `"name": "acf/cards"`, Italian `title`/`description`/`keywords`, a theme `category`, `"textdomain": "sage"`, `"apiVersion": 3`, `supports` with `anchor` and `jsx`, `acf.blockVersion: 3` and `acf.renderCallback: "App\\Blocks\\BlockRenderer::render"`. No PHP registration needed: `app/blocks.php` registers every folder with a `block.json`.
+1. **Metadata**: create `resources/views/blocks/cards/block.json` with `"name": "acf/cards"`, Italian `title`/`description`/`keywords`, a theme `category`, `"textdomain": "sage"`, `"apiVersion": 3`, `supports` with `"anchor": true` and `"align": false` only (no `supports.jsx`: the theme blocks do not use InnerBlocks and `blockVersion` 3 ignores it), `acf.blockVersion: 3` and `acf.renderCallback: "App\\Blocks\\BlockRenderer::render"`. No PHP registration needed: `app/blocks.php` registers every folder with a `block.json`.
 2. **Fields**: locally, in _ACF → Field Groups_ create a group with Italian labels and location _Block is equal to_ the new block. Saving writes `acf-json/group_*.json`: commit it. Reuse the shared _Blocco_ fields (title, content, spacings, colors, buttons) instead of duplicating them.
 3. **Block view**: create `resources/views/blocks/cards/cards.blade.php`: `BlockRenderer::data($block)`, read and validate the block fields, sanitize URLs (`sanitize_url()`) and colors (`sanitize_hex_color()`), then `@include('modules.cards', [...])`.
 4. **Module**: create `resources/views/modules/cards.blade.php` with the `@var` header, the `<section id … class="w-full overflow-x-clip …">` and `<div class="container mx-auto px-6 3xl:px-0">` markup, `<x-title :tag>` for the title and `next_heading` for the child headings. Use the [components](#components) for buttons, images and titles.
@@ -119,7 +121,7 @@ Anonymous Blade components in `resources/views/components/`; the full prop docum
 | `<x-share>`               | Social share links + Web Share API button                                        | `title`, `link` (default: current post), `facebook`, `twitter` (X), `linkedin`, `whatsapp`                                 |
 | `<x-image>`               | Attachment image (`wp_get_attachment_image()`)                                   | `id`, `size` (default `large`), `sizes`, `eager`, `alt`, `fallback`, `img-id`                                              |
 | `<x-breadcrumbs>`         | Breadcrumbs with JSON-LD                                                         | `items` (default `Breadcrumbs::items()`), `jsonld` (default `true`)                                                        |
-| `<x-acf.placeholder>`     | Editor placeholder of ACF blocks (used by `BlockRenderer`)                       | `block`, `title`, `message`, `variant` (`default`/`empty`)                                                                 |
+| `<x-acf.placeholder>`     | Editor placeholder of ACF blocks (used by `BlockRenderer`)                       | `block`, `title`, `message`                                                                                                |
 | `<x-carousel-navigation>` | Previous/next buttons for a carousel                                             | `id` (prefix of the `-prev`/`-next` classes)                                                                               |
 
 ## Renaming the theme

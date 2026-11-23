@@ -10,7 +10,7 @@
   "keywords": ["contenuto", "paragrafo", "testo"],
   "supports": {
     "anchor": true,
-    "jsx": true
+    "align": false
   },
   "acf": {
     "blockVersion": 3,

@@ -47,7 +47,7 @@
 | M34 | ⬜ | `editor.js`: meno fragile, meno costoso | Editor | 🟢 | S | – |
 | M35 | ✅ | PHPStan/Larastan + Pest + script Composer | Qualità | 🟠 | M | – |
 | M36 | ✅ | Lint e format frontend + `.nvmrc` | Qualità | 🟠 | M | – |
-| M37 | ⬜ | CI su GitHub Actions + Dependabot | DX | 🟠 | M | M10, M35, M36 |
+| M37 | ✅ | CI su GitHub Actions + Dependabot | DX | 🟠 | M | M10, M35, M36 |
 | M38 | ⬜ | Ambiente locale riproducibile, deploy, `solo.yml` | DX | 🟠 | M | – |
 | M39 | ⬜ | README e documentazione delle convenzioni | Docs | 🟠 | S | M10, M38 |
 | M40 | ✅ | Permalink di default nel setup (404 e rewrite non funzionano) | Config | 🟠 | S | – |

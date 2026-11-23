@@ -1,0 +1,88 @@
+version: 2
+
+# ACF Pro arriva da un repository Composer privato: Dependabot lo raggiunge con
+# due secret Dependabot (Settings > Secrets and variables > Dependabot).
+# username = chiave di licenza ACF Pro, password = URL del sito della licenza.
+registries:
+  acf-pro:
+    type: composer-repository
+    url: https://connect.advancedcustomfields.com
+    username: ${{secrets.ACF_PRO_LICENSE_KEY}}
+    password: ${{secrets.ACF_PRO_SITE_URL}}
+
+updates:
+  # Root Bedrock: WordPress, plugin, ACF Pro, Pint.
+  - package-ecosystem: composer
+    directory: /
+    registries:
+      - acf-pro
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Europe/Rome
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore(deps)
+    groups:
+      root-dev:
+        dependency-type: development
+        update-types: [minor, patch]
+      root-minor-patch:
+        dependency-type: production
+        update-types: [minor, patch]
+    ignore:
+      # Le release WordPress x.y sono "major" pur cambiando solo il minor SemVer:
+      # l'aggiornamento del core resta una scelta manuale (vincolo ~7.1.0).
+      # Le patch 7.1.x passano.
+      - dependency-name: roots/wordpress
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: roots/wordpress-no-content
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      # Metapacchetto dev-latest senza codice: serve solo come conflitto in
+      # composer update, non c'è nulla da aggiornare.
+      - dependency-name: roave/security-advisories
+
+  # Tema Sage: Acorn e strumenti di qualità (Pest, PHPStan, Pint).
+  - package-ecosystem: composer
+    directory: /web/app/themes/sage
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Europe/Rome
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore(deps)
+    groups:
+      theme-dev:
+        dependency-type: development
+        update-types: [minor, patch]
+      theme-minor-patch:
+        dependency-type: production
+        update-types: [minor, patch]
+
+  # Tema Sage: Vite, Tailwind, linter.
+  - package-ecosystem: npm
+    directory: /web/app/themes/sage
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Europe/Rome
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore(deps)
+    groups:
+      npm-minor-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Europe/Rome
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore(ci)
+    groups:
+      actions:
+        update-types: [minor, patch]

@@ -1,10 +1,13 @@
 # WordPress Project with Bedrock & Sage
 
+[![CI](https://github.com/Toms15/bedwind/actions/workflows/ci.yml/badge.svg)](https://github.com/Toms15/bedwind/actions/workflows/ci.yml)
+
 This project uses [Bedrock](https://roots.io/bedrock/) as a WordPress boilerplate and [Sage](https://roots.io/sage/) as a starter theme.
 
 ## Requirements
 
-- PHP >= 8.0
+- PHP >= 8.2 to run the site (the non-dev packages of the root and of the theme; production installs with `--no-dev`)
+- PHP >= 8.3 for root development: the root dev tools (Pint 1.32, in `require-dev`) require it. The theme alone supports PHP >= 8.2 for development too
 - Composer
 - Node.js 22 (see `web/app/themes/sage/.nvmrc`; `engines`: `^22.13.0 || >=24`)
 - npm
@@ -228,6 +231,29 @@ composer check
 ```
 
 See "Qualità PHP" in the theme README for the PHPStan setup and how to write a test.
+
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every push to `main` and on every pull request (a new push to a PR cancels the previous run). The workflow only has `contents: read`. Every action is pinned to a commit SHA (with the version in a comment); Dependabot updates SHA and comment together.
+
+| Job | What it runs |
+| --- | --- |
+| **Tema PHP 8.2 / 8.3 / 8.4** | in `web/app/themes/sage`: `composer install` + `composer check` (validate --strict, audit, Pint, PHPStan, Pest). Public packages only, no credentials. |
+| **Root Bedrock** (PHP 8.3: the root lock includes Pint 1.32, which needs PHP 8.3, so a full install with dev tools fails on 8.2) | `composer validate --strict`, `composer install` (ACF Pro via `COMPOSER_AUTH`, WordPress translations via wp-translation-downloader), `composer audit --locked`, `vendor/bin/pint --test`. |
+| **Frontend** (Node from `.nvmrc`) | in `web/app/themes/sage`: `npm ci`, `npm run lint`, `npm run build`. Needs neither `vendor/` nor `.env`. |
+
+### Secrets to create on GitHub
+
+- **Actions** → *Settings → Secrets and variables → Actions → New repository secret*: `COMPOSER_AUTH`, whose value is the whole content of your local `auth.json` (the `http-basic` JSON for `connect.advancedcustomfields.com`, same shape as the example above). Never paste it anywhere else.
+- **Dependabot** → *Settings → Secrets and variables → Dependabot*:
+  - `COMPOSER_AUTH` again, with the same value: workflow runs triggered by Dependabot PRs only see Dependabot secrets, so without it the root job fails on those PRs;
+  - `ACF_PRO_LICENSE_KEY` (ACF Pro license key) and `ACF_PRO_SITE_URL` (site URL the license is activated for), used by `.github/dependabot.yml` to reach the ACF Pro repository when updating the root `composer.lock`.
+
+If `COMPOSER_AUTH` is missing the root job fails with an explicit error, except on pull requests from forks: GitHub does not pass secrets to them, so the job warns, skips `composer install` and Pint and still runs `validate` and `audit`.
+
+### Dependabot
+
+`.github/dependabot.yml` checks every Monday (Europe/Rome) Composer in `/` and in `web/app/themes/sage`, npm in `web/app/themes/sage` and the GitHub Actions used by the workflow. Minor and patch updates are grouped (dev and production separately for Composer), with at most 5 open PRs per ecosystem. WordPress core (`roots/wordpress`) only gets patch updates: moving to a new x.y release stays a manual decision. `roave/security-advisories` is ignored.
 
 ## Database
 

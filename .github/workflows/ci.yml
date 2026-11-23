@@ -1,0 +1,125 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Il workflow legge solo il codice: nessun job scrive sul repository.
+permissions:
+  contents: read
+
+# Una nuova push sulla stessa PR annulla il run precedente; su main ogni commit
+# completa il proprio run, così lo stato resta legato al commit.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  theme-php:
+    name: Tema PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        # 8.2 è il minimo dichiarato (require php >=8.2, config.platform.php 8.2.0).
+        php: ['8.2', '8.3', '8.4']
+    defaults:
+      run:
+        working-directory: web/app/themes/sage
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: composer:v2
+
+      # Il tema dipende solo da pacchetti pubblici (Packagist): niente ACF né
+      # COMPOSER_AUTH, quindi la cache di Composer è sicura anche per le PR da fork.
+      - uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
+        with:
+          working-directory: web/app/themes/sage
+
+      # validate --strict, audit, Pint, PHPStan e Pest.
+      - run: composer check
+
+  root-php:
+    name: Root Bedrock
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          # Il lock della root contiene laravel/pint 1.32 (require-dev), che
+          # richiede PHP ^8.3: è il minimo con cui il lock si installa.
+          php-version: '8.3'
+          coverage: none
+          tools: composer:v2
+
+      # I secret non arrivano ai run delle PR da fork: lì si salta l'install
+      # (serve la licenza ACF Pro) e restano validate e audit, che leggono solo
+      # composer.json e composer.lock. In ogni altro caso il secret è obbligatorio.
+      - name: Verifica COMPOSER_AUTH
+        id: auth
+        env:
+          COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
+          IS_FORK: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
+        run: |
+          if [ -n "$COMPOSER_AUTH" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          elif [ "$IS_FORK" = "true" ]; then
+            echo "::warning title=COMPOSER_AUTH assente::PR da fork: i secret non sono disponibili, salto composer install e Pint della root (restano validate e audit)."
+            echo "available=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error title=COMPOSER_AUTH mancante::Crea il secret COMPOSER_AUTH (Settings > Secrets and variables > Actions, e Dependabot per le PR di Dependabot) con il JSON di auth.json per connect.advancedcustomfields.com. Vedi la sezione CI del README."
+            exit 1
+          fi
+
+      - run: composer validate --strict
+
+      # Composer legge le credenziali da COMPOSER_AUTH. Niente cache: conterrebbe
+      # lo zip di ACF Pro, e le cache del branch principale sono ripristinabili
+      # anche dai run delle PR (fork compresi).
+      - name: composer install
+        if: steps.auth.outputs.available == 'true'
+        env:
+          COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - run: composer audit --locked
+
+      - name: Pint (root)
+        if: steps.auth.outputs.available == 'true'
+        run: vendor/bin/pint --test
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: web/app/themes/sage
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: web/app/themes/sage/.nvmrc
+          cache: npm
+          cache-dependency-path: web/app/themes/sage/package-lock.json
+
+      # La build non usa vendor/ né WordPress: Vite legge resources/ e theme.json.
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build

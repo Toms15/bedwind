@@ -15,6 +15,9 @@
 /* Traduzioni (.pot/.po/.mo/.l10n.php): testo, non classi */
 @source not '../lang/';
 
+/* Documentazione del tema (README, CONVENTIONS, LICENSE): testo, non classi */
+@source not '../../*.md';
+
 /**
  * Focus visibile (WCAG 2.4.7): niente reset globale di outline/underline
  */

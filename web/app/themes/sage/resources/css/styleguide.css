@@ -17,3 +17,6 @@
 @import 'tailwindcss/utilities' layer(utilities) source(none);
 
 @source '../views/styleguide.blade.php';
+
+/* Documentazione del tema (README, CONVENTIONS, LICENSE): testo, non classi */
+@source not '../../*.md';

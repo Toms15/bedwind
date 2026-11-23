@@ -15,6 +15,9 @@
 /* Traduzioni (.pot/.po/.mo/.l10n.php): testo, non classi */
 @source not '../lang/';
 
+/* Documentazione del tema (README, CONVENTIONS, LICENSE): testo, non classi */
+@source not '../../*.md';
+
 /* Stessa sottolineatura di app.css (WP 7.1 non stampa più la regola di core sui link) */
 @layer base {
   a {

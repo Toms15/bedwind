@@ -39,6 +39,11 @@ add_action('admin_head', function () {
         }
     }
 
+    // Console warnings of editor.js (e.g. ACF selectors not found) only while debugging.
+    $debug = (defined('SCRIPT_DEBUG') && SCRIPT_DEBUG) || wp_get_environment_type() === 'development';
+
+    wp_print_inline_script_tag('window.sageEditor = '.wp_json_encode(['debug' => $debug]).';');
+
     echo Vite::withEntryPoints([
         'resources/js/editor.js',
     ])->toHtml();

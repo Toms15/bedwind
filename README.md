@@ -9,7 +9,7 @@ This project uses [Bedrock](https://roots.io/bedrock/) as a WordPress boilerplat
 - PHP >= 8.2 to run the site (the non-dev packages of the root and of the theme; production installs with `--no-dev`)
 - PHP >= 8.3 for root development: the root dev tools (Pint 1.32, in `require-dev`) require it. The theme alone supports PHP >= 8.2 for development too
 - Composer
-- Node.js 22 (see `web/app/themes/sage/.nvmrc`; `engines`: `^22.13.0 || >=24`)
+- Node.js 22 (see `web/app/themes/sage/.nvmrc`; `engines`: `^22.22.2 || ^24.15.0 || >=26`, the minimum required by Stylelint 18)
 - npm
 
 ## Initial Setup

@@ -24,7 +24,7 @@ Sage brings proper PHP templating and modern JavaScript tooling to WordPress the
 
 ## Lint e formattazione
 
-Node 22 (`.nvmrc` in questa cartella, dove si eseguono gli script npm: `nvm use`). `engines`: `^22.13.0 || >=24`, cioè l'intersezione di ESLint 10 (`^20.19.0 || ^22.13.0 || >=24`), Vite 8 (`^20.19.0 || >=22.12.0`) ed `editorconfig` 4 (`>=22`, vedi override sotto).
+Node 22 (`.nvmrc` in questa cartella, dove si eseguono gli script npm: `nvm use`). `engines`: `^22.22.2 || ^24.15.0 || >=26`, cioè l'intersezione di Stylelint 18 e `stylelint-config-standard` 41 (`^22.22.2 || ^24.15.0 || >=26.0.0`), ESLint 10 (`^20.19.0 || ^22.13.0 || >=24`), Vite 8 (`^20.19.0 || >=22.12.0`) ed `editorconfig` 4 (`>=22`, vedi override sotto). Il vincolo più stretto è quello di Stylelint: serve Node 22.22.2 o successivo (`nvm install 22` se la 22 locale è più vecchia).
 
 | Script                 | Cosa fa                                                                                     |
 | ---------------------- | ------------------------------------------------------------------------------------------- |

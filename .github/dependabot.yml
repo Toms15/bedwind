@@ -71,6 +71,12 @@ updates:
     commit-message:
       prefix: chore(deps)
     groups:
+      # Stylelint e la sua config condividono major ed engines: le major vanno
+      # applicate insieme. Il gruppo precede npm-minor-patch perché Dependabot
+      # assegna ogni dipendenza al primo gruppo che corrisponde.
+      stylelint:
+        patterns: ["stylelint", "stylelint-config-*"]
+        update-types: [major, minor, patch]
       npm-minor-patch:
         update-types: [minor, patch]
 

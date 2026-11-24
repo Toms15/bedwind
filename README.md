@@ -166,6 +166,16 @@ Solo does not run `nvm use`: its processes use the **nvm default** Node. Make su
 
 In development PHP errors are shown on the page and written to `logs/debug.log` (outside the webroot).
 
+### Site driver (`LocalValetDriver.php`)
+
+Herd picks up `LocalValetDriver.php` in the project root before its own drivers, on every request (no restart needed). The file extends Herd's `BedrockValetDriver` and changes one thing: for requests routed to the front controller (`web/index.php`) it sets `$_SERVER['PHP_SELF']` to `/index.php`, as nginx (`try_files … /index.php?$args`) and Apache (WordPress `.htaccess`) do.
+
+Without it Herd sets `PHP_SELF` to the requested URI, and WordPress (`WP::parse_request()`) cancels the 404 when the requested path equals `PHP_SELF`: a non-existent URL that matches no rewrite rule, such as `/a/b/c/`, answers 200 with the home page instead of the theme 404. Static files, `wp-admin`, `wp-login.php`, `wp-cron.php`, `xmlrpc.php` and the other real PHP scripts are not affected.
+
+The file is outside the docroot (`web/`), so it is never served, and staging/production ignore it. It needs Herd or Valet 4+ (which ship `Valet\Drivers\Specific\BedrockValetDriver`). To go back to Herd's default behaviour, delete the file.
+
+If Herd shows a fatal error about `BedrockValetDriver` (for example because a future version renames the class), delete `LocalValetDriver.php`. The driver also takes precedence over Herd's global custom drivers (such as `BedrockMultisiteValetDriver`): if the site becomes a multisite, remove it or adapt it.
+
 ## Environments
 
 `WP_ENV` selects the environment. `config/application.php` holds the **production** defaults and then loads `config/environments/{WP_ENV}.php`, if it exists, to override them. An empty `WP_ENV` means `production`. `WP_ENVIRONMENT_TYPE` (what `wp_get_environment_type()` returns) defaults to `WP_ENV` when it is `production`, `staging`, `development` or `local`.
@@ -387,6 +397,7 @@ project-name/
 ├── .env                    # Environment configuration (never commit it)
 ├── auth.json               # ACF Pro credentials (never commit it)
 ├── composer.json           # PHP dependencies and quality scripts
+├── LocalValetDriver.php    # Herd site driver, local only (see "Site driver")
 ├── solo.yml                # Solo processes
 └── wp-cli.yml              # WP-CLI paths (web/wp, docroot web/)
 ```

@@ -3,7 +3,7 @@
   /**
    * Block Name: Only text
    *
-   * Prepares the Only text block data; the markup is in modules/only-text.
+   * Prepara i dati del blocco Only text; il markup sta in modules/only-text.
    */
 
   $data = \App\Blocks\BlockRenderer::data($block);

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * Theme setup.
+ * Setup del tema.
  */
 
 namespace App;
@@ -11,7 +11,7 @@ namespace App;
 use Illuminate\Support\Facades\Vite;
 
 /**
- * Inject styles into the block editor.
+ * Inserisce gli stili nel block editor.
  */
 add_filter('block_editor_settings_all', function ($settings) {
     $style = Vite::asset('resources/css/editor.css');
@@ -24,7 +24,7 @@ add_filter('block_editor_settings_all', function ($settings) {
 });
 
 /**
- * Inject scripts into the block editor.
+ * Inserisce gli script nel block editor.
  */
 add_action('admin_head', function () {
     if (! get_current_screen()?->is_block_editor()) {
@@ -39,7 +39,7 @@ add_action('admin_head', function () {
         }
     }
 
-    // Console warnings of editor.js (e.g. ACF selectors not found) only while debugging.
+    // Warning in console di editor.js (es. selettori ACF non trovati) solo in debug.
     $debug = (defined('SCRIPT_DEBUG') && SCRIPT_DEBUG) || wp_get_environment_type() === 'development';
 
     wp_print_inline_script_tag('window.sageEditor = '.wp_json_encode(['debug' => $debug]).';');
@@ -50,15 +50,15 @@ add_action('admin_head', function () {
 });
 
 /**
- * Preload the theme webfonts.
+ * Precarica i webfont del tema.
  *
- * Nothing is preloaded by default: return from the 'sage/preload_fonts'
- * filter the woff2 sources to preload, as Vite paths relative to the theme
- * (e.g. 'resources/fonts/inter-var.woff2'). Files missing from the theme
- * (or from the Vite manifest) are skipped, both in build and with the dev
- * server, so a stale entry never breaks the page. The URL is
- * the same one the compiled @font-face in fonts.css points to, so the font
- * is downloaded once.
+ * Di default non si precarica nulla: il filtro 'sage/preload_fonts' deve
+ * restituire i sorgenti woff2 da precaricare, come percorsi Vite relativi al
+ * tema (es. 'resources/fonts/inter-var.woff2'). I file assenti dal tema
+ * (o dal manifest di Vite) vengono saltati, sia in build sia con il dev
+ * server, così una voce non aggiornata non rompe mai la pagina. L'URL è
+ * lo stesso a cui punta il @font-face compilato in fonts.css, quindi il font
+ * viene scaricato una volta sola.
  */
 add_action('wp_head', function () {
     $fonts = apply_filters('sage/preload_fonts', []);
@@ -86,7 +86,7 @@ add_action('wp_head', function () {
 }, 2);
 
 /**
- * Use the generated theme.json file.
+ * Usa il file theme.json generato.
  */
 add_filter('theme_file_path', function ($path, $file) {
     return $file === 'theme.json'
@@ -95,30 +95,30 @@ add_filter('theme_file_path', function ($path, $file) {
 }, 10, 2);
 
 /**
- * Register the initial theme setup.
+ * Registra il setup iniziale del tema.
  */
 add_action('after_setup_theme', function () {
     /**
-     * Make the theme available for translation.
+     * Rende il tema traducibile.
      *
-     * Source strings are in Italian (text domain `sage`); translations live
-     * in resources/lang as {locale}.mo / {locale}.l10n.php (e.g. en_US.mo).
-     * Since WP 6.7 this only registers the path: the files are loaded just in
-     * time on the first __() call. Acorn does not do this for the theme.
+     * Le stringhe sorgente sono in italiano (text domain `sage`); le traduzioni
+     * stanno in resources/lang come {locale}.mo / {locale}.l10n.php (es. en_US.mo).
+     * Da WP 6.7 questo registra solo il percorso: i file vengono caricati al
+     * momento, alla prima chiamata a __(). Acorn non lo fa per il tema.
      *
      * @link https://developer.wordpress.org/reference/functions/load_theme_textdomain/
      */
     load_theme_textdomain('sage', get_template_directory().'/resources/lang');
 
     /**
-     * Disable full-site editing support.
+     * Disattiva il supporto al full-site editing.
      *
      * @link https://wptavern.com/gutenberg-10-5-embeds-pdfs-adds-verse-block-color-options-and-introduces-new-patterns
      */
     remove_theme_support('block-templates');
 
     /**
-     * Register the navigation menus.
+     * Registra i menu di navigazione.
      *
      * @link https://developer.wordpress.org/reference/functions/register_nav_menus/
      */
@@ -127,33 +127,33 @@ add_action('after_setup_theme', function () {
     ]);
 
     /**
-     * Disable the default block patterns.
+     * Disattiva i block pattern di default.
      *
      * @link https://developer.wordpress.org/block-editor/developers/themes/theme-support/#disabling-the-default-block-patterns
      */
     remove_theme_support('core-block-patterns');
 
     /**
-     * Enable plugins to manage the document title.
+     * Permette ai plugin di gestire il titolo del documento.
      *
      * @link https://developer.wordpress.org/reference/functions/add_theme_support/#title-tag
      */
     add_theme_support('title-tag');
 
     /**
-     * Enable post thumbnail support.
+     * Attiva il supporto alle immagini in evidenza.
      *
      * @link https://developer.wordpress.org/themes/functionality/featured-images-post-thumbnails/
      */
     add_theme_support('post-thumbnails');
 
     /**
-     * Enable the custom logo (Customizer → Site Identity).
+     * Attiva il custom logo (Customizer → Identità del sito).
      *
-     * Flexible sizes, the header limits the height. The logo stays linked to
-     * the home page on the front page too: with `unlink-homepage-logo`
-     * WordPress would print it with an empty alt there, and the header
-     * would lose the site name.
+     * Dimensioni flessibili, l'altezza la limita l'header. Il logo resta
+     * collegato alla home anche sulla front page: con `unlink-homepage-logo`
+     * WordPress lì lo stamperebbe con un alt vuoto, e l'header perderebbe il
+     * nome del sito.
      *
      * @link https://developer.wordpress.org/themes/functionality/custom-logo/
      */
@@ -165,14 +165,14 @@ add_action('after_setup_theme', function () {
     ]);
 
     /**
-     * Enable responsive embed support.
+     * Attiva il supporto agli embed responsive.
      *
      * @link https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#responsive-embedded-content
      */
     add_theme_support('responsive-embeds');
 
     /**
-     * Enable HTML5 markup support.
+     * Attiva il supporto al markup HTML5.
      *
      * @link https://developer.wordpress.org/reference/functions/add_theme_support/#html5
      */
@@ -187,7 +187,7 @@ add_action('after_setup_theme', function () {
     ]);
 
     /**
-     * Enable selective refresh for widgets in customizer.
+     * Attiva il refresh selettivo dei widget nel Customizer.
      *
      * @link https://developer.wordpress.org/reference/functions/add_theme_support/#customize-selective-refresh-widgets
      */
@@ -195,7 +195,7 @@ add_action('after_setup_theme', function () {
 }, 20);
 
 /**
- * Register the theme sidebars.
+ * Registra le sidebar del tema.
  */
 add_action('widgets_init', function () {
     $config = [
@@ -217,7 +217,7 @@ add_action('widgets_init', function () {
 });
 
 /**
- * ACF JSON Save/Load
+ * Salvataggio/caricamento ACF JSON
  */
 add_filter('acf/settings/save_json', function ($path) {
     return get_stylesheet_directory().'/acf-json';
@@ -231,22 +231,21 @@ add_filter('acf/settings/load_json', function ($paths) {
 });
 
 /**
- * Translate the ACF field groups of the theme with the `sage` text domain.
+ * Traduce i field group ACF del tema con il text domain `sage`.
  *
- * Labels, instructions, choices, button labels and group titles in
- * acf-json are written in Italian; with a text domain set ACF passes them
- * through __($string, 'sage') when it loads them, so en_US.po translates
- * them like any other theme string. The .pot gets them from
- * resources/scripts/acf-strings.js (see `npm run translate:pot`).
+ * Label, istruzioni, scelte, etichette dei pulsanti e titoli dei gruppi in
+ * acf-json sono scritti in italiano; con un text domain impostato ACF li passa
+ * da __($string, 'sage') quando li carica, quindi en_US.po li traduce come
+ * qualsiasi altra stringa del tema. Il .pot li prende da
+ * resources/scripts/acf-strings.js (vedi `npm run translate:pot`).
  *
- * The text domain is turned off while field groups are edited or saved:
- * on the ACF admin screens of `acf-field-group` and in the ACF field group
- * AJAX actions (`acf/field_group/*`, e.g. `acf/field_group/move_field`,
- * which loads the groups and fires `acf/update_field_group`, so local JSON
- * rewrites the files; there `$typenow` is empty). ACF does not skip
- * translation in these requests, so with a non-Italian admin language the
- * translated values would be shown in the editor and written back to
- * acf-json.
+ * Il text domain viene disattivato mentre i field group si modificano o si
+ * salvano: nelle schermate admin ACF di `acf-field-group` e nelle azioni AJAX
+ * dei field group ACF (`acf/field_group/*`, es. `acf/field_group/move_field`,
+ * che carica i gruppi e lancia `acf/update_field_group`, così il local JSON
+ * riscrive i file; lì `$typenow` è vuoto). In queste richieste ACF non salta
+ * la traduzione, quindi con una lingua dell'admin diversa dall'italiano i
+ * valori tradotti verrebbero mostrati nell'editor e riscritti in acf-json.
  *
  * @link https://www.advancedcustomfields.com/resources/acf-settings/
  */
@@ -264,12 +263,12 @@ add_filter('acf/settings/l10n_textdomain', function () {
 });
 
 /**
- * Set a default permalink structure on theme activation.
+ * Imposta una struttura dei permalink di default all'attivazione del tema.
  *
- * With "plain" permalinks WordPress skips rewrite rule matching, so
- * unknown URLs fall back to the front page with a 200 status and the
- * theme's custom rewrites never match. Only applies when no structure
- * is set, so an existing configuration is never overwritten.
+ * Con i permalink "semplici" WordPress salta il confronto con le regole di
+ * rewrite, quindi gli URL sconosciuti ricadono sulla front page con stato 200
+ * e le rewrite personalizzate del tema non corrispondono mai. Vale solo se non
+ * c'è una struttura impostata, così una configurazione esistente non viene mai sovrascritta.
  */
 add_action('after_switch_theme', function () {
     if (get_option('permalink_structure')) {

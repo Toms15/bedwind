@@ -3,16 +3,16 @@
 declare(strict_types=1);
 
 /**
- * Theme filters.
+ * Filtri del tema.
  */
 
 namespace App;
 
 /**
- * Append "… Continua a leggere" to automatic excerpts (the_excerpt()).
+ * Aggiunge "… Continua a leggere" agli excerpt automatici (the_excerpt()).
  *
- * The post title is added for screen readers only, so every link has a
- * unique, descriptive name. The excerpt length is set by excerpt_length().
+ * Il titolo del post è aggiunto solo per gli screen reader, così ogni link ha
+ * un nome univoco e descrittivo. La lunghezza dell'excerpt la imposta excerpt_length().
  *
  * @return string
  */
@@ -26,12 +26,12 @@ add_filter('excerpt_more', function () {
 });
 
 /**
- * Set the length of automatic excerpts (the_excerpt()) to 20 words.
+ * Imposta a 20 parole la lunghezza degli excerpt automatici (the_excerpt()).
  *
- * Priority 999 so it wins over plugins setting their own length.
- * The "Continua a leggere" link is added by the excerpt_more filter above.
+ * Priorità 999 per prevalere sui plugin che impostano una propria lunghezza.
+ * Il link "Continua a leggere" lo aggiunge il filtro excerpt_more qui sopra.
  *
- * @param  mixed  $length  The length set so far (ignored).
+ * @param  mixed  $length  La lunghezza impostata finora (ignorata).
  */
 function excerpt_length(mixed $length): int
 {
@@ -40,12 +40,12 @@ function excerpt_length(mixed $length): int
 add_filter('excerpt_length', __NAMESPACE__.'\\excerpt_length', 999);
 
 /**
- * Automatically set title and alt text of uploaded images from their file name.
+ * Imposta in automatico titolo e testo alternativo delle immagini caricate dal nome del file.
  *
- * Works for every upload channel (media library, REST/Gutenberg, WP-CLI,
- * media_sideload_image) because the name comes from the attached file.
- * The title is replaced only when it is WordPress' file-name default, the
- * alt only when empty. Caption and description are left untouched.
+ * Funziona con ogni canale di caricamento (libreria media, REST/Gutenberg, WP-CLI,
+ * media_sideload_image) perché il nome arriva dal file allegato.
+ * Il titolo viene sostituito solo se è quello di default ricavato da WordPress
+ * dal nome del file, l'alt solo se vuoto. Didascalia e descrizione restano invariate.
  */
 function add_image_meta_data(int $attachment_id): void
 {
@@ -60,7 +60,7 @@ function add_image_meta_data(int $attachment_id): void
     }
 
     $name = pathinfo($file, PATHINFO_FILENAME);
-    // Drop WordPress generated suffixes (-scaled, -150x150, -150x150-1).
+    // Rimuove i suffissi generati da WordPress (-scaled, -150x150, -150x150-1).
     $name = preg_replace('/(-scaled|-\d+x\d+)+(-\d+)?$/i', '', $name) ?? $name;
     $name = str_replace(['-', '_'], ' ', $name);
     $name = preg_replace('/\s+/', ' ', $name) ?? $name;
@@ -70,11 +70,11 @@ function add_image_meta_data(int $attachment_id): void
         return;
     }
 
-    // Only replace the title WordPress derives from the file name. A title set
-    // explicitly (REST "title", --title, post_data, IPTC/EXIF) is kept as is.
-    // Inside the hook the original upload name is gone, so compare a
-    // normalized key of the title with the stored file name, which may be
-    // sanitized (accents, spaces, dots) and carry a "-N" uniqueness suffix.
+    // Sostituisce solo il titolo che WordPress ricava dal nome del file. Un titolo
+    // impostato esplicitamente (REST "title", --title, post_data, IPTC/EXIF) resta com'è.
+    // Dentro l'hook il nome originale del file caricato non c'è più, quindi si
+    // confronta una chiave normalizzata del titolo con il nome del file salvato,
+    // che può essere sanificato (accenti, spazi, punti) e avere un suffisso "-N" di unicità.
     $key = static function (string $value): string {
         $value = mb_strtolower(remove_accents(wp_specialchars_decode($value, ENT_QUOTES)));
 
@@ -103,29 +103,29 @@ function add_image_meta_data(int $attachment_id): void
 add_action('add_attachment', __NAMESPACE__.'\\add_image_meta_data');
 
 /**
- * Performance optimizations: disable the WordPress emoji assets.
+ * Ottimizzazioni di performance: disattiva gli asset emoji di WordPress.
  *
- * Removes the emoji detection script and inline styles from the frontend
- * <head>, and the static emoji images from feeds and emails.
+ * Rimuove lo script di rilevamento delle emoji e gli stili inline dal <head>
+ * del frontend, e le immagini statiche delle emoji da feed ed email.
  *
- * The admin emoji assets are handled by disable_admin_emoji() and
- * disable_tinymce_emoji(): the admin hooks are registered after
- * "init", so they cannot be removed from here.
+ * Gli asset emoji dell'admin li gestiscono disable_admin_emoji() e
+ * disable_tinymce_emoji(): gli hook dell'admin sono registrati dopo
+ * "init", quindi non si possono rimuovere da qui.
  *
- * wp-embed is intentionally NOT touched. Since WP 5.9 core enqueues it only
- * when the rendered content contains a WordPress post embed
- * (wp_maybe_enqueue_oembed_host_js() on "embed_oembed_html"), so there is
- * nothing to save on pages without embeds. Deregistering it broke the
- * auto-resize of post embeds and the TinyMCE preview in the admin, and
- * unhooking wp_oembed_add_host_js would only add that breakage back.
+ * wp-embed volutamente NON viene toccato. Da WP 5.9 il core lo carica solo
+ * quando il contenuto renderizzato contiene l'embed di un post WordPress
+ * (wp_maybe_enqueue_oembed_host_js() su "embed_oembed_html"), quindi sulle
+ * pagine senza embed non c'è nulla da risparmiare. Deregistrarlo rompeva il
+ * ridimensionamento automatico degli embed dei post e l'anteprima TinyMCE
+ * nell'admin, e sganciare wp_oembed_add_host_js reintrodurrebbe solo quel guasto.
  */
 function disable_emoji(): void
 {
-    // Frontend emoji script and styles.
+    // Script e stili delle emoji nel frontend.
     remove_action('wp_head', 'print_emoji_detection_script', 7);
     remove_action('wp_print_styles', 'print_emoji_styles');
 
-    // Static emoji images in feeds and emails.
+    // Immagini statiche delle emoji in feed ed email.
     remove_filter('the_content_feed', 'wp_staticize_emoji');
     remove_filter('comment_text_rss', 'wp_staticize_emoji');
     remove_filter('wp_mail', 'wp_staticize_emoji_for_email');
@@ -133,17 +133,17 @@ function disable_emoji(): void
 add_action('init', __NAMESPACE__.'\\disable_emoji');
 
 /**
- * Disable the WordPress emoji assets in the admin.
+ * Disattiva gli asset emoji di WordPress nell'admin.
  *
- * Core registers the admin emoji hooks in wp-admin/includes/admin-filters.php
- * (print_emoji_detection_script on "admin_print_scripts", print_emoji_styles
- * on "admin_print_styles", both at the default priority 10). That file is
- * loaded after "init", so the removal runs on "admin_init" instead.
+ * Il core registra gli hook emoji dell'admin in wp-admin/includes/admin-filters.php
+ * (print_emoji_detection_script su "admin_print_scripts", print_emoji_styles
+ * su "admin_print_styles", entrambi alla priorità di default 10). Quel file è
+ * caricato dopo "init", quindi la rimozione gira invece su "admin_init".
  *
- * Removing print_emoji_styles is enough for the CSS as well:
- * wp_enqueue_emoji_styles() (on "admin_enqueue_scripts") bails out when
- * print_emoji_styles is no longer hooked to "admin_print_styles".
- * The block editor already unhooks the detection script itself
+ * Rimuovere print_emoji_styles basta anche per il CSS:
+ * wp_enqueue_emoji_styles() (su "admin_enqueue_scripts") esce subito quando
+ * print_emoji_styles non è più agganciato a "admin_print_styles".
+ * Il block editor sgancia già da sé lo script di rilevamento
  * (wp-admin/edit-form-blocks.php).
  */
 function disable_admin_emoji(): void
@@ -154,12 +154,12 @@ function disable_admin_emoji(): void
 add_action('admin_init', __NAMESPACE__.'\\disable_admin_emoji');
 
 /**
- * Remove the "wpemoji" TinyMCE plugin.
+ * Rimuove il plugin TinyMCE "wpemoji".
  *
- * Applies to the classic editor and to the Classic block of the block
- * editor, which both pass their plugin list through "tiny_mce_plugins".
+ * Vale per l'editor classico e per il blocco Classico del block editor,
+ * che passano entrambi la loro lista di plugin da "tiny_mce_plugins".
  *
- * @param  array<int, string>  $plugins  TinyMCE plugin names.
+ * @param  array<int, string>  $plugins  Nomi dei plugin TinyMCE.
  * @return array<int, string>
  */
 function disable_tinymce_emoji(array $plugins): array
@@ -169,24 +169,24 @@ function disable_tinymce_emoji(array $plugins): array
 add_filter('tiny_mce_plugins', __NAMESPACE__.'\\disable_tinymce_emoji');
 
 /**
- * Adapt the custom logo image to the header (get_custom_logo()).
+ * Adatta l'immagine del custom logo all'header (get_custom_logo()).
  *
- * - sizes: the header caps the logo at 80px of height (max-h-20, the
- *   'height' of the custom-logo support in setup.php) with an automatic
- *   width, so its rendered width is 80px times the image ratio (240px for
- *   the recommended 240×80). Core would use the full image width
- *   (e.g. "(max-width: 480px) 100vw, 480px") and let the browser download
- *   a larger variant than needed.
- * - fetchpriority: "auto" (browser default) instead of the "high" core
- *   gives to the first image over 50000px² it meets. The logo is small and
- *   rarely the LCP element; images explicitly marked "high" (x-ui.image
- *   with eager) keep the priority anyway. "auto" rather than removing the
- *   attribute: without it core would add "high" again
- *   (wp_maybe_add_fetchpriority_high_attr()). A value already set by
- *   another filter is left untouched.
+ * - sizes: l'header limita il logo a 80px di altezza (max-h-20, la
+ *   'height' del supporto custom-logo in setup.php) con larghezza
+ *   automatica, quindi la larghezza renderizzata è 80px per il rapporto
+ *   dell'immagine (240px per il 240×80 consigliato). Il core userebbe la
+ *   larghezza piena dell'immagine (es. "(max-width: 480px) 100vw, 480px") e
+ *   il browser scaricherebbe una variante più grande del necessario.
+ * - fetchpriority: "auto" (default del browser) invece del "high" che il core
+ *   assegna alla prima immagine oltre 50000px² che incontra. Il logo è piccolo
+ *   e raramente è l'elemento LCP; le immagini marcate esplicitamente "high"
+ *   (x-ui.image con eager) mantengono comunque la priorità. "auto" invece di
+ *   rimuovere l'attributo: senza, il core aggiungerebbe di nuovo "high"
+ *   (wp_maybe_add_fetchpriority_high_attr()). Un valore già impostato da un
+ *   altro filtro resta invariato.
  *
- * @param  array<string, mixed>  $attr  Image attributes.
- * @param  int|string  $attachment_id  Logo attachment ID (theme mod).
+ * @param  array<string, mixed>  $attr  Attributi dell'immagine.
+ * @param  int|string  $attachment_id  ID dell'allegato del logo (theme mod).
  * @return array<string, mixed>
  */
 function custom_logo_image_attributes(array $attr, int|string $attachment_id): array

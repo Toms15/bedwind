@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Queries;
 
 /**
- * Page queries.
+ * Query sulle pagine.
  */
 class Pages
 {
     /**
-     * Get the published child pages of a page, in menu order.
+     * Restituisce le pagine figlie pubblicate di una pagina, in ordine di menu.
      *
      * @return \WP_Post[]
      */

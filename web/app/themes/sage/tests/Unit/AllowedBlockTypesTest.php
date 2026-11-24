@@ -5,7 +5,7 @@ use Brain\Monkey\Filters;
 use function App\allowed_block_types;
 
 beforeEach(function () {
-    // app/blocks.php only registers hooks (Brain Monkey) and defines the function.
+    // app/blocks.php registra solo hook (Brain Monkey) e definisce la funzione.
     require_once dirname(__DIR__, 2).'/app/blocks.php';
 
     WP_Block_Type_Registry::get_instance()->registered = array_fill_keys([
@@ -18,7 +18,7 @@ beforeEach(function () {
 });
 
 /**
- * Editor context of the given post type, or of a non-post editor.
+ * Contesto dell'editor per il post type dato, o di un editor senza post.
  */
 function editor_context(?string $post_type, string $name = 'core/edit-post'): WP_Block_Editor_Context
 {
@@ -33,29 +33,29 @@ function editor_context(?string $post_type, string $name = 'core/edit-post'): WP
 }
 
 describe('allowed_block_types', function () {
-    it('keeps false', function () {
+    test('restituisce false quando riceve false', function () {
         expect(allowed_block_types(false, editor_context('page')))->toBeFalse();
     });
 
-    it('allows only ACF blocks in pages', function () {
+    test('ammette solo i blocchi ACF nelle pagine', function () {
         expect(allowed_block_types(true, editor_context('page')))->toBe(['acf/only-text']);
     });
 
-    it('allows core and ACF blocks in the core post types', function (string $post_type) {
+    test('ammette blocchi core e ACF nei post type con i blocchi core', function (string $post_type) {
         expect(allowed_block_types(true, editor_context($post_type)))
             ->toBe(['core/paragraph', 'core/block', 'acf/only-text']);
     })->with(['post', 'faq']);
 
-    it('allows core and ACF blocks in the non-content editors', function (string $name) {
+    test('ammette blocchi core e ACF negli editor che non sono di contenuto', function (string $name) {
         expect(allowed_block_types(true, editor_context(null, $name)))
             ->toBe(['core/paragraph', 'core/block', 'acf/only-text']);
     })->with(['core/edit-widgets', 'core/customize-widgets', 'core/edit-site']);
 
-    it('allows only ACF blocks in a post editor without a post', function () {
+    test('ammette solo i blocchi ACF in un post editor senza post', function () {
         expect(allowed_block_types(true, editor_context(null)))->toBe(['acf/only-text']);
     });
 
-    it('reads the core post types from sage/core_blocks_post_types', function () {
+    test('legge i post type con i blocchi core da sage/core_blocks_post_types', function () {
         Filters\expectApplied('sage/core_blocks_post_types')->twice()->with(['post', 'faq'])->andReturn(['page']);
 
         expect(allowed_block_types(true, editor_context('page')))
@@ -63,7 +63,7 @@ describe('allowed_block_types', function () {
             ->and(allowed_block_types(true, editor_context('post')))->toBe(['acf/only-text']);
     });
 
-    it('adds the blocks of sage/extra_blocks in every editor', function () {
+    test('aggiunge i blocchi di sage/extra_blocks in ogni editor', function () {
         Filters\expectApplied('sage/extra_blocks')->andReturn(['my-plugin/form']);
 
         expect(allowed_block_types(true, editor_context('page')))
@@ -72,7 +72,7 @@ describe('allowed_block_types', function () {
             ->toBe(['core/paragraph', 'core/block', 'acf/only-text', 'my-plugin/form']);
     });
 
-    it('only narrows an incoming array', function () {
+    test('restringe soltanto un array in ingresso', function () {
         Filters\expectApplied('sage/extra_blocks')->andReturn(['my-plugin/form', 'third/missing']);
 
         expect(allowed_block_types(

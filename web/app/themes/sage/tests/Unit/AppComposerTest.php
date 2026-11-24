@@ -3,8 +3,8 @@
 use App\View\Composers\App;
 use Brain\Monkey\Functions;
 
-describe('App composer', function () {
-    it('returns the custom logo markup when a logo is set', function () {
+describe('Composer App', function () {
+    test('restituisce il markup del custom logo quando un logo è impostato', function () {
         $markup = '<a href="https://example.test/" class="custom-logo-link" rel="home"><img class="custom-logo" alt="Sito"></a>';
 
         Functions\when('has_custom_logo')->justReturn(true);
@@ -13,27 +13,27 @@ describe('App composer', function () {
         expect((new App)->customLogo())->toBe($markup);
     });
 
-    it('returns an empty string without a custom logo, so the header falls back to the site name', function () {
+    test('restituisce una stringa vuota senza custom logo, così l\'header ripiega sul nome del sito', function () {
         Functions\when('has_custom_logo')->justReturn(false);
         Functions\expect('get_custom_logo')->never();
 
         expect((new App)->customLogo())->toBe('');
     });
 
-    it('returns the site name as plain text, decoding the entities of the display filters', function () {
+    test('restituisce il nome del sito come testo semplice, decodificando le entity dei filtri display', function () {
         Functions\expect('get_bloginfo')->once()->with('name', 'display')->andReturn('Rossi &amp; Figli &#8211; l&#8217;officina');
 
         expect((new App)->siteName())->toBe('Rossi & Figli – l’officina');
     });
 
-    it('marks the first page of the front page as current', function (bool $front, bool $paged, bool $expected) {
+    test('marca come corrente la prima pagina della front page', function (bool $front, bool $paged, bool $expected) {
         Functions\when('is_front_page')->justReturn($front);
         Functions\when('is_paged')->justReturn($paged);
 
         expect((new App)->isFrontPage())->toBe($expected);
     })->with([
         'front page' => [true, false, true],
-        'front page, page 2' => [true, true, false],
-        'other page' => [false, false, false],
+        'front page, pagina 2' => [true, true, false],
+        'altra pagina' => [false, false, false],
     ]);
 });

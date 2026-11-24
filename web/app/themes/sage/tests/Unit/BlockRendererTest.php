@@ -6,8 +6,8 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 
 /**
- * Mock get_field() with the given block field values (missing fields: null)
- * and sanitize_hex_color() with a minimal #rgb/#rrggbb validator.
+ * Mock di get_field() con i valori dei campi del blocco dati (campi mancanti: null)
+ * e di sanitize_hex_color() con un validatore #rgb/#rrggbb minimo.
  *
  * @param  array<string, mixed>  $fields
  */
@@ -20,7 +20,7 @@ function fake_block_fields(array $fields): void
 }
 
 describe('spacings', function () {
-    it('maps padding presets to Tailwind classes', function (string $padding, string $dimension, string $classes) {
+    test('converte i preset di padding in classi Tailwind', function (string $padding, string $dimension, string $classes) {
         fake_block_fields(['padding' => $padding, 'padding_dimension' => $dimension, 'margin' => 'no']);
 
         expect(BlockRenderer::data([])['spacings']['padding'])->toBe($classes);
@@ -33,7 +33,7 @@ describe('spacings', function () {
         ['py', 'xxl', ''],
     ]);
 
-    it('maps margin presets to Tailwind classes', function (string $margin, string $dimension, string $classes) {
+    test('converte i preset di margin in classi Tailwind', function (string $margin, string $dimension, string $classes) {
         fake_block_fields(['padding' => 'no', 'margin' => $margin, 'margin_dimension' => $dimension]);
 
         expect(BlockRenderer::data([])['spacings']['margin'])->toBe($classes);
@@ -47,7 +47,7 @@ describe('spacings', function () {
 });
 
 describe('settings', function () {
-    it('uses the anchor as id, the ACF block id otherwise', function () {
+    test('usa l\'anchor come id, altrimenti l\'id del blocco ACF', function () {
         fake_block_fields([]);
 
         expect(BlockRenderer::data(['anchor' => 'intro', 'id' => 'block_1'])['settings']['id'])->toBe('intro')
@@ -55,7 +55,7 @@ describe('settings', function () {
             ->and(BlockRenderer::data([])['settings']['id'])->toBe('');
     });
 
-    it('drops invalid colors', function () {
+    test('scarta i colori non validi', function () {
         fake_block_fields(['background_color' => '#112233', 'text_color' => 'red']);
 
         expect(BlockRenderer::data([])['settings'])
@@ -65,7 +65,7 @@ describe('settings', function () {
 });
 
 describe('contents', function () {
-    it('whitelists the title tag and computes the next heading', function (mixed $formatting, string $tag, string $next) {
+    test('limita il tag del titolo ai valori ammessi e calcola il titolo successivo', function (mixed $formatting, string $tag, string $next) {
         fake_block_fields(['title_formatting' => $formatting]);
 
         expect(BlockRenderer::data([])['contents'])
@@ -80,7 +80,7 @@ describe('contents', function () {
         [null, 'h2', 'h3'],
     ]);
 
-    it('normalizes the buttons repeater to a list', function () {
+    test('normalizza il repeater dei pulsanti in una lista', function () {
         fake_block_fields(['buttons' => [3 => ['button' => ['url' => '/a']], 7 => ['button' => ['url' => '/b']]]]);
         expect(BlockRenderer::data([])['contents']['buttons'])->toBe([
             ['button' => ['url' => '/a']],
@@ -93,8 +93,8 @@ describe('contents', function () {
 });
 
 /**
- * Mock the Acorn view factory (resolved by view() through app()): the given
- * views exist and render as "<name>|<json of the data>"; the others do not exist.
+ * Mock della view factory di Acorn (risolta da view() tramite app()): le view
+ * date esistono e si renderizzano come "<name>|<json dei dati>"; le altre non esistono.
  *
  * @param  list<string>  $views
  */
@@ -112,12 +112,12 @@ function fake_views(array $views): void
 
     Functions\when('app')->justReturn($factory);
 
-    // No block has assets (view.js/style.css): see BlockAssetsTest.
+    // Nessun blocco ha asset (view.js/style.css): vedi BlockAssetsTest.
     Functions\when('get_theme_file_path')->alias(fn (string $path) => '/nonexistent/'.$path);
 }
 
 /**
- * Output of BlockRenderer::render().
+ * Output di BlockRenderer::render().
  *
  * @param  array<string, mixed>  $block
  */
@@ -130,30 +130,30 @@ function render_block(array $block, bool $is_preview = false): string
 }
 
 describe('render', function () {
-    it('renders the block view by name, with the block and its slug only', function () {
+    test('renderizza la view del blocco per nome, solo con il blocco e il suo slug', function () {
         fake_views(['blocks.only-text.only-text']);
 
         expect(render_block(['name' => 'acf/only-text', 'id' => 'block_1']))
             ->toBe('blocks.only-text.only-text|'.json_encode(['block' => ['name' => 'acf/only-text', 'id' => 'block_1', 'slug' => 'only-text']]));
     });
 
-    it('strips only the leading acf/ prefix', function () {
-        // A namespace ending in "acf" (e.g. a third-party "my-acf/cards"):
-        // removing "acf/" anywhere would turn it into "my-cards".
+    test('toglie solo il prefisso acf/ iniziale', function () {
+        // Un namespace che finisce in "acf" (es. un "my-acf/cards" di terze parti):
+        // rimuovere "acf/" in qualsiasi punto lo trasformerebbe in "my-cards".
         fake_views(['blocks.cards.cards', 'blocks.my-cards.my-cards']);
 
         expect(render_block(['name' => 'acf/cards']))->toStartWith('blocks.cards.cards|')
             ->and(render_block(['name' => 'my-acf/cards']))->toBe('');
     });
 
-    it('renders nothing when the view does not exist', function () {
+    test('non renderizza nulla quando la view non esiste', function () {
         fake_views([]);
 
         expect(render_block(['name' => 'acf/missing']))->toBe('')
             ->and(render_block([]))->toBe('');
     });
 
-    it('enqueues the block assets only when the view is rendered on the frontend', function () {
+    test('carica gli asset del blocco solo quando la view è renderizzata nel frontend', function () {
         fake_views(['components.acf.placeholder', 'blocks.only-text.only-text']);
         fake_block_fields([]);
         Functions\expect('wp_enqueue_style')->never();
@@ -176,7 +176,7 @@ describe('render', function () {
         ]);
     });
 
-    it('renders the placeholder with the title field in the editor', function () {
+    test('renderizza nell\'editor il placeholder con il campo title', function () {
         fake_views(['components.acf.placeholder', 'blocks.only-text.only-text']);
         fake_block_fields(['title' => 'Intro']);
 

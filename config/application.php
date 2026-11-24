@@ -1,12 +1,11 @@
 <?php
 
 /**
- * Your base production configuration goes in this file. Environment-specific
- * overrides go in their respective config/environments/{{WP_ENV}}.php file.
+ * Qui va la configurazione di base, quella di produzione. Gli override per
+ * ambiente vanno nel rispettivo file config/environments/{{WP_ENV}}.php.
  *
- * A good default policy is to deviate from the production config as little as
- * possible. Try to define as much of your configuration in this file as you
- * can.
+ * Come regola, conviene discostarsi il meno possibile dalla configurazione di
+ * produzione: definisci in questo file quanta più configurazione puoi.
  */
 
 use Roots\WPConfig\Config;
@@ -17,7 +16,7 @@ use function Env\env;
 Env\Env::$options = 31;
 
 /**
- * Directory containing all of the site's files
+ * Directory che contiene tutti i file del sito
  *
  * @var string
  */
@@ -31,8 +30,8 @@ $root_dir = dirname(__DIR__);
 $webroot_dir = $root_dir . '/web';
 
 /**
- * Use Dotenv to set required environment variables and load .env file in root
- * .env.local will override .env if it exists
+ * Dotenv imposta le variabili d'ambiente richieste e carica il file .env della root;
+ * .env.local, se esiste, sovrascrive .env
  */
 if (file_exists($root_dir . '/.env')) {
     $env_files = file_exists($root_dir . '/.env.local')
@@ -55,13 +54,13 @@ if (file_exists($root_dir . '/.env')) {
 }
 
 /**
- * Set up our global environment constant and load its config first
+ * Definisce la costante globale dell'ambiente, la cui config viene caricata per prima
  * Default: production
  */
 define('WP_ENV', env('WP_ENV') ?: 'production');
 
 /**
- * Infer WP_ENVIRONMENT_TYPE based on WP_ENV
+ * Ricava WP_ENVIRONMENT_TYPE da WP_ENV
  */
 if (!env('WP_ENVIRONMENT_TYPE') && in_array(WP_ENV, ['production', 'staging', 'development', 'local'])) {
     Config::define('WP_ENVIRONMENT_TYPE', WP_ENV);
@@ -74,14 +73,14 @@ Config::define('WP_HOME', env('WP_HOME'));
 Config::define('WP_SITEURL', env('WP_SITEURL'));
 
 /**
- * Custom Content Directory
+ * Directory dei contenuti personalizzata
  */
 Config::define('CONTENT_DIR', '/app');
 Config::define('WP_CONTENT_DIR', $webroot_dir . Config::get('CONTENT_DIR'));
 Config::define('WP_CONTENT_URL', Config::get('WP_HOME') . Config::get('CONTENT_DIR'));
 
 /**
- * DB settings
+ * Impostazioni del database
  */
 if (env('DB_SSL')) {
     Config::define('MYSQL_CLIENT_FLAGS', MYSQLI_CLIENT_SSL);
@@ -105,7 +104,7 @@ if (env('DATABASE_URL')) {
 }
 
 /**
- * Authentication Unique Keys and Salts
+ * Chiavi e salt univoci di autenticazione
  */
 Config::define('AUTH_KEY', env('AUTH_KEY'));
 Config::define('SECURE_AUTH_KEY', env('SECURE_AUTH_KEY'));
@@ -117,28 +116,28 @@ Config::define('LOGGED_IN_SALT', env('LOGGED_IN_SALT'));
 Config::define('NONCE_SALT', env('NONCE_SALT'));
 
 /**
- * Custom Settings
+ * Impostazioni personalizzate
  */
 Config::define('AUTOMATIC_UPDATER_DISABLED', true);
 Config::define('DISABLE_WP_CRON', env('DISABLE_WP_CRON') ?: false);
 
-// Disable the plugin and theme file editor in the admin
+// Disattiva l'editor dei file di plugin e temi nell'admin
 Config::define('DISALLOW_FILE_EDIT', true);
 
-// Disable plugin and theme updates and installation from the admin
+// Disattiva aggiornamenti e installazione di plugin e temi dall'admin
 Config::define('DISALLOW_FILE_MODS', true);
 
-// Default/fallback theme: no bundled twentytwenty* theme is installed
+// Tema di default/fallback: nessun tema twentytwenty* incluso è installato
 Config::define('WP_DEFAULT_THEME', 'sage');
 
-// Limit the number of post revisions
+// Limita il numero di revisioni dei post
 Config::define('WP_POST_REVISIONS', env('WP_POST_REVISIONS') ?? true);
 
-// Disable script concatenation
+// Disattiva la concatenazione degli script
 Config::define('CONCATENATE_SCRIPTS', false);
 
 /**
- * Debugging Settings
+ * Impostazioni di debug
  */
 Config::define('WP_DEBUG', false);
 Config::define('WP_DEBUG_DISPLAY', false);
@@ -147,8 +146,8 @@ Config::define('SCRIPT_DEBUG', false);
 ini_set('display_errors', '0');
 
 /**
- * Allow WordPress to detect HTTPS when used behind a reverse proxy or a load balancer
- * See https://codex.wordpress.org/Function_Reference/is_ssl#Notes
+ * Permette a WordPress di rilevare HTTPS dietro un reverse proxy o un load balancer
+ * Vedi https://codex.wordpress.org/Function_Reference/is_ssl#Notes
  */
 if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
     $_SERVER['HTTPS'] = 'on';
@@ -163,7 +162,7 @@ if (file_exists($env_config)) {
 Config::apply();
 
 /**
- * Bootstrap WordPress
+ * Avvio di WordPress
  */
 if (!defined('ABSPATH')) {
     define('ABSPATH', $webroot_dir . '/wp/');

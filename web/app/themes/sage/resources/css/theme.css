@@ -14,7 +14,7 @@
   --font-body:
     ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 
-  /* Font size */
+  /* Dimensioni del testo */
   --text-small: 0.875rem;
   --text-small--line-height: calc(1.25 / 0.875);
 

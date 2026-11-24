@@ -7,8 +7,8 @@ use Tests\TestCase;
 | Test Case
 |--------------------------------------------------------------------------
 |
-| Every test runs in Tests\TestCase, which sets up and tears down Brain
-| Monkey: WordPress functions are mocked, no database or WordPress needed.
+| Ogni test gira in Tests\TestCase, che prepara e smonta Brain Monkey:
+| le funzioni di WordPress sono mock, non servono né database né WordPress.
 |
 */
 
@@ -16,12 +16,12 @@ uses(TestCase::class)->in('Unit');
 
 /*
 |--------------------------------------------------------------------------
-| Theme files
+| File del tema
 |--------------------------------------------------------------------------
 |
-| Classes in app/ are autoloaded (PSR-4 App\). The helper functions are not:
-| functions.php loads them with locate_template(), so require them here.
-| WordPress classes used by the tested code are stubbed in tests/Stubs.
+| Le classi in app/ sono in autoload (PSR-4 App\). Le funzioni helper no:
+| le carica functions.php con locate_template(), quindi si includono qui.
+| Le classi di WordPress usate dal codice testato hanno uno stub in tests/Stubs.
 |
 */
 

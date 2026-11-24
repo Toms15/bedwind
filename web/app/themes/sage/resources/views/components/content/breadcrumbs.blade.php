@@ -44,9 +44,9 @@
 
   $schema = null;
 
-  // JSON-LD: only items with a URL, plus the last one (Google requires
-  // 'item' on every ListItem except the last). Positions are renumbered
-  // from 1 and the "at least two items" check applies to this list.
+  // JSON-LD: solo le voci con un URL, più l'ultima (Google richiede
+  // 'item' su ogni ListItem tranne l'ultimo). Le posizioni sono rinumerate
+  // da 1 e il controllo "almeno due voci" si applica a questa lista.
   $ld = array_values(array_filter(
     $items,
     fn (array $item, int $index): bool => $index === $last || (bool) $item['url'],

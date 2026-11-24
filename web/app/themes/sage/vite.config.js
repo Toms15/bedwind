@@ -10,14 +10,14 @@ import { blocksDir, writeBlocksManifest } from './resources/scripts/blocks-manif
 
 const themeDir = path.dirname(fileURLToPath(import.meta.url));
 
-// Bedrock root (web/app/themes/<theme> -> ../../../..), where the project .env lives.
+// Root di Bedrock (web/app/themes/<theme> -> ../../../..), dove sta il .env del progetto.
 const bedrockRoot = path.resolve(themeDir, '../../../..');
 
-// Derive the theme slug from this config's folder so a renamed theme keeps
-// working; set VITE_THEME_SLUG to override it.
+// Lo slug del tema si ricava dalla cartella di questa config, così un tema
+// rinominato continua a funzionare; VITE_THEME_SLUG lo sovrascrive.
 const themeSlug = process.env.VITE_THEME_SLUG || path.basename(themeDir);
 
-// Herd/Valet certificate folders checked by laravel-vite-plugin.
+// Cartelle dei certificati Herd/Valet controllate da laravel-vite-plugin.
 const tlsConfigPaths = [
   path.resolve(os.homedir(), 'Library', 'Application Support', 'Herd', 'config', 'valet'),
   path.resolve(os.homedir(), '.config', 'herd', 'config', 'valet'),
@@ -25,10 +25,11 @@ const tlsConfigPaths = [
   path.resolve(os.homedir(), '.valet'),
 ];
 
-// laravel-vite-plugin's default TLS detection looks for "<cwd folder>.<tld>",
-// i.e. the theme folder name, so a renamed theme would silently fall back to
-// http. Use the site host instead, but only when a Herd/Valet certificate
-// exists for it: a string value makes the plugin throw if it is missing.
+// Il rilevamento TLS di default di laravel-vite-plugin cerca "<cartella cwd>.<tld>",
+// cioè il nome della cartella del tema, quindi un tema rinominato tornerebbe
+// in silenzio a http. Si usa invece l'host del sito, ma solo se esiste un
+// certificato Herd/Valet per quell'host: con un valore stringa il plugin
+// lancia un errore se il certificato manca.
 function resolveDetectTls(appUrl) {
   let host;
   try {
@@ -41,7 +42,7 @@ function resolveDetectTls(appUrl) {
     return null;
   }
 
-  // Like the plugin, only look in the first existing Herd/Valet config folder.
+  // Come il plugin, cerca solo nella prima cartella di config Herd/Valet esistente.
   const configPath = tlsConfigPaths.find((dir) => fs.existsSync(dir));
 
   const hasCertificate =
@@ -49,14 +50,16 @@ function resolveDetectTls(appUrl) {
     fs.existsSync(path.join(configPath, 'Certificates', `${host}.crt`)) &&
     fs.existsSync(path.join(configPath, 'Certificates', `${host}.key`));
 
-  // null keeps the plugin's default detection.
+  // null mantiene il rilevamento di default del plugin.
   return hasCertificate ? host : null;
 }
 
-// Optional per-block assets (resources/views/blocks/<slug>/view.js and
-// style.css): one entry each, enqueued only on the pages that render the block
-// (App\Blocks\BlockAssets). Globbed when the config loads: restart `npm run
-// dev` after adding one (the dev server serves it anyway, the build needs it).
+// Asset opzionali per blocco (resources/views/blocks/<slug>/view.js e
+// style.css): una entry ciascuno, caricata solo nelle pagine che renderizzano
+// il blocco (App\Blocks\BlockAssets). Il glob gira al caricamento della config,
+// quindi un asset aggiunto dopo l'avvio diventa entry solo riavviando
+// `npm run dev`. In sviluppo il dev server lo serve comunque, anche senza
+// riavvio; l'entry serve alla build, che la scrive nel manifest.
 const blockAssets = fs
   .globSync(['resources/views/blocks/*/view.js', 'resources/views/blocks/*/style.css'], {
     cwd: themeDir,
@@ -64,9 +67,9 @@ const blockAssets = fs
   .map((file) => file.split(path.sep).join('/'))
   .sort();
 
-// Keep resources/views/blocks/blocks-manifest.php in sync with the block.json
-// files: written at build start and, in dev, whenever a block.json is added,
-// changed or removed (the refresh option then reloads the page).
+// Tiene resources/views/blocks/blocks-manifest.php allineato ai block.json:
+// scritto all'avvio della build e, in dev, ogni volta che un block.json viene
+// aggiunto, modificato o rimosso (poi l'opzione refresh ricarica la pagina).
 function blocksManifest() {
   const isBlockJson = (file) =>
     path.basename(file) === 'block.json' && path.dirname(path.dirname(file)) === blocksDir;
@@ -98,10 +101,10 @@ function blocksManifest() {
 }
 
 export default defineConfig(({ mode }) => {
-  // laravel-vite-plugin reads APP_URL (process.env included) for the dev-server
-  // CORS allowlist, the TLS host with VITE_DEV_SERVER_KEY/CERT, its fallback
-  // page and the console banner. Default it to Bedrock's WP_HOME; only these
-  // keys are loaded, so no other .env value reaches the build.
+  // laravel-vite-plugin legge APP_URL (anche da process.env) per la allowlist
+  // CORS del dev server, l'host TLS con VITE_DEV_SERVER_KEY/CERT, la sua pagina
+  // di fallback e il banner in console. Di default vale il WP_HOME di Bedrock;
+  // si caricano solo queste chiavi, così nessun altro valore del .env arriva alla build.
   const env = loadEnv(mode, bedrockRoot, ['WP_HOME', 'APP_URL']);
   const appUrl = process.env.APP_URL || env.APP_URL || env.WP_HOME || 'http://localhost';
   process.env.APP_URL = appUrl;
@@ -122,14 +125,14 @@ export default defineConfig(({ mode }) => {
         ],
         refresh: true,
         detectTls: resolveDetectTls(appUrl),
-        // laravel-vite-plugin 3 / Vite 8: static assets go here, not in import.meta.glob.
+        // laravel-vite-plugin 3 / Vite 8: gli asset statici vanno qui, non in import.meta.glob.
         assets: ['resources/images/**', 'resources/fonts/**'],
       }),
 
       wordpressPlugin(),
 
-      // Generate the theme.json file in the public/build/assets directory
-      // based on the Tailwind config and the theme.json file from base theme folder
+      // Genera il file theme.json nella directory public/build/assets
+      // a partire dalla config di Tailwind e dal theme.json nella cartella base del tema
       wordpressThemeJson({
         disableTailwindColors: false,
         disableTailwindFonts: false,

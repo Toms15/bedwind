@@ -9,7 +9,7 @@ use Roots\Acorn\View\Composer;
 class Post extends Composer
 {
     /**
-     * List of views served by this composer.
+     * Elenco delle view servite da questo composer.
      *
      * @var array<string>
      */
@@ -20,7 +20,7 @@ class Post extends Composer
     ];
 
     /**
-     * Retrieve the post title.
+     * Restituisce il titolo del post.
      */
     public function title(): string
     {
@@ -42,7 +42,7 @@ class Post extends Composer
 
         if (is_search()) {
             return sprintf(
-                /* translators: %s: search query. */
+                /* translators: %s: termini di ricerca. */
                 __('Risultati della ricerca per %s', 'sage'),
                 get_search_query()
             );
@@ -56,7 +56,7 @@ class Post extends Composer
     }
 
     /**
-     * Retrieve the pagination links.
+     * Restituisce i link della paginazione.
      */
     public function pagination(): string
     {

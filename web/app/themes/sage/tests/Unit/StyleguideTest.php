@@ -9,7 +9,7 @@ afterEach(function () {
 });
 
 /**
- * Stored rewrite rules and FLUSH_OPTION, with the flush recorded.
+ * Regole di rewrite salvate e FLUSH_OPTION, con il flush registrato.
  *
  * @param  array<string, string>|string  $rules
  * @return ArrayObject<string, mixed>
@@ -40,7 +40,7 @@ function fake_rewrite_state(array|string $rules, string|false $flushed = false):
 }
 
 describe('enabled()', function () {
-    it('is true only in development', function (string $env, bool $expected) {
+    test('restituisce true solo in development', function (string $env, bool $expected) {
         expect(Styleguide::enabled($env))->toBe($expected);
     })->with([
         ['development', true],
@@ -52,7 +52,7 @@ describe('enabled()', function () {
 });
 
 describe('register()', function () {
-    it('only hooks the rewrite sync outside development', function (string $env) {
+    test('aggancia solo la sincronizzazione delle rewrite fuori da development', function (string $env) {
         Styleguide::register($env);
 
         expect(has_action('init'))->toBeTrue()
@@ -62,7 +62,7 @@ describe('register()', function () {
             ->and(has_filter('wp_robots', [Styleguide::class, 'robots']))->toBeFalse();
     })->with(['staging', 'production', '']);
 
-    it('hooks the route in development', function () {
+    test('aggancia la route in development', function () {
         Styleguide::register('development');
 
         expect(has_action('init', [Styleguide::class, 'addRewriteRule']))->not->toBeFalse()
@@ -76,7 +76,7 @@ describe('register()', function () {
 });
 
 describe('syncRewriteRules()', function () {
-    it('flushes once when the rule is missing in development', function () {
+    test('fa il flush una volta quando in development la regola manca', function () {
         $state = fake_rewrite_state(['^foo/?$' => 'index.php?foo=1']);
 
         Styleguide::syncRewriteRules(true);
@@ -85,7 +85,7 @@ describe('syncRewriteRules()', function () {
         expect($state['flushes'])->toBe(1)->and($state['option'])->toBe('on');
     });
 
-    it('flushes once when the rule is left outside development', function () {
+    test('fa il flush una volta quando fuori da development la regola è rimasta', function () {
         $state = fake_rewrite_state([Styleguide::RULE => 'index.php?sage_styleguide=1'], 'on');
 
         Styleguide::syncRewriteRules(false);
@@ -93,7 +93,7 @@ describe('syncRewriteRules()', function () {
         expect($state['flushes'])->toBe(1)->and($state['option'])->toBe('off');
     });
 
-    it('does nothing when the rules match the environment', function (bool $enabled, array $rules) {
+    test('non fa nulla quando le regole corrispondono all\'ambiente', function (bool $enabled, array $rules) {
         $state = fake_rewrite_state($rules);
 
         Styleguide::syncRewriteRules($enabled);
@@ -104,7 +104,7 @@ describe('syncRewriteRules()', function () {
         'production' => [false, ['^foo/?$' => 'index.php?foo=1']],
     ]);
 
-    it('does nothing without stored rules (plain permalinks)', function () {
+    test('non fa nulla senza regole salvate (permalink semplici)', function () {
         $state = fake_rewrite_state('');
 
         Styleguide::syncRewriteRules(true);
@@ -112,7 +112,7 @@ describe('syncRewriteRules()', function () {
         expect($state['flushes'])->toBe(0);
     });
 
-    it('forgets an old flush state once the rules are in sync', function () {
+    test('dimentica uno stato di flush vecchio quando le regole sono allineate', function () {
         $state = fake_rewrite_state(['^foo/?$' => 'index.php?foo=1'], 'on');
 
         Styleguide::syncRewriteRules(false);
@@ -121,15 +121,15 @@ describe('syncRewriteRules()', function () {
     });
 });
 
-describe('request', function () {
-    it('recognizes only the main query with the query var', function () {
+describe('richiesta', function () {
+    test('riconosce solo la main query con la query var', function () {
         expect(Styleguide::isRequest(new WP_Query([Styleguide::QUERY_VAR => '1'])))->toBeTrue()
             ->and(Styleguide::isRequest(new WP_Query([Styleguide::QUERY_VAR => '1'], false)))->toBeFalse()
             ->and(Styleguide::isRequest(new WP_Query))->toBeFalse()
             ->and(Styleguide::isRequest())->toBeFalse();
     });
 
-    it('is not the blog home, runs no posts query and is not a 404', function () {
+    test('non è la home del blog, non esegue la query dei post e non è un 404', function () {
         $query = new WP_Query([Styleguide::QUERY_VAR => '1']);
         Styleguide::parseQuery($query);
 
@@ -140,7 +140,7 @@ describe('request', function () {
             ->and(Styleguide::skip404(false, new WP_Query))->toBeFalse();
     });
 
-    it('renders the view with noindex, nofollow', function () {
+    test('renderizza la view con noindex, nofollow', function () {
         $GLOBALS['wp_query'] = new WP_Query([Styleguide::QUERY_VAR => '1']);
         Functions\when('get_theme_file_path')->alias(fn (string $path) => "/theme/{$path}");
         Functions\when('__')->returnArg();
@@ -152,7 +152,7 @@ describe('request', function () {
             ->and(Styleguide::bodyClass(['home']))->toBe(['home', 'styleguide']);
     });
 
-    it('leaves other requests untouched', function () {
+    test('lascia invariate le altre richieste', function () {
         $GLOBALS['wp_query'] = new WP_Query;
 
         expect(Styleguide::template('/theme/index.php'))->toBe('/theme/index.php')
@@ -162,7 +162,7 @@ describe('request', function () {
 });
 
 describe('tokens()', function () {
-    it('reads palette, font families and font sizes from theme.json', function () {
+    test('legge palette, famiglie di font e dimensioni del testo dal theme.json', function () {
         $path = tempnam(sys_get_temp_dir(), 'sage-theme-json');
         file_put_contents($path, json_encode(['settings' => [
             'color' => ['palette' => [
@@ -188,7 +188,7 @@ describe('tokens()', function () {
         unlink($path);
     });
 
-    it('returns empty lists without a build', function () {
+    test('restituisce liste vuote senza una build', function () {
         expect(Styleguide::tokens('/missing/theme.json'))
             ->toBe(['colors' => [], 'fonts' => [], 'sizes' => []]);
     });
@@ -200,7 +200,7 @@ describe('enqueueAssets()', function () {
     });
 
     /**
-     * Vite facade: asset() returns "build/<path>", or throws when $missing.
+     * Facade Vite: asset() restituisce "build/<path>", o lancia un'eccezione se $missing.
      */
     function fake_styleguide_vite(bool $missing = false): void
     {
@@ -219,7 +219,7 @@ describe('enqueueAssets()', function () {
         });
     }
 
-    it('enqueues the stylesheet of the view only on the styleguide', function () {
+    test('carica il foglio di stile della view solo sulla styleguide', function () {
         fake_styleguide_vite();
         Functions\expect('wp_enqueue_style')->once()
             ->with(Styleguide::HANDLE, 'build/'.Styleguide::STYLE, [], null);
@@ -231,7 +231,7 @@ describe('enqueueAssets()', function () {
         Styleguide::enqueueAssets();
     });
 
-    it('skips the stylesheet missing from the Vite manifest', function () {
+    test('salta il foglio di stile assente dal manifest di Vite', function () {
         fake_styleguide_vite(missing: true);
         Functions\expect('wp_enqueue_style')->never();
 
@@ -239,14 +239,14 @@ describe('enqueueAssets()', function () {
         Styleguide::enqueueAssets();
     });
 
-    it('is hooked only in development', function () {
+    test('è agganciato solo in development', function () {
         Styleguide::register('development');
         expect(has_action('wp_enqueue_scripts', [Styleguide::class, 'enqueueAssets']))->not->toBeFalse();
     });
 });
 
-describe('contrast', function () {
-    it('computes the WCAG luminance of hex and oklch colors', function (string $color, float $expected) {
+describe('contrasto', function () {
+    test('calcola la luminanza WCAG dei colori hex e oklch', function (string $color, float $expected) {
         expect(Styleguide::luminance($color))->toEqualWithDelta($expected, 0.0005);
     })->with([
         ['#000', 0.0],
@@ -263,13 +263,13 @@ describe('contrast', function () {
         ['oklch(50% none none)', 0.125],
     ]);
 
-    it('returns null for formats it cannot read or transparent colors', function (string $color) {
+    test('restituisce null per i formati che non sa leggere o per i colori trasparenti', function (string $color) {
         expect(Styleguide::luminance($color))->toBeNull()
             ->and(Styleguide::contrast($color, '#fff'))->toBeNull()
             ->and(Styleguide::contrasts($color))->toBe([]);
     })->with(['', 'red', '#12', '#12345', 'rgb(0 0 0)', 'oklch(50% 0 0 / .5)', 'oklch(50% 0 0 / 50%)', 'var(--color-black)']);
 
-    it('computes the contrast ratio in both directions', function () {
+    test('calcola il rapporto di contrasto in entrambe le direzioni', function () {
         expect(Styleguide::contrast('#000', '#fff'))->toEqualWithDelta(21.0, 0.0001)
             ->and(Styleguide::contrast('#fff', '#000'))->toEqualWithDelta(21.0, 0.0001)
             ->and(Styleguide::contrast('#fff', '#fff'))->toEqualWithDelta(1.0, 0.0001)
@@ -277,7 +277,7 @@ describe('contrast', function () {
             ->and(Styleguide::contrast('oklch(14.5% 0 0)', '#fff'))->toEqualWithDelta(19.79, 0.01);
     });
 
-    it('maps the ratio to the WCAG levels for normal and large text', function (float $ratio, ?string $normal, ?string $large) {
+    test('converte il rapporto nei livelli WCAG per testo normale e grande', function (float $ratio, ?string $normal, ?string $large) {
         expect(Styleguide::wcag($ratio))->toBe(['normal' => $normal, 'large' => $large]);
     })->with([
         [21.0, 'AAA', 'AAA'],
@@ -290,7 +290,7 @@ describe('contrast', function () {
         [1.0, null, null],
     ]);
 
-    it('gives the contrast with white and black', function () {
+    test('restituisce il contrasto con il bianco e il nero', function () {
         $contrasts = Styleguide::contrasts('#767676');
 
         expect(array_keys($contrasts))->toBe(['white', 'black'])

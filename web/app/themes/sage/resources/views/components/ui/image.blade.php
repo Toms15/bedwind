@@ -41,10 +41,10 @@
 @php
   $id = (int) $id;
 
-  // Only scalar attributes can be printed on the <img>.
+  // Sull'<img> si possono stampare solo attributi scalari.
   $attrs = array_filter($attributes->getAttributes(), 'is_scalar');
 
-  // A custom class replaces WP's default one: keep "attachment-{size} size-{size}".
+  // Una classe personalizzata sostituisce quella di default di WP: si mantiene "attachment-{size} size-{size}".
   if (! empty($attrs['class']) && is_string($size)) {
     $attrs['class'] = "attachment-{$size} size-{$size} {$attrs['class']}";
   }

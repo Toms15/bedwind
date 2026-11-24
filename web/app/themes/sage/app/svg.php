@@ -3,19 +3,19 @@
 declare(strict_types=1);
 
 /**
- * Safe SVG uploads.
+ * Caricamento sicuro degli SVG.
  *
- * SVG files are XML documents that can carry scripts, event handlers and
- * external references, so an unfiltered SVG upload is a stored XSS vector.
- * Here SVG uploads are:
- *  - allowed only to users with the `sage/svg_upload_capability` capability
- *    (default `edit_others_posts`, i.e. editors and administrators);
- *  - always sanitized with enshrined/svg-sanitize before WordPress stores
- *    them, and rejected when the sanitizer cannot produce a clean document;
- *  - rejected when compressed (.svgz), since they could not be inspected;
- *  - rejected when written through wp_upload_bits() (XML-RPC
- *    wp.uploadFile / metaWeblog.newMediaObject), which bypasses the upload
- *    prefilters and cannot be sanitized.
+ * I file SVG sono documenti XML che possono contenere script, event handler e
+ * riferimenti esterni, quindi un caricamento SVG non filtrato è un vettore di XSS
+ * persistente. Qui i caricamenti SVG sono:
+ *  - consentiti solo agli utenti con la capability `sage/svg_upload_capability`
+ *    (default `edit_others_posts`, cioè editor e amministratori);
+ *  - sempre sanificati con enshrined/svg-sanitize prima che WordPress li salvi,
+ *    e rifiutati se il sanitizer non riesce a produrre un documento pulito;
+ *  - rifiutati se compressi (.svgz), perché non si potrebbero ispezionare;
+ *  - rifiutati se scritti tramite wp_upload_bits() (XML-RPC
+ *    wp.uploadFile / metaWeblog.newMediaObject), che salta i prefiltri di
+ *    caricamento e non permette la sanificazione.
  */
 
 namespace App\Svg;
@@ -26,7 +26,7 @@ use WP_User;
 const MIME_TYPE = 'image/svg+xml';
 
 /**
- * Capability required to upload SVG files.
+ * Capability richiesta per caricare file SVG.
  */
 function capability(): string
 {
@@ -34,7 +34,7 @@ function capability(): string
 }
 
 /**
- * Whether the given user (default: current user) may upload SVG files.
+ * Indica se l'utente dato (default: l'utente corrente) può caricare file SVG.
  */
 function user_can_upload(int|WP_User|null $user = null): bool
 {
@@ -42,7 +42,7 @@ function user_can_upload(int|WP_User|null $user = null): bool
 }
 
 /**
- * Allow the svg extension only to authorized users.
+ * Consente l'estensione svg solo agli utenti autorizzati.
  *
  * @param  array<string, string>  $mimes
  * @return array<string, string>
@@ -62,7 +62,7 @@ function filter_upload_mimes(array $mimes, int|WP_User|null $user = null): array
 add_filter('upload_mimes', __NAMESPACE__.'\\filter_upload_mimes', 10, 2);
 
 /**
- * Detect the real MIME type of a file from its content.
+ * Rileva il vero MIME type di un file dal suo contenuto.
  */
 function real_mime(string $path): ?string
 {
@@ -78,10 +78,10 @@ function real_mime(string $path): ?string
 }
 
 /**
- * Sanitize SVG uploads before WordPress moves them into the uploads folder.
+ * Sanifica i caricamenti SVG prima che WordPress li sposti nella cartella uploads.
  *
- * Runs on both wp_handle_upload_prefilter (form/REST multipart uploads) and
- * wp_handle_sideload_prefilter (sideload, REST raw body, WP-CLI).
+ * Gira sia su wp_handle_upload_prefilter (caricamenti da form/REST multipart) sia
+ * su wp_handle_sideload_prefilter (sideload, body REST grezzo, WP-CLI).
  *
  * @param  array<string, mixed>  $file
  * @return array<string, mixed>
@@ -142,14 +142,14 @@ add_filter('wp_handle_upload_prefilter', __NAMESPACE__.'\\sanitize_upload');
 add_filter('wp_handle_sideload_prefilter', __NAMESPACE__.'\\sanitize_upload');
 
 /**
- * Whether raw file contents look like an SVG document (plain or gzipped).
+ * Indica se il contenuto grezzo di un file sembra un documento SVG (semplice o gzip).
  */
 function is_svg_content(string $bits): bool
 {
     if (str_starts_with($bits, "\x1f\x8b")) {
-        // Inflate in small chunks with a size cap to avoid gzip bombs
-        // (gzdecode() does not enforce its max_length). Anything that cannot
-        // be decoded within the limit is treated as SVG, so it is rejected.
+        // Decomprime a piccoli blocchi con un tetto di dimensione per evitare le
+        // gzip bomb (gzdecode() non rispetta il suo max_length). Ciò che non si
+        // riesce a decodificare entro il limite è trattato come SVG, quindi rifiutato.
         $limit = 10 * MB_IN_BYTES;
         $context = inflate_init(ZLIB_ENCODING_GZIP);
         $decoded = '';
@@ -169,11 +169,11 @@ function is_svg_content(string $bits): bool
 }
 
 /**
- * Reject SVG files written with wp_upload_bits() (XML-RPC media uploads).
+ * Rifiuta i file SVG scritti con wp_upload_bits() (caricamenti media via XML-RPC).
  *
- * wp_upload_bits() skips the upload prefilters, and the core ignores any
- * change made to 'bits' by this filter, so these files cannot be sanitized:
- * returning a string makes the core abort the upload with that error.
+ * wp_upload_bits() salta i prefiltri di caricamento, e il core ignora qualsiasi
+ * modifica fatta a 'bits' da questo filtro, quindi questi file non si possono
+ * sanificare: restituire una stringa fa interrompere al core il caricamento con quell'errore.
  */
 function reject_upload_bits(mixed $upload): mixed
 {
@@ -193,7 +193,7 @@ function reject_upload_bits(mixed $upload): mixed
 add_filter('wp_upload_bits', __NAMESPACE__.'\\reject_upload_bits');
 
 /**
- * Read the intrinsic size of an SVG from its width/height or viewBox.
+ * Legge la dimensione intrinseca di un SVG da width/height o dal viewBox.
  *
  * @return array{width: int, height: int}|null
  */
@@ -232,11 +232,11 @@ function dimensions(string $path): ?array
 }
 
 /**
- * Store width/height for SVG attachments.
+ * Salva width/height per gli allegati SVG.
  *
- * WordPress treats image/svg+xml as an image (wp_attachment_is_image) but
- * cannot measure it, so code reading $meta['width'] (e.g. the REST
- * missing_image_sizes field used by the block editor) raises warnings.
+ * WordPress tratta image/svg+xml come un'immagine (wp_attachment_is_image) ma
+ * non sa misurarla, quindi il codice che legge $meta['width'] (es. il campo REST
+ * missing_image_sizes usato dal block editor) genera warning.
  *
  * @param  array<string, mixed>|false  $metadata
  * @return array<string, mixed>|false

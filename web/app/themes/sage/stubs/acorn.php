@@ -1,17 +1,17 @@
 <?php
 
 /**
- * PHPStan stubs for the Laravel helpers that Acorn loads at boot.
+ * Stub PHPStan per gli helper Laravel che Acorn carica all'avvio.
  *
- * Acorn requires vendor/roots/acorn/src/Illuminate/Foundation/helpers.php
- * from Application::__construct(), not through Composer autoload, so PHPStan
- * does not see them. The whole file cannot be scanned: it also declares
- * Laravel's __(), which would shadow the WordPress one.
+ * Acorn include vendor/roots/acorn/src/Illuminate/Foundation/helpers.php
+ * da Application::__construct(), non tramite l'autoload di Composer, quindi
+ * PHPStan non li vede. Non si può analizzare l'intero file: dichiara anche
+ * la __() di Laravel, che oscurerebbe quella di WordPress.
  *
- * Only declarations, never loaded at runtime.
+ * Solo dichiarazioni, mai caricate a runtime.
  */
 
 /**
- * Get the path to the public folder.
+ * Restituisce il percorso della cartella public.
  */
 function public_path(string $path = ''): string {}

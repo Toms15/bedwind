@@ -34,7 +34,7 @@
   $u = rawurlencode($url);
   $t = rawurlencode($text);
 
-  /* translators: %s: social network name, e.g. Facebook. */
+  /* translators: %s: nome del social network, es. Facebook. */
   $share_on = __('Condividi su %s', 'sage');
 
   $networks = array_filter([

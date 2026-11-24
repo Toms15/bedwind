@@ -1,36 +1,37 @@
 import domReady from '@wordpress/dom-ready';
 
 /**
- * Open the ACF "expanded editor" of a block from a trigger rendered inside
- * the block preview (components/acf/placeholder: [data-acf-expanded-editor]).
+ * Apre l'"expanded editor" ACF di un blocco da un trigger renderizzato dentro
+ * l'anteprima del blocco (components/acf/placeholder: [data-acf-expanded-editor]).
  *
- * ACF Pro 6.8 (blocks v3) keeps the expanded editor open state in a local
- * React useState of the block edit component: there is no store, action or
- * public JS API to open it. The only entry points are the "Open Expanded
- * Editor" button in the block inspector and an unlabelled toolbar button, so
- * we open the block sidebar and click the inspector button.
+ * ACF Pro 6.8 (blocks v3) tiene lo stato di apertura dell'expanded editor in uno
+ * useState React locale del componente di modifica del blocco: non c'è uno store,
+ * un'azione o un'API JS pubblica per aprirlo. Gli unici punti d'ingresso sono il
+ * pulsante "Open Expanded Editor" nell'inspector del blocco e un pulsante della
+ * toolbar senza etichetta, quindi si apre la sidebar del blocco e si clicca il
+ * pulsante dell'inspector.
  *
- * The ACF fields panel in the inspector is hidden with a stylesheet added to
- * the parent document (the inspector is not in the canvas iframe, where
- * editor.css is loaded): the fields are edited in the expanded editor only.
+ * Il pannello dei campi ACF nell'inspector è nascosto con un foglio di stile
+ * aggiunto al documento padre (l'inspector non sta nell'iframe del canvas, dove
+ * è caricato editor.css): i campi si modificano solo nell'expanded editor.
  */
 
 /**
- * ACF internal selectors, taken from acf-pro-blocks.min.js of ACF Pro 6.8.12
- * (blocks v3). Check them again when updating ACF: with SCRIPT_DEBUG or in
- * development a missing selector is reported in the console.
+ * Selettori interni di ACF, presi da acf-pro-blocks.min.js di ACF Pro 6.8.12
+ * (blocks v3). Vanno ricontrollati quando si aggiorna ACF: con SCRIPT_DEBUG o
+ * in development un selettore mancante viene segnalato in console.
  */
 const ACF_SELECTORS = {
-  // Fields form of the block in the inspector (blocks v2 and v3).
+  // Form dei campi del blocco nell'inspector (blocks v2 e v3).
   inspectorPanel: '.block-editor-block-inspector .acf-block-component.acf-block-panel',
-  // "Open Expanded Editor" button in the inspector (blocks v3).
+  // Pulsante "Open Expanded Editor" nell'inspector (blocks v3).
   expandedEditorButton: '.block-editor-block-inspector .acf-blocks-open-expanded-editor-btn',
 };
 
 const TRIGGER = '[data-acf-expanded-editor]';
 const CANVAS = 'iframe[name="editor-canvas"]';
 
-/** How long to wait for the inspector to render the ACF button. */
+/** Quanto attendere che l'inspector renderizzi il pulsante ACF. */
 const BUTTON_TIMEOUT = 2000;
 
 const debug = Boolean(window.sageEditor?.debug);
@@ -42,12 +43,12 @@ const warn = (...args) => {
 };
 
 /**
- * Open the "Block" tab of the editor sidebar, otherwise the inspector (and the
- * ACF button) is not rendered.
+ * Apre la scheda "Blocco" della sidebar dell'editor, altrimenti l'inspector (e il
+ * pulsante ACF) non viene renderizzato.
  *
- * Post editor: core/edit-post. Site editor (and any editor without that store):
- * core/interface, scope "core". In WP 7.1 both editors share the sidebar of
- * the editor package, whose block tab is "edit-post/block".
+ * Post editor: core/edit-post. Site editor (e qualsiasi editor senza quello store):
+ * core/interface, scope "core". In WP 7.1 entrambi gli editor condividono la
+ * sidebar del pacchetto editor, la cui scheda del blocco è "edit-post/block".
  */
 const openBlockSidebar = () => {
   const data = window.wp?.data;
@@ -67,12 +68,12 @@ const openBlockSidebar = () => {
     return;
   }
 
-  warn('No store to open the block sidebar (core/edit-post, core/interface).');
+  warn('Nessuno store per aprire la sidebar del blocco (core/edit-post, core/interface).');
 };
 
 /**
- * Resolve with the first element matching the selector in the parent document,
- * polling once per frame, or with null after the timeout.
+ * Risolve con il primo elemento che corrisponde al selettore nel documento padre,
+ * controllando una volta per frame, o con null dopo il timeout.
  */
 const waitFor = (selector, timeout = BUTTON_TIMEOUT) =>
   new Promise((resolve) => {
@@ -94,34 +95,37 @@ const waitFor = (selector, timeout = BUTTON_TIMEOUT) =>
   });
 
 /**
- * Click on the trigger inside a block -> open the ACF expanded editor.
+ * Clic sul trigger dentro un blocco -> apre l'expanded editor ACF.
  */
 const onClick = async (event) => {
   const trigger = event.target.closest?.(TRIGGER);
   if (!trigger) return;
 
   event.preventDefault();
-  // No stopPropagation: the editor must still select the block.
+  // Niente stopPropagation: l'editor deve comunque selezionare il blocco.
 
   openBlockSidebar();
 
   const button = await waitFor(ACF_SELECTORS.expandedEditorButton);
 
   if (button) {
-    // Check before the click: when the expanded editor opens, ACF moves the
-    // fields form from the inspector to the modal and the panel is gone.
+    // Controllo prima del clic: quando l'expanded editor si apre, ACF sposta il
+    // form dei campi dall'inspector alla modale e il pannello non c'è più.
     if (!document.querySelector(ACF_SELECTORS.inspectorPanel)) {
-      warn('ACF inspector panel not found, it is not hidden:', ACF_SELECTORS.inspectorPanel);
+      warn(
+        "Pannello ACF dell'inspector non trovato, non viene nascosto:",
+        ACF_SELECTORS.inspectorPanel,
+      );
     }
 
     button.click();
   } else {
-    warn('ACF expanded editor button not found:', ACF_SELECTORS.expandedEditorButton);
+    warn("Pulsante dell'expanded editor ACF non trovato:", ACF_SELECTORS.expandedEditorButton);
   }
 };
 
 /**
- * Hide the ACF fields panel of the inspector, once, with CSS.
+ * Nasconde con il CSS, una volta sola, il pannello dei campi ACF dell'inspector.
  */
 const hideInspectorPanel = () => {
   const style = document.createElement('style');
@@ -131,8 +135,8 @@ const hideInspectorPanel = () => {
 };
 
 /**
- * Documents with the click listener. WeakSet: replaced iframe documents are
- * garbage collected.
+ * Documenti con il listener del clic. WeakSet: i documenti degli iframe
+ * sostituiti vengono liberati dal garbage collector.
  */
 const boundDocs = new WeakSet();
 
@@ -143,8 +147,8 @@ const bindDoc = (doc) => {
 };
 
 /**
- * Bind the canvas iframe: its current document and, on every load, the new
- * one (the document is replaced when the iframe content is reloaded).
+ * Collega l'iframe del canvas: il suo documento corrente e, a ogni load, quello
+ * nuovo (il documento viene sostituito quando il contenuto dell'iframe si ricarica).
  */
 const boundIframes = new WeakSet();
 
@@ -159,10 +163,10 @@ const bindIframe = (iframe) => {
 };
 
 /**
- * Look for the canvas iframe at most once per frame. The iframe is recreated
- * (code editor -> visual editor switch, navigation in the site editor), so
- * this runs on store changes; the work is a single querySelector plus WeakSet
- * lookups.
+ * Cerca l'iframe del canvas al massimo una volta per frame. L'iframe viene
+ * ricreato (passaggio da editor di codice a editor visuale, navigazione nel site
+ * editor), quindi questo gira sui cambi dello store; il lavoro è un solo
+ * querySelector più qualche lookup nei WeakSet.
  */
 let checkScheduled = false;
 
@@ -177,10 +181,10 @@ const scheduleCanvasCheck = () => {
 };
 
 /**
- * The pointer (or focus) has to enter the iframe before anything inside it
- * can be clicked, and the parent document sees that event on the iframe
- * element: bind it there too, so a recreated iframe is always bound in time
- * even without a store change after its creation.
+ * Il puntatore (o il focus) deve entrare nell'iframe prima che si possa
+ * cliccare qualcosa al suo interno, e il documento padre vede quell'evento
+ * sull'elemento iframe: si collega anche lì, così un iframe ricreato è sempre
+ * collegato in tempo anche senza un cambio dello store dopo la sua creazione.
  */
 const onEnterCanvas = (event) => {
   if (event.target instanceof HTMLIFrameElement && event.target.matches(CANVAS)) {
@@ -191,7 +195,7 @@ const onEnterCanvas = (event) => {
 domReady(() => {
   hideInspectorPanel();
 
-  // Fallback for an editor canvas that is not in an iframe.
+  // Fallback per un canvas dell'editor che non sta in un iframe.
   bindDoc(document);
 
   document.addEventListener('pointerover', onEnterCanvas, true);

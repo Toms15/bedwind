@@ -5,8 +5,8 @@ use Brain\Monkey\Functions;
 use Illuminate\Support\Facades\Vite;
 
 /**
- * A temporary theme with the given block files (paths relative to
- * resources/views/blocks), resolved by get_theme_file_path().
+ * Un tema temporaneo con i file di blocco dati (percorsi relativi a
+ * resources/views/blocks), risolti da get_theme_file_path().
  *
  * @param  list<string>  $files
  */
@@ -27,8 +27,8 @@ function fake_theme(array $files): string
 }
 
 /**
- * Swap the Vite facade: asset() returns "build/<path>", or throws for the
- * paths missing from the manifest.
+ * Sostituisce la facade Vite: asset() restituisce "build/<path>", o lancia
+ * un'eccezione per i percorsi assenti dal manifest.
  *
  * @param  list<string>  $missing
  */
@@ -70,7 +70,7 @@ afterEach(function () {
 });
 
 describe('for', function () {
-    it('lists only the assets that exist in the block folder', function () {
+    test('elenca solo gli asset presenti nella cartella del blocco', function () {
         fake_theme(['cards/view.js', 'cards/style.css', 'hero/style.css', 'only-text/block.json']);
 
         expect(BlockAssets::for('cards'))->toBe([
@@ -81,7 +81,7 @@ describe('for', function () {
             ->and(BlockAssets::for('only-text'))->toBe([]);
     });
 
-    it('rejects slugs that are not a block folder name', function (string $slug) {
+    test('rifiuta gli slug che non sono un nome di cartella di blocco', function (string $slug) {
         fake_theme(['cards/view.js']);
 
         expect(BlockAssets::for($slug))->toBe([]);
@@ -89,7 +89,7 @@ describe('for', function () {
 });
 
 describe('enqueue', function () {
-    it('enqueues the stylesheet and the script module with the Vite URLs', function () {
+    test('carica il foglio di stile e lo script module con gli URL di Vite', function () {
         fake_theme(['cards/view.js', 'cards/style.css']);
         fake_vite();
 
@@ -103,7 +103,7 @@ describe('enqueue', function () {
         BlockAssets::enqueue('cards');
     });
 
-    it('enqueues nothing for a block without assets', function () {
+    test('non carica nulla per un blocco senza asset', function () {
         fake_theme(['only-text/block.json']);
         fake_vite();
 
@@ -113,7 +113,7 @@ describe('enqueue', function () {
         BlockAssets::enqueue('only-text');
     });
 
-    it('skips the assets missing from the Vite manifest', function () {
+    test('salta gli asset assenti dal manifest di Vite', function () {
         fake_theme(['cards/view.js', 'cards/style.css']);
         fake_vite(['resources/views/blocks/cards/view.js']);
 

@@ -11,10 +11,10 @@ use Roots\Acorn\Sage\SageServiceProvider;
 class ThemeServiceProvider extends SageServiceProvider
 {
     /**
-     * Custom post types registered by the theme.
+     * Custom post type registrati dal tema.
      *
-     * Each class exposes a static register() method that calls
-     * register_post_type(); it runs on "init".
+     * Ogni classe espone un metodo statico register() che chiama
+     * register_post_type(); gira su "init".
      *
      * @var array<int, class-string>
      */
@@ -23,18 +23,18 @@ class ThemeServiceProvider extends SageServiceProvider
     ];
 
     /**
-     * Custom taxonomies registered by the theme.
+     * Tassonomie personalizzate registrate dal tema.
      *
-     * Same contract as $postTypes (static register() calling
-     * register_taxonomy()). Taxonomies are registered before the post
-     * types, at the same "init" priority, so a post type can reference them.
+     * Stesso contratto di $postTypes (register() statico che chiama
+     * register_taxonomy()). Le tassonomie sono registrate prima dei post
+     * type, alla stessa priorità di "init", così un post type può farvi riferimento.
      *
      * @var array<int, class-string>
      */
     protected array $taxonomies = [];
 
     /**
-     * Register any application services.
+     * Registra i servizi dell'applicazione.
      *
      * @return void
      */
@@ -44,7 +44,7 @@ class ThemeServiceProvider extends SageServiceProvider
     }
 
     /**
-     * Bootstrap any application services.
+     * Avvia i servizi dell'applicazione.
      *
      * @return void
      */
@@ -56,8 +56,8 @@ class ThemeServiceProvider extends SageServiceProvider
             add_action('init', [$class, 'register']);
         }
 
-        // /styleguide/ only in development; elsewhere it only removes a
-        // leftover rewrite rule (see App\Styleguide).
+        // /styleguide/ solo in development; altrove rimuove soltanto una
+        // regola di rewrite rimasta (vedi App\Styleguide).
         Styleguide::register();
     }
 }

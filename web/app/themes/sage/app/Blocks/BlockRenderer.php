@@ -5,34 +5,34 @@ declare(strict_types=1);
 namespace App\Blocks;
 
 /**
- * Rendering of the theme ACF blocks.
+ * Render dei blocchi ACF del tema.
  *
- * render() is the shared ACF render callback (block.json
- * "acf.renderCallback": "App\\Blocks\\BlockRenderer::render"); data() prepares
- * the common block data for the block templates (resources/views/blocks).
+ * render() è la render callback ACF condivisa (block.json
+ * "acf.renderCallback": "App\\Blocks\\BlockRenderer::render"); data() prepara
+ * i dati comuni dei blocchi per i template dei blocchi (resources/views/blocks).
  */
 class BlockRenderer
 {
     /**
-     * Render callback shared by every ACF block.
+     * Render callback condivisa da tutti i blocchi ACF.
      *
-     * In the editor: no preview, a "Modifica blocco" placeholder for every block.
-     * On the frontend: the view blocks/<slug>/<slug> with $block (slug and
-     * block.json "name" "acf/<slug>" must match); nothing if the view is missing.
-     * The optional blocks/<slug>/{view.js,style.css} are enqueued only when the
-     * view is rendered (BlockAssets).
+     * Nell'editor: nessuna anteprima, un placeholder "Modifica blocco" per ogni blocco.
+     * Nel frontend: la view blocks/<slug>/<slug> con $block (lo slug e il "name"
+     * "acf/<slug>" del block.json devono corrispondere); nulla se la view manca.
+     * I file opzionali blocks/<slug>/{view.js,style.css} vengono caricati solo
+     * quando la view è renderizzata (BlockAssets).
      *
-     * ACF calls it with ($block, $content, $is_preview, $post_id, $wp_block,
-     * $context). Only the first three are declared, the others are unused:
-     * $post_id comes from get_the_ID() (int|false) and $context can be false,
-     * so declaring them would only add TypeError risks.
-     * $content is the InnerBlocks HTML: the theme blocks do not use InnerBlocks
-     * (no supports.jsx), so it is not passed to the views. Not to be confused
-     * with the ACF "content" field, read by data() with get_field().
+     * ACF la chiama con ($block, $content, $is_preview, $post_id, $wp_block,
+     * $context). Sono dichiarati solo i primi tre, gli altri non servono:
+     * $post_id arriva da get_the_ID() (int|false) e $context può essere false,
+     * quindi dichiararli aggiungerebbe solo rischi di TypeError.
+     * $content è l'HTML delle InnerBlocks: i blocchi del tema non usano InnerBlocks
+     * (niente supports.jsx), quindi non viene passato alle view. Da non confondere
+     * con il campo ACF "content", letto da data() con get_field().
      *
-     * @param  array<string, mixed>  $block  The ACF block data (name, id, anchor, ...).
-     * @param  string  $content  The InnerBlocks HTML (unused).
-     * @param  bool  $is_preview  Whether the block is rendered in the editor.
+     * @param  array<string, mixed>  $block  I dati del blocco ACF (name, id, anchor, ...).
+     * @param  string  $content  L'HTML delle InnerBlocks (non usato).
+     * @param  bool  $is_preview  Indica se il blocco è renderizzato nell'editor.
      */
     public static function render(array $block, string $content = '', bool $is_preview = false): void
     {
@@ -58,9 +58,9 @@ class BlockRenderer
     }
 
     /**
-     * Block slug: the block name without the leading "acf/" (only the prefix).
+     * Slug del blocco: il nome del blocco senza il "acf/" iniziale (solo il prefisso).
      *
-     * @param  array<string, mixed>  $block  The ACF block data.
+     * @param  array<string, mixed>  $block  I dati del blocco ACF.
      */
     private static function slug(array $block): string
     {
@@ -70,23 +70,23 @@ class BlockRenderer
     }
 
     /**
-     * Retrieves and prepares the common data for a block.
+     * Recupera e prepara i dati comuni di un blocco.
      *
-     * Groups block data into settings, contents, and spacings.
-     * Padding and margin values are converted into their corresponding
-     * Tailwind classes by self::padding() and self::margin().
+     * Raggruppa i dati del blocco in settings, contents e spacings.
+     * I valori di padding e margin sono convertiti nelle corrispondenti
+     * classi Tailwind da self::padding() e self::margin().
      *
-     * settings.id is the block anchor when set, otherwise the ACF block id
-     * (e.g. "block_abc123"), so every block section always has an id.
-     * Colors are validated with sanitize_hex_color(): invalid values become ''.
+     * settings.id è l'anchor del blocco se impostata, altrimenti l'id del blocco
+     * ACF (es. "block_abc123"), così ogni section di blocco ha sempre un id.
+     * I colori sono validati con sanitize_hex_color(): i valori non validi diventano ''.
      *
-     * Heading convention for every block:
-     * - contents.title_tag is the tag of the block title (ACF title_formatting,
-     *   whitelisted to h1..h6/p, default 'h2'): <x-ui.title :tag="$contents['title_tag']">.
-     * - contents.next_heading is the tag for the block's child headings
-     *   (subtitles, card titles, ...), from \App\get_next_heading_level(title_tag).
+     * Convenzione dei titoli per ogni blocco:
+     * - contents.title_tag è il tag del titolo del blocco (title_formatting ACF,
+     *   limitato a h1..h6/p, default 'h2'): <x-ui.title :tag="$contents['title_tag']">.
+     * - contents.next_heading è il tag per i titoli figli del blocco
+     *   (sottotitoli, titoli delle card, ...), da \App\get_next_heading_level(title_tag).
      *
-     * @param  array<string, mixed>  $block  The ACF block data.
+     * @param  array<string, mixed>  $block  I dati del blocco ACF.
      * @return array{
      *     settings: array{
      *         id: string,
@@ -105,7 +105,7 @@ class BlockRenderer
      *         padding: mixed,
      *         margin: mixed
      *     }
-     * } The prepared block data grouped by type.
+     * } I dati del blocco preparati, raggruppati per tipo.
      */
     public static function data(array $block): array
     {
@@ -123,7 +123,7 @@ class BlockRenderer
             ? 'custom-'.$margin.'-'.$margin_dimension
             : 'no-margin';
 
-        // Repeater: false/null when there are no rows.
+        // Repeater: false/null quando non ci sono righe.
         $buttons = get_field('buttons');
         $buttons = is_array($buttons) ? array_values($buttons) : [];
 
@@ -156,7 +156,7 @@ class BlockRenderer
     }
 
     /**
-     * Tailwind classes of a padding preset (e.g. 'custom-py-m').
+     * Classi Tailwind di un preset di padding (es. 'custom-py-m').
      */
     private static function padding(string $custom_padding): string
     {
@@ -179,7 +179,7 @@ class BlockRenderer
     }
 
     /**
-     * Tailwind classes of a margin preset (e.g. 'custom-mt-s').
+     * Classi Tailwind di un preset di margin (es. 'custom-mt-s').
      */
     private static function margin(string $custom_margin): string
     {

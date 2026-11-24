@@ -3,23 +3,23 @@
 declare(strict_types=1);
 
 /**
- * Yearly post archives exposed as /{base}/YYYY/ (default base: news/archivio).
+ * Archivi annuali dei post esposti come /{base}/YYYY/ (base di default: news/archivio).
  *
- * - Rewrite rules for the archive, its pagination and its feed.
- * - `year_link` filter so get_year_link() and wp_get_archives(type=yearly)
- *   point to the new base (monthly/daily links are untouched).
- * - 301 redirect from the core /YYYY/ URL to avoid duplicate content.
+ * - Regole di rewrite per l'archivio, la sua paginazione e il suo feed.
+ * - Filtro `year_link`, così get_year_link() e wp_get_archives(type=yearly)
+ *   puntano alla nuova base (i link mensili/giornalieri restano invariati).
+ * - Redirect 301 dall'URL /YYYY/ del core per evitare contenuti duplicati.
  *
- * The base is filterable via `sage/yearly_archive_base` (no leading or
- * trailing slashes). Rewrite rules are stored in the database: after
- * changing the base or the rules run `wp rewrite flush` (or save the
- * permalink settings in the admin).
+ * La base è filtrabile con `sage/yearly_archive_base` (senza slash iniziali o
+ * finali). Le regole di rewrite sono salvate nel database: dopo aver
+ * cambiato la base o le regole esegui `wp rewrite flush` (o salva le
+ * impostazioni dei permalink nell'admin).
  */
 
 namespace App;
 
 /**
- * Get the yearly archive base path, without leading/trailing slashes.
+ * Restituisce il percorso base dell'archivio annuale, senza slash iniziali/finali.
  */
 function yearly_archive_base(): string
 {
@@ -27,7 +27,7 @@ function yearly_archive_base(): string
 }
 
 add_action('init', function (): void {
-    // WordPress matches rewrite rules with '#' as delimiter.
+    // WordPress confronta le regole di rewrite usando '#' come delimitatore.
     $base = preg_quote(yearly_archive_base(), '#');
 
     add_rewrite_rule(
@@ -42,8 +42,8 @@ add_action('init', function (): void {
         'top'
     );
 
-    // Matches both /feed/{type}/ and /{type}/ (core canonicalizes the
-    // default feed to /feed/), like core date feed rules.
+    // Corrisponde sia a /feed/{type}/ sia a /{type}/ (il core rende canonico il
+    // feed di default in /feed/), come le regole dei feed per data del core.
     add_rewrite_rule(
         "^{$base}/([0-9]{4})/(?:feed/)?(feed|rdf|rss|rss2|atom)/?$",
         'index.php?year=$matches[1]&feed=$matches[2]',
@@ -52,14 +52,14 @@ add_action('init', function (): void {
 });
 
 /**
- * Covers get_year_link() everywhere, including wp_get_archives(type=yearly).
+ * Copre get_year_link() ovunque, compreso wp_get_archives(type=yearly).
  */
 add_filter('year_link', function (string $link, int|string $year): string {
     return home_url(user_trailingslashit(yearly_archive_base().'/'.(int) $year, 'year'));
 }, 10, 2);
 
 /**
- * Redirect the core yearly archive (/YYYY/, /YYYY/page/N/) to the new base.
+ * Reindirizza l'archivio annuale del core (/YYYY/, /YYYY/page/N/) alla nuova base.
  */
 add_action('template_redirect', function (): void {
     global $wp;
@@ -82,7 +82,7 @@ add_action('template_redirect', function (): void {
         $url = trailingslashit($url).user_trailingslashit('page/'.$paged, 'paged');
     }
 
-    // Keep the query string (e.g. utm parameters) on the redirect.
+    // Mantiene la query string (es. parametri utm) nel redirect.
     if (! empty($_SERVER['QUERY_STRING'])) {
         $url .= '?'.$_SERVER['QUERY_STRING'];
     }
@@ -94,7 +94,7 @@ add_action('template_redirect', function (): void {
 add_filter('get_the_archive_title', function (string $title): string {
     if (is_year()) {
         $title = sprintf(
-            /* translators: %s: year, e.g. 2026. */
+            /* translators: %s: anno, es. 2026. */
             __('Archivio %s', 'sage'),
             (int) get_query_var('year')
         );

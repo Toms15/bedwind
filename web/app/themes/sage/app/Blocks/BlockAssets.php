@@ -7,27 +7,27 @@ namespace App\Blocks;
 use Illuminate\Support\Facades\Vite;
 
 /**
- * Optional per-block frontend assets.
+ * Asset frontend opzionali per blocco.
  *
- * A block folder may contain, next to block.json and <slug>.blade.php:
- * - view.js: enqueued as a script module (type="module", in the footer);
- * - style.css: enqueued as a stylesheet (WordPress 6.9+ hoists the styles
- *   enqueued while rendering into the <head> in classic themes too).
+ * La cartella di un blocco può contenere, accanto a block.json e <slug>.blade.php:
+ * - view.js: caricato come script module (type="module", nel footer);
+ * - style.css: caricato come foglio di stile (WordPress 6.9+ sposta nel <head>
+ *   gli stili caricati durante il render anche nei temi classici).
  *
- * Both are Vite entries (vite.config.js globs them) and are enqueued by
- * BlockRenderer::render() only when the block is rendered on the frontend, so
- * pages without the block do not load them. In the editor the blocks render
- * a placeholder, so nothing is enqueued there.
+ * Entrambi sono entry Vite (vite.config.js li raccoglie con un glob) e li
+ * carica BlockRenderer::render() solo quando il blocco è renderizzato nel
+ * frontend, quindi le pagine senza il blocco non li caricano. Nell'editor i
+ * blocchi renderizzano un placeholder, quindi lì non si carica nulla.
  *
- * With the dev server, Vite::asset() returns the dev server URL (HMR via the
- * Vite client loaded with app.js); in build, the hashed file of the manifest.
- * An asset missing from the Vite manifest (added without rebuilding) is
- * skipped, so it never breaks the page.
+ * Con il dev server, Vite::asset() restituisce l'URL del dev server (HMR tramite
+ * il client Vite caricato con app.js); in build, il file con hash del manifest.
+ * Un asset assente dal manifest di Vite (aggiunto senza rifare la build) viene
+ * saltato, così non rompe mai la pagina.
  */
 class BlockAssets
 {
     /**
-     * Asset type => file name in the block folder.
+     * Tipo di asset => nome del file nella cartella del blocco.
      */
     public const FILES = [
         'style' => 'style.css',
@@ -35,7 +35,7 @@ class BlockAssets
     ];
 
     /**
-     * The assets of a block that exist, as Vite paths relative to the theme.
+     * Gli asset esistenti di un blocco, come percorsi Vite relativi al tema.
      *
      * @return array{style?: string, script?: string}
      */
@@ -59,7 +59,7 @@ class BlockAssets
     }
 
     /**
-     * Handle of the block assets (stylesheet handle and script module id).
+     * Handle degli asset del blocco (handle del foglio di stile e id dello script module).
      */
     public static function handle(string $slug): string
     {
@@ -67,8 +67,8 @@ class BlockAssets
     }
 
     /**
-     * Enqueue the assets of a block. Safe to call once per rendered block:
-     * WordPress enqueues each handle once.
+     * Carica gli asset di un blocco. Si può chiamare una volta per ogni blocco
+     * renderizzato: WordPress carica ogni handle una volta sola.
      */
     public static function enqueue(string $slug): void
     {
@@ -81,7 +81,7 @@ class BlockAssets
                 continue;
             }
 
-            // null version: the build files are hashed, the dev server needs none.
+            // Versione null: i file di build hanno l'hash nel nome, il dev server non ne ha bisogno.
             if ($type === 'style') {
                 wp_enqueue_style($handle, $url, [], null);
             } else {

@@ -53,6 +53,8 @@
 | M40 | ✅ | Permalink di default nel setup (404 e rewrite non funzionano) | Config | 🟠 | S | – |
 | M41 | ✅ | URL inesistenti a più segmenti rispondono 200 in locale (Valet/Herd PHP_SELF) | Ambiente | 🟢 | S | – |
 | M42 | ✅ | `composer update` del tema (27 advisory → 0, Acorn 5.1, platform PHP 8.2) | Dipendenze | 🔴 | S | M35 |
+| M43 | ✅ | Commenti e docblock in italiano (tema, config, CI; esclusi i file upstream) | Coerenza | 🟠 | M | – |
+| M44 | ⬜ | README e CONVENTIONS in italiano, descrizione e topics del repo GitHub | Docs | 🟠 | S | M43 |
 
 **Ordine consigliato.** Fase 0 (M01–M10), poi Fase 1 (M11–M16), Fase 2 (M17–M27), Fase 3 (M28–M34), Fase 4 (M35–M39).
 

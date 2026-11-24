@@ -3,13 +3,13 @@
 declare(strict_types=1);
 
 /**
- * Theme helpers in the App namespace.
+ * Helper del tema nel namespace App.
  *
- * Call them as \App\name() from Blade views and from other namespaces,
- * or import them with `use function App\name;`.
+ * Si chiamano come \App\name() dalle view Blade e dagli altri namespace,
+ * oppure si importano con `use function App\name;`.
  *
- * Only plain functions without side effects live here: hooks belong to
- * the hook files (setup.php, filters.php, ...) or to the classes in app/.
+ * Qui stanno solo funzioni semplici senza effetti collaterali: gli hook vanno
+ * nei file degli hook (setup.php, filters.php, ...) o nelle classi in app/.
  */
 
 namespace App;
@@ -17,18 +17,18 @@ namespace App;
 use Illuminate\Support\Facades\Vite;
 
 /**
- * Get the heading tag that follows a given heading level.
+ * Restituisce il tag di titolo che segue un dato livello di titolo.
  *
- * Used for the child headings of a block (subtitles, card titles, ...):
- * the block title uses $current_heading, its children the returned tag.
- * Examples: h2 → h3, h5 → h6, h6 → p, p → p, h5 with increment 2 → p.
+ * Serve per i titoli figli di un blocco (sottotitoli, titoli delle card, ...):
+ * il titolo del blocco usa $current_heading, i figli il tag restituito.
+ * Esempi: h2 → h3, h5 → h6, h6 → p, p → p, h5 con incremento 2 → p.
  *
- * Any value that is not one of h1..h6 or p (e.g. null, '', 'h', 'h9', 'div')
- * is treated as 'h2' (the default block title tag) before calculating.
+ * Qualsiasi valore diverso da h1..h6 o p (es. null, '', 'h', 'h9', 'div')
+ * viene trattato come 'h2' (il tag di default del titolo dei blocchi) prima del calcolo.
  *
- * @param  string|null  $current_heading  The current tag: h1..h6 or p (null → 'h2').
- * @param  int  $increment  How many levels to go down (minimum 1).
- * @return string The next tag: h2..h6, or p when the level goes past h6.
+ * @param  string|null  $current_heading  Il tag corrente: h1..h6 o p (null → 'h2').
+ * @param  int  $increment  Di quanti livelli scendere (minimo 1).
+ * @return string Il tag successivo: h2..h6, o p quando il livello supera h6.
  */
 function get_next_heading_level(?string $current_heading, int $increment = 1): string
 {
@@ -53,14 +53,14 @@ function get_next_heading_level(?string $current_heading, int $increment = 1): s
 }
 
 /**
- * Generate a random lowercase string, e.g. for HTML ids.
+ * Genera una stringa casuale minuscola, es. per gli id HTML.
  *
- * Only letters a-z are used, so the result is always a valid id start
- * (HTML ids used in CSS selectors cannot start with a digit).
- * Uses random_int(), a cryptographically secure generator.
+ * Usa solo le lettere a-z, quindi il risultato è sempre un inizio di id valido
+ * (gli id HTML usati nei selettori CSS non possono iniziare con una cifra).
+ * Usa random_int(), un generatore crittograficamente sicuro.
  *
- * @param  int  $length  Number of characters (minimum 1).
- * @return string The random string.
+ * @param  int  $length  Numero di caratteri (minimo 1).
+ * @return string La stringa casuale.
  */
 function random_string_for_id(int $length = 5): string
 {
@@ -77,14 +77,14 @@ function random_string_for_id(int $length = 5): string
 }
 
 /**
- * Get the URL of the local fallback image (resources/images/fallback.svg).
+ * Restituisce l'URL dell'immagine di fallback locale (resources/images/fallback.svg).
  *
- * The image is a 16:9 SVG compiled by Vite, so it scales to any size and no
- * external service is involved.
+ * L'immagine è un SVG 16:9 compilato da Vite, quindi scala a qualsiasi
+ * dimensione e non coinvolge servizi esterni.
  *
- * @param  int  $width  Ignored, kept for backward compatibility (the SVG is resolution independent).
- * @param  int  $height  Ignored, kept for backward compatibility.
- * @return string The asset URL, or '' when the asset is missing from the Vite manifest.
+ * @param  int  $width  Ignorato, mantenuto per retrocompatibilità (l'SVG non dipende dalla risoluzione).
+ * @param  int  $height  Ignorato, mantenuto per retrocompatibilità.
+ * @return string L'URL dell'asset, o '' se l'asset manca dal manifest di Vite.
  */
 function get_fallback_image_url(int $width = 1920, int $height = 1080): string
 {
@@ -96,15 +96,15 @@ function get_fallback_image_url(int $width = 1920, int $height = 1080): string
 }
 
 /**
- * Get a trimmed excerpt of a post.
+ * Restituisce un excerpt accorciato di un post.
  *
- * Source text, in order: the ACF 'excerpt' field (when ACF is active),
- * the manual post excerpt, the post content without shortcodes and tags.
- * The text is trimmed with wp_trim_words() and '…' is appended when cut.
+ * Testo di partenza, in ordine: il campo ACF 'excerpt' (se ACF è attivo),
+ * l'excerpt manuale del post, il contenuto del post senza shortcode e tag.
+ * Il testo viene accorciato con wp_trim_words() e, se tagliato, termina con '…'.
  *
- * @param  int  $num  Maximum number of words.
- * @param  int|\WP_Post|null  $post  Post ID or object, current post when null.
- * @return string The excerpt, or '' when the post does not exist.
+ * @param  int  $num  Numero massimo di parole.
+ * @param  int|\WP_Post|null  $post  ID o oggetto del post, il post corrente se null.
+ * @return string L'excerpt, o '' se il post non esiste.
  */
 function get_trimmed_excerpt(int $num, int|\WP_Post|null $post = null): string
 {

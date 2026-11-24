@@ -73,31 +73,31 @@ add_filter('block_categories_all', function ($categories) {
 });
 
 /**
- * Restrict the blocks available in the editor.
+ * Limita i blocchi disponibili nell'editor.
  *
- * ACF blocks are always allowed. Core blocks are allowed only in the post
- * types returned by the `sage/core_blocks_post_types` filter and in the
- * non-content editors (widgets, Customizer widgets, site editor). Every other
- * post type (e.g. pages) gets ACF blocks only.
+ * I blocchi ACF sono sempre ammessi. I blocchi core sono ammessi solo nei post
+ * type restituiti dal filtro `sage/core_blocks_post_types` e negli editor che
+ * non sono di contenuto (widget, widget del Customizer, site editor). Ogni altro
+ * post type (es. le pagine) ha solo i blocchi ACF.
  *
- * Blocks of other namespaces (e.g. third-party plugins) are excluded, unless
- * their full names (e.g. 'my-plugin/form') are returned by the
- * `sage/extra_blocks` filter (default: none): those are allowed in every
- * editor, like the ACF blocks.
+ * I blocchi di altri namespace (es. plugin di terze parti) sono esclusi, a meno
+ * che il loro nome completo (es. 'my-plugin/form') non sia restituito dal
+ * filtro `sage/extra_blocks` (default: nessuno): quelli sono ammessi in ogni
+ * editor, come i blocchi ACF.
  *
- * Synced patterns (`core/block`) are a core block and follow the same rule:
- * they are not allowed where only ACF blocks are, because a synced pattern can
- * contain core blocks and would bypass the restriction.
+ * I pattern sincronizzati (`core/block`) sono un blocco core e seguono la stessa
+ * regola: non sono ammessi dove ci sono solo i blocchi ACF, perché un pattern
+ * sincronizzato può contenere blocchi core e aggirerebbe la restrizione.
  *
- * The site editor gets core blocks too: the theme removes `block-templates`
- * support, so it is normally unreachable, but if it is ever opened (e.g. for
- * template parts) it cannot work without core blocks.
+ * Anche il site editor ha i blocchi core: il tema rimuove il supporto
+ * `block-templates`, quindi di norma non è raggiungibile, ma se mai venisse
+ * aperto (es. per i template part) senza blocchi core non funzionerebbe.
  *
- * The incoming value is respected: `false` stays `false`, and an array coming
- * from earlier filters is only narrowed, never widened.
+ * Il valore in ingresso è rispettato: `false` resta `false`, e un array che
+ * arriva da filtri precedenti viene solo ristretto, mai allargato.
  *
- * @param  bool|array<mixed>  $allowed_blocks  true (all), false (none) or the allowed block names.
- * @return bool|list<string> false, or the allowed block names.
+ * @param  bool|array<mixed>  $allowed_blocks  true (tutti), false (nessuno) o i nomi dei blocchi ammessi.
+ * @return bool|list<string> false, o i nomi dei blocchi ammessi.
  */
 function allowed_block_types(bool|array $allowed_blocks, \WP_Block_Editor_Context $editor_context): bool|array
 {

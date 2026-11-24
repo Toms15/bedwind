@@ -5,26 +5,26 @@ declare(strict_types=1);
 namespace App\PostTypes;
 
 /**
- * The "faq" custom post type.
+ * Il custom post type "faq".
  *
- * FAQs are data-only content: they are managed in the admin and rendered
- * through blocks/queries, so they have no public single pages or archive.
- * The post type stays available in the REST API (required by the block
- * editor) and to WP_Query/get_posts().
+ * Le FAQ sono contenuti solo dati: si gestiscono nell'admin e si renderizzano
+ * tramite blocchi/query, quindi non hanno pagine singole né archivio pubblici.
+ * Il post type resta disponibile nella REST API (richiesta dal block editor)
+ * e per WP_Query/get_posts().
  *
- * The admin bar "New → FAQ" shortcut is kept for editors' convenience.
+ * La scorciatoia "Nuovo → FAQ" della admin bar resta, per comodità degli editor.
  *
- * Registered on "init" by App\Providers\ThemeServiceProvider.
+ * Registrato su "init" da App\Providers\ThemeServiceProvider.
  */
 class Faq
 {
     /**
-     * Post type key.
+     * Chiave del post type.
      */
     public const NAME = 'faq';
 
     /**
-     * Register the post type.
+     * Registra il post type.
      */
     public static function register(): void
     {

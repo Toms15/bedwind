@@ -1,13 +1,13 @@
 {{--
-  Module: Only text
+  Modulo: Only text
 
-  Markup of the Only text block. Data is prepared in blocks/only-text.
+  Markup del blocco Only text. I dati sono preparati in blocks/only-text.
 
-  @var array $settings Block settings (id, colors).
-  @var array $contents Block contents (title, title_tag, next_heading, content).
-  @var array $spacings Padding and margin classes.
-  @var string $section_style Inline style for the section ('' when none).
-  @var list<array{url: string, target: string, label: string}> $buttons Valid buttons.
+  @var array $settings Impostazioni del blocco (id, colori).
+  @var array $contents Contenuti del blocco (title, title_tag, next_heading, content).
+  @var array $spacings Classi di padding e margin.
+  @var string $section_style Stile inline della section ('' se assente).
+  @var list<array{url: string, target: string, label: string}> $buttons Pulsanti validi.
 --}}
 
 <section

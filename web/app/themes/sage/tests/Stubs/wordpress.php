@@ -2,11 +2,11 @@
 
 /*
 |--------------------------------------------------------------------------
-| WordPress class stubs
+| Stub delle classi di WordPress
 |--------------------------------------------------------------------------
 |
-| Minimal fakes of the WordPress classes used by the tested code, since
-| WordPress is not loaded in the unit tests.
+| Fake minimi delle classi di WordPress usate dal codice testato, perché
+| nei test unitari WordPress non viene caricato.
 |
 */
 

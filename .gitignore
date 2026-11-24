@@ -2,7 +2,7 @@
 /.idea/
 .DS_Store
 
-# Application
+# Applicazione
 web/app/plugins/*
 !web/app/plugins/.gitkeep
 web/app/mu-plugins/*/
@@ -21,7 +21,7 @@ web/app/languages/*
 web/wp
 web/.htaccess
 
-# Logs
+# Log
 *.log
 /logs/*
 !/logs/.gitkeep

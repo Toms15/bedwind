@@ -7,27 +7,27 @@ namespace App\Queries;
 use WP_Query;
 
 /**
- * Post queries returning plain arrays of post data for views.
+ * Query sui post che restituiscono array semplici di dati dei post per le view.
  *
- * Stateless static methods, so they can be called from Blade views, View
- * Composers and block templates alike (e.g. a "latest news" block or a
- * Composer that feeds a listing). They are not View Composers themselves
- * because the data depends on arguments (page, category, count) chosen by
- * the caller, not on the view being rendered.
+ * Metodi statici senza stato, quindi si possono chiamare indifferentemente da
+ * view Blade, View Composer e template dei blocchi (es. un blocco "ultime news"
+ * o un Composer che alimenta un elenco). Non sono View Composer perché i dati
+ * dipendono da argomenti (pagina, categoria, numero) scelti da chi chiama,
+ * non dalla view che si sta renderizzando.
  *
  * @phpstan-type PostData array{title: string, link: string|false, image: string, image_id: int|null, date: string|int|false, categories: \WP_Term[]}
  */
 class Posts
 {
     /**
-     * Extract the display data of a post.
+     * Estrae i dati di visualizzazione di un post.
      *
-     * 'title' is decoded from HTML entities, so it must be printed escaped
-     * (Blade {{ }}), never raw. 'image' is the 'large' thumbnail URL or the local
-     * fallback; 'image_id' is the attachment ID (null without thumbnail) for
-     * responsive markup. 'date' follows the site's date_format option.
+     * 'title' è decodificato dalle entity HTML, quindi va stampato con l'escape
+     * (Blade {{ }}), mai raw. 'image' è l'URL della miniatura 'large' o il fallback
+     * locale; 'image_id' è l'ID dell'allegato (null senza miniatura) per il
+     * markup responsive. 'date' segue l'opzione date_format del sito.
      *
-     * @param  int|null  $post_id  Post ID, current post when null.
+     * @param  int|null  $post_id  ID del post, il post corrente se null.
      * @return PostData|null
      */
     public static function data(?int $post_id = null): ?array
@@ -51,12 +51,13 @@ class Posts
     }
 
     /**
-     * Get a page of published posts, optionally filtered by category.
+     * Restituisce una pagina di post pubblicati, filtrabile per categoria.
      *
-     * Sticky posts are not moved to the top; found rows are kept for pagination.
+     * I post in evidenza non vengono spostati in cima; il conteggio delle righe
+     * trovate resta, per la paginazione.
      *
-     * @param  int|string  $page  Page number (e.g. get_query_var("paged")), at least 1.
-     * @param  int|null  $category_id  Category term ID, all categories when null.
+     * @param  int|string  $page  Numero di pagina (es. get_query_var("paged")), almeno 1.
+     * @param  int|null  $category_id  ID del termine categoria, tutte le categorie se null.
      * @return array{posts: list<PostData>, total_pages: int, current_page: int, total_posts: int}
      */
     public static function paginated(int|string $page = 1, ?int $category_id = null): array
@@ -88,10 +89,10 @@ class Posts
     }
 
     /**
-     * Get the latest published posts, sticky posts not moved to the top.
+     * Restituisce gli ultimi post pubblicati, senza spostare in cima quelli in evidenza.
      *
-     * @param  int  $posts  Number of posts.
-     * @return list<PostData> Post data as returned by self::data().
+     * @param  int  $posts  Numero di post.
+     * @return list<PostData> Dati dei post come li restituisce self::data().
      */
     public static function latest(int $posts = 3): array
     {
@@ -107,11 +108,11 @@ class Posts
     }
 
     /**
-     * Map the posts of a query to their display data.
+     * Converte i post di una query nei loro dati di visualizzazione.
      *
-     * The thumbnails are primed in one query to avoid N+1 lookups.
+     * Le miniature vengono precaricate con una sola query per evitare N+1 lookup.
      *
-     * @return list<PostData> Post data as returned by self::data().
+     * @return list<PostData> Dati dei post come li restituisce self::data().
      */
     private static function collect(WP_Query $query): array
     {

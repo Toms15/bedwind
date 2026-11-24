@@ -9,7 +9,7 @@ use Roots\Acorn\View\Composer;
 class App extends Composer
 {
     /**
-     * List of views served by this composer.
+     * Elenco delle view servite da questo composer.
      *
      * @var array<string>
      */
@@ -18,11 +18,11 @@ class App extends Composer
     ];
 
     /**
-     * Retrieve the site name as plain text, to be escaped by the view ({{ }}).
+     * Restituisce il nome del sito come testo semplice, di cui la view fa l'escape ({{ }}).
      *
-     * The blogname option is stored HTML-escaped and the 'display' filters
-     * add entities (wptexturize): decode them, so Blade does not escape
-     * them a second time.
+     * L'opzione blogname è salvata con l'escape HTML e i filtri 'display'
+     * aggiungono entity (wptexturize): vengono decodificate, così Blade non ne
+     * fa l'escape una seconda volta.
      */
     public function siteName(): string
     {
@@ -30,12 +30,12 @@ class App extends Composer
     }
 
     /**
-     * Retrieve the custom logo markup (link to the home page with the image),
-     * or an empty string when no logo is set: the header then shows the site
-     * name.
+     * Restituisce il markup del custom logo (link alla home con l'immagine),
+     * o una stringa vuota se non c'è un logo: in quel caso l'header mostra il
+     * nome del sito.
      *
-     * The markup comes from get_custom_logo(), already escaped by WordPress;
-     * the image alt falls back to the site name when the attachment has none.
+     * Il markup arriva da get_custom_logo(), con l'escape già fatto da WordPress;
+     * l'alt dell'immagine ripiega sul nome del sito se l'allegato non ne ha uno.
      */
     public function customLogo(): string
     {
@@ -47,9 +47,9 @@ class App extends Composer
     }
 
     /**
-     * Whether the current page is the first page of the front page: the
-     * header then marks the home link with aria-current="page", as
-     * get_custom_logo() does for the logo link.
+     * Indica se la pagina corrente è la prima pagina della front page: in quel
+     * caso l'header marca il link alla home con aria-current="page", come fa
+     * get_custom_logo() per il link del logo.
      */
     public function isFrontPage(): bool
     {

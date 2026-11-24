@@ -9,28 +9,28 @@ use WP_Term;
 use WP_User;
 
 /**
- * Breadcrumb trail of the current request, as plain data.
+ * Percorso di breadcrumb della richiesta corrente, come dati semplici.
  *
- * Stateless static methods (like App\Queries\*): the trail depends only on
- * the main query, so it can be built from any view, component or block,
- * wherever <x-content.breadcrumbs /> is included. It is not a View Composer because
- * a composer is bound to view names, while the component must work in any
- * template without being registered for it.
+ * Metodi statici senza stato (come App\Queries\*): il percorso dipende solo
+ * dalla main query, quindi si può costruire da qualsiasi view, componente o
+ * blocco, ovunque sia incluso <x-content.breadcrumbs />. Non è un View Composer
+ * perché un composer è legato ai nomi delle view, mentre il componente deve
+ * funzionare in qualsiasi template senza esservi registrato.
  *
- * Contract of items():
- * - empty array on the front page (nothing to show);
- * - otherwise the first item is the home page and the last one is the
- *   current page, with 'url' => null;
- * - labels are plain text (WordPress titles and names are stripped of
- *   tags and decoded from entities when the trail is built; the search
- *   terms are kept as typed): print them escaped with Blade {{ }}, never raw.
+ * Contratto di items():
+ * - array vuoto sulla front page (niente da mostrare);
+ * - altrimenti la prima voce è la home e l'ultima è la pagina corrente,
+ *   con 'url' => null;
+ * - le label sono testo semplice (a titoli e nomi di WordPress vengono tolti i
+ *   tag e decodificate le entity quando si costruisce il percorso; i termini di
+ *   ricerca restano come digitati): stampale con l'escape di Blade {{ }}, mai raw.
  *
- * The final list goes through the `sage/breadcrumbs` filter.
+ * La lista finale passa dal filtro `sage/breadcrumbs`.
  */
 class Breadcrumbs
 {
     /**
-     * Build the breadcrumb trail of the current request.
+     * Costruisce il percorso di breadcrumb della richiesta corrente.
      *
      * @return array<int, array{label: string, url: ?string}>
      */
@@ -39,24 +39,24 @@ class Breadcrumbs
         $items = static::trail();
 
         /**
-         * Filter the breadcrumb items of the current request.
+         * Filtra le voci di breadcrumb della richiesta corrente.
          *
-         * @param  array<int, array{label: string, url: ?string}>  $items  Items, the last one is the current page.
+         * @param  array<int, array{label: string, url: ?string}>  $items  Voci, l'ultima è la pagina corrente.
          */
         $items = apply_filters('sage/breadcrumbs', static::normalize($items));
 
-        // The PHPDoc above describes the expected value, but a third-party
-        // callback can return anything: keep the runtime check.
+        // Il PHPDoc qui sopra descrive il valore atteso, ma una callback di terze
+        // parti può restituire qualsiasi cosa: il controllo a runtime resta.
         // @phpstan-ignore function.alreadyNarrowedType
         return static::normalize(is_array($items) ? $items : []);
     }
 
     /**
-     * Enforce the shape of the items: string labels (trimmed, empty ones
-     * dropped), string or null URLs, last item (current page) without URL.
+     * Impone la forma delle voci: label stringa (con trim, quelle vuote
+     * scartate), URL stringa o null, ultima voce (pagina corrente) senza URL.
      *
-     * Idempotent and without decoding: labels coming from the filter or from
-     * <x-content.breadcrumbs :items="..."> are already plain text.
+     * Idempotente e senza decodifica: le label che arrivano dal filtro o da
+     * <x-content.breadcrumbs :items="..."> sono già testo semplice.
      *
      * @param  array<mixed>  $items
      * @return array<int, array{label: string, url: ?string}>
@@ -91,8 +91,8 @@ class Breadcrumbs
     }
 
     /**
-     * Trail before normalize() and the filter. The current page keeps its
-     * URL here: normalize() drops it, after the pagination item.
+     * Percorso prima di normalize() e del filtro. Qui la pagina corrente
+     * mantiene l'URL: lo toglie normalize(), dopo la voce della paginazione.
      *
      * @return array<int, array{label: string, url: mixed}>
      */
@@ -107,7 +107,7 @@ class Breadcrumbs
         $items = [static::item(__('Home', 'sage'), home_url('/'))];
 
         if (is_front_page()) {
-            // Paginated front page: Home → Pagina N.
+            // Front page paginata: Home → Pagina N.
         } elseif (is_home()) {
             $items = [...$items, ...static::postsPage()];
         } elseif (is_singular()) {
@@ -121,11 +121,11 @@ class Breadcrumbs
         } elseif (is_author()) {
             $items = [...$items, ...static::postsPage(), static::author()];
         } elseif (is_search()) {
-            // Not through item(): the search terms are shown as typed
-            // (no tag stripping or entity decoding); Blade {{ }} and
-            // JSON_HEX_TAG escape them on output.
+            // Non passa da item(): i termini di ricerca si mostrano come digitati
+            // (senza rimozione dei tag né decodifica delle entity); Blade {{ }} e
+            // JSON_HEX_TAG ne fanno l'escape in output.
             $items[] = [
-                /* translators: %s: search terms. */
+                /* translators: %s: termini di ricerca. */
                 'label' => sprintf(__('Risultati per “%s”', 'sage'), get_search_query(false)),
                 'url' => get_search_link(),
             ];
@@ -133,11 +133,11 @@ class Breadcrumbs
             $items[] = static::item(__('Pagina non trovata', 'sage'), null);
         }
 
-        // A paginated URL past the last page is a 404: no "Pagina N" after
+        // Un URL paginato oltre l'ultima pagina è un 404: niente "Pagina N" dopo
         // "Pagina non trovata".
         if ($page > 1 && ! is_404()) {
             $items[] = static::item(
-                /* translators: %d: page number. */
+                /* translators: %d: numero di pagina. */
                 sprintf(__('Pagina %d', 'sage'), $page),
                 null
             );
@@ -147,9 +147,9 @@ class Breadcrumbs
     }
 
     /**
-     * Author archive. When the display name is empty, fall back to the
-     * nicename, then the login, then to a generic "Autore", so the trail
-     * never collapses to Home alone.
+     * Archivio autore. Se il display name è vuoto ripiega sul nicename,
+     * poi sul login, poi su un generico "Autore", così il percorso non si
+     * riduce mai alla sola Home.
      *
      * @return array{label: string, url: mixed}
      */
@@ -177,8 +177,8 @@ class Breadcrumbs
     }
 
     /**
-     * Current page number: 'paged' on archives, 'page' on a paginated static
-     * front page or on a post split with <!--nextpage-->.
+     * Numero della pagina corrente: 'paged' negli archivi, 'page' su una front
+     * page statica paginata o su un post diviso con <!--nextpage-->.
      */
     protected static function pageNumber(): int
     {
@@ -186,10 +186,10 @@ class Breadcrumbs
     }
 
     /**
-     * Posts page (Settings → Reading), with its parent pages.
+     * Pagina degli articoli (Impostazioni → Lettura), con le pagine genitore.
      *
-     * Empty when the posts are shown on the front page: there the home item
-     * already is the blog.
+     * Vuota quando gli articoli sono mostrati sulla front page: lì la voce
+     * della home è già il blog.
      *
      * @return array<int, array{label: string, url: mixed}>
      */
@@ -205,11 +205,11 @@ class Breadcrumbs
     }
 
     /**
-     * Singular content.
+     * Contenuto singolo.
      *
-     * - post: posts page → first category (with its parents) → title;
-     * - other post types: archive (if has_archive) → parents → title.
-     *   Parents are the page hierarchy, or the parent post of an attachment.
+     * - post: pagina degli articoli → prima categoria (con i genitori) → titolo;
+     * - altri post type: archivio (se has_archive) → genitori → titolo.
+     *   I genitori sono la gerarchia delle pagine, o il post genitore di un allegato.
      *
      * @return array<int, array{label: string, url: mixed}>
      */
@@ -239,10 +239,10 @@ class Breadcrumbs
     }
 
     /**
-     * Category, tag or custom taxonomy archive.
+     * Archivio di categoria, tag o tassonomia personalizzata.
      *
-     * Taxonomies of posts start from the posts page; taxonomies of other
-     * post types from the archive of the first one that has it.
+     * Le tassonomie dei post partono dalla pagina degli articoli; quelle degli
+     * altri post type dall'archivio del primo che ne ha uno.
      *
      * @return array<int, array{label: string, url: mixed}>
      */
@@ -272,7 +272,7 @@ class Breadcrumbs
     }
 
     /**
-     * Post type archive.
+     * Archivio del post type.
      *
      * @return array<int, array{label: string, url: mixed}>
      */
@@ -286,8 +286,8 @@ class Breadcrumbs
     }
 
     /**
-     * Date archive: year → month → day. get_year_link() goes through the
-     * `year_link` filter of app/rewrites.php (news/archivio base).
+     * Archivio per data: anno → mese → giorno. get_year_link() passa dal
+     * filtro `year_link` di app/rewrites.php (base news/archivio).
      *
      * @return array<int, array{label: string, url: mixed}>
      */
@@ -299,7 +299,7 @@ class Breadcrumbs
         $month = (int) get_query_var('monthnum');
         $day = (int) get_query_var('day');
 
-        // Archives requested with ?m=YYYYMMDD.
+        // Archivi richiesti con ?m=YYYYMMDD.
         if (! $year && ($m = (string) get_query_var('m'))) {
             $year = (int) substr($m, 0, 4);
             $month = (int) substr($m, 4, 2);
@@ -320,7 +320,7 @@ class Breadcrumbs
     }
 
     /**
-     * A post preceded by its ancestors (page hierarchy).
+     * Un post preceduto dai suoi antenati (gerarchia delle pagine).
      *
      * @return array<int, array{label: string, url: mixed}>
      */
@@ -335,7 +335,7 @@ class Breadcrumbs
     }
 
     /**
-     * A term preceded by its ancestors.
+     * Un termine preceduto dai suoi antenati.
      *
      * @return array<int, array{label: string, url: mixed}>
      */
@@ -357,9 +357,9 @@ class Breadcrumbs
     }
 
     /**
-     * Item from WordPress data: titles and term names may contain tags and
-     * HTML entities (e.g. &#8217; from wptexturize, &amp; in term names),
-     * turned here into plain text.
+     * Voce dai dati di WordPress: titoli e nomi dei termini possono contenere tag
+     * ed entity HTML (es. &#8217; da wptexturize, &amp; nei nomi dei termini),
+     * qui trasformati in testo semplice.
      *
      * @return array{label: string, url: mixed}
      */

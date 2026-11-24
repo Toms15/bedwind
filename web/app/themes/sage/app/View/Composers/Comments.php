@@ -9,7 +9,7 @@ use Roots\Acorn\View\Composer;
 class Comments extends Composer
 {
     /**
-     * List of views served by this composer.
+     * Elenco delle view servite da questo composer.
      *
      * @var array<string>
      */
@@ -18,12 +18,12 @@ class Comments extends Composer
     ];
 
     /**
-     * The comment title.
+     * Il titolo dei commenti.
      */
     public function title(): string
     {
         return sprintf(
-            /* translators: 1: number of comments ("Una" when 1), 2: post title. */
+            /* translators: 1: numero di commenti ("Una" se 1), 2: titolo del post. */
             _nx('%1$s risposta a &ldquo;%2$s&rdquo;', '%1$s risposte a &ldquo;%2$s&rdquo;', get_comments_number(), 'comments title', 'sage'),
             (int) get_comments_number() === 1 ? _x('Una', 'comments title', 'sage') : number_format_i18n(get_comments_number()),
             get_the_title()
@@ -31,7 +31,7 @@ class Comments extends Composer
     }
 
     /**
-     * Retrieve the comments.
+     * Restituisce i commenti.
      */
     public function responses(): ?string
     {
@@ -47,7 +47,7 @@ class Comments extends Composer
     }
 
     /**
-     * The previous comments link.
+     * Il link ai commenti precedenti.
      */
     public function previous(): ?string
     {
@@ -61,7 +61,7 @@ class Comments extends Composer
     }
 
     /**
-     * The next comments link.
+     * Il link ai commenti successivi.
      */
     public function next(): ?string
     {
@@ -75,7 +75,7 @@ class Comments extends Composer
     }
 
     /**
-     * Determine if the comments are paginated.
+     * Indica se i commenti sono paginati.
      */
     public function paginated(): bool
     {
@@ -83,7 +83,7 @@ class Comments extends Composer
     }
 
     /**
-     * Determine if the comments are closed.
+     * Indica se i commenti sono chiusi.
      */
     public function closed(): bool
     {

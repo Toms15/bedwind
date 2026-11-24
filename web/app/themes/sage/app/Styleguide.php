@@ -8,52 +8,53 @@ use Illuminate\Support\Facades\Vite;
 use WP_Query;
 
 /**
- * Styleguide of the theme at /styleguide/, only in development.
+ * Styleguide del tema su /styleguide/, solo in development.
  *
- * With WP_ENV === 'development' the theme registers a rewrite rule and a
- * query var for /styleguide/ and renders resources/views/styleguide.blade.php
- * (theme layout, noindex, no database page, no main query). In every other
- * environment nothing is registered: /styleguide/ is a regular 404.
+ * Con WP_ENV === 'development' il tema registra una regola di rewrite e una
+ * query var per /styleguide/ e renderizza resources/views/styleguide.blade.php
+ * (layout del tema, noindex, nessuna pagina nel database, nessuna main query).
+ * In ogni altro ambiente non registra nulla: /styleguide/ è un normale 404.
  *
- * Rewrite rules are stored in the database, so they are not flushed on every
- * request: on "init" the stored rules are compared with the environment and
- * flushed once when they disagree (rule missing in development, still there
- * elsewhere, e.g. after copying the database). `wp rewrite flush` also works.
+ * Le regole di rewrite sono salvate nel database, quindi non si fa il flush a
+ * ogni richiesta: su "init" le regole salvate vengono confrontate con
+ * l'ambiente e, se non corrispondono (regola assente in development, ancora
+ * presente altrove, es. dopo una copia del database), si fa il flush una volta.
+ * Funziona anche `wp rewrite flush`.
  *
- * The utilities used only by the view are compiled in a dedicated entry
- * (resources/css/styleguide.css, excluded from app.css and editor.css), enqueued
- * only on the styleguide, so they never reach the production stylesheets.
+ * Le utility usate solo dalla view sono compilate in una entry dedicata
+ * (resources/css/styleguide.css, esclusa da app.css ed editor.css), caricata
+ * solo sulla styleguide, così non finiscono mai nei fogli di stile di produzione.
  */
 final class Styleguide
 {
-    /** Path of the styleguide, without slashes. */
+    /** Percorso della styleguide, senza slash. */
     public const PATH = 'styleguide';
 
-    /** Query var set by the rewrite rule. */
+    /** Query var impostata dalla regola di rewrite. */
     public const QUERY_VAR = 'sage_styleguide';
 
-    /** Rewrite rule regex, also the key of the rule in the stored rules. */
+    /** Regex della regola di rewrite, anche chiave della regola fra quelle salvate. */
     public const RULE = '^styleguide/?$';
 
-    /** Environment ('on'/'off') of the last flush done by the theme. */
+    /** Ambiente ('on'/'off') dell'ultimo flush fatto dal tema. */
     public const FLUSH_OPTION = 'sage_styleguide_rewrite';
 
-    /** Vite entry with the utilities of the view, enqueued only here. */
+    /** Entry Vite con le utility della view, caricata solo qui. */
     public const STYLE = 'resources/css/styleguide.css';
 
-    /** Stylesheet handle of STYLE. */
+    /** Handle del foglio di stile di STYLE. */
     public const HANDLE = 'sage-styleguide';
 
-    /** WCAG 2.2 minimum contrast: [AA, AAA] for normal and large text. */
+    /** Contrasto minimo WCAG 2.2: [AA, AAA] per testo normale e grande. */
     public const WCAG = [
         'normal' => ['AA' => 4.5, 'AAA' => 7.0],
         'large' => ['AA' => 3.0, 'AAA' => 4.5],
     ];
 
     /**
-     * Whether the styleguide is available: only with WP_ENV === 'development'.
+     * Indica se la styleguide è disponibile: solo con WP_ENV === 'development'.
      *
-     * @param  string|null  $env  Environment to check, default: WP_ENV.
+     * @param  string|null  $env  Ambiente da verificare, default: WP_ENV.
      */
     public static function enabled(?string $env = null): bool
     {
@@ -63,12 +64,12 @@ final class Styleguide
     }
 
     /**
-     * Hook the styleguide (called by ThemeServiceProvider::boot()).
+     * Aggancia la styleguide agli hook (chiamato da ThemeServiceProvider::boot()).
      *
-     * The rewrite sync runs in every environment, to remove a rule left in
-     * the database by development; everything else only in development.
+     * La sincronizzazione delle rewrite gira in ogni ambiente, per rimuovere una
+     * regola lasciata nel database da development; tutto il resto solo in development.
      *
-     * @param  string|null  $env  Environment, default: WP_ENV.
+     * @param  string|null  $env  Ambiente, default: WP_ENV.
      */
     public static function register(?string $env = null): void
     {
@@ -93,9 +94,9 @@ final class Styleguide
     }
 
     /**
-     * Enqueue the stylesheet of the view, only on the styleguide. Skipped when
-     * the entry is missing from the Vite manifest (not built yet), like the
-     * block assets: the page still works with app.css only.
+     * Carica il foglio di stile della view, solo sulla styleguide. Saltato se
+     * la entry manca dal manifest di Vite (build non ancora fatta), come per gli
+     * asset dei blocchi: la pagina funziona comunque con il solo app.css.
      */
     public static function enqueueAssets(): void
     {
@@ -109,7 +110,7 @@ final class Styleguide
             return;
         }
 
-        // null version: the build file is hashed, the dev server needs none.
+        // Versione null: il file di build ha l'hash nel nome, il dev server non ne ha bisogno.
         wp_enqueue_style(self::HANDLE, $url, [], null);
     }
 
@@ -119,13 +120,13 @@ final class Styleguide
     }
 
     /**
-     * Flush the rewrite rules when the stored ones disagree with $enabled.
+     * Fa il flush delle regole di rewrite se quelle salvate non corrispondono a $enabled.
      *
-     * Nothing happens when the rules are not stored (plain permalinks, or not
-     * generated yet: WordPress builds them on demand with the current rule).
-     * FLUSH_OPTION remembers the state of the last flush: if the rule is still
-     * wrong after flushing for the same state (e.g. a plugin filters it out),
-     * the theme does not flush again on every request.
+     * Non succede nulla se le regole non sono salvate (permalink semplici, o non
+     * ancora generate: WordPress le crea al bisogno con la regola corrente).
+     * FLUSH_OPTION ricorda lo stato dell'ultimo flush: se la regola è ancora
+     * sbagliata dopo un flush per lo stesso stato (es. un plugin la filtra via),
+     * il tema non ripete il flush a ogni richiesta.
      */
     public static function syncRewriteRules(bool $enabled): void
     {
@@ -139,8 +140,8 @@ final class Styleguide
         $flushed = get_option(self::FLUSH_OPTION);
 
         if (array_key_exists(self::RULE, $rules) === $enabled) {
-            // In sync (e.g. after `wp rewrite flush`): forget an old state,
-            // so a later mismatch for it is flushed again.
+            // Allineate (es. dopo `wp rewrite flush`): dimentica uno stato vecchio,
+            // così un successivo disallineamento per quello stato rifà il flush.
             if ($flushed !== false && $flushed !== $state) {
                 delete_option(self::FLUSH_OPTION);
             }
@@ -168,7 +169,7 @@ final class Styleguide
     }
 
     /**
-     * Whether the current request (or the given query) is the styleguide.
+     * Indica se la richiesta corrente (o la query passata) è la styleguide.
      */
     public static function isRequest(?WP_Query $query = null): bool
     {
@@ -180,8 +181,8 @@ final class Styleguide
     }
 
     /**
-     * Not the blog home: WP_Query flags a request with only a custom query
-     * var as is_home.
+     * Non è la home del blog: WP_Query segna come is_home una richiesta che
+     * ha solo una query var personalizzata.
      */
     public static function parseQuery(WP_Query $query): void
     {
@@ -192,7 +193,7 @@ final class Styleguide
     }
 
     /**
-     * Skip the posts query of the main query: the styleguide shows no posts.
+     * Salta la query dei post della main query: la styleguide non mostra post.
      *
      * @param  array<int, mixed>|null  $posts
      * @return array<int, mixed>|null
@@ -203,7 +204,7 @@ final class Styleguide
     }
 
     /**
-     * No posts must not turn the styleguide into a 404.
+     * L'assenza di post non deve trasformare la styleguide in un 404.
      */
     public static function skip404(bool $preempt, WP_Query $query): bool
     {
@@ -216,7 +217,7 @@ final class Styleguide
             return $template;
         }
 
-        // Acorn (template_include, priority 100) renders the Blade view.
+        // Acorn (template_include, priorità 100) renderizza la view Blade.
         return get_theme_file_path('resources/views/styleguide.blade.php');
     }
 
@@ -262,10 +263,10 @@ final class Styleguide
     }
 
     /**
-     * Design tokens from the theme.json generated by the build
-     * (public/build/assets/theme.json, from the @theme of theme.css).
+     * Design token dal theme.json generato dalla build
+     * (public/build/assets/theme.json, dal @theme di theme.css).
      *
-     * @param  string|null  $path  theme.json path, default: the build one.
+     * @param  string|null  $path  Percorso del theme.json, default: quello della build.
      * @return array{colors: list<array{name: string, slug: string, color: string}>, fonts: list<array{name: string, slug: string, family: string}>, sizes: list<array{name: string, slug: string, size: string}>}
      */
     public static function tokens(?string $path = null): array
@@ -301,8 +302,8 @@ final class Styleguide
     }
 
     /**
-     * WCAG 2.2 contrast ratio (1–21) between two colors, null when either
-     * cannot be parsed (see luminance()).
+     * Rapporto di contrasto WCAG 2.2 (1–21) fra due colori, null se uno dei
+     * due non è interpretabile (vedi luminance()).
      */
     public static function contrast(string $color, string $against): ?float
     {
@@ -317,9 +318,9 @@ final class Styleguide
     }
 
     /**
-     * WCAG levels met by a contrast ratio, for normal and large text
-     * (large: at least 24px, or 18.66px bold): 'AAA', 'AA' or null.
-     * The ratio is compared unrounded, as WCAG requires.
+     * Livelli WCAG raggiunti da un rapporto di contrasto, per testo normale e
+     * grande (grande: almeno 24px, o 18.66px in grassetto): 'AAA', 'AA' o null.
+     * Il rapporto si confronta senza arrotondarlo, come richiede WCAG.
      *
      * @return array{normal: 'AAA'|'AA'|null, large: 'AAA'|'AA'|null}
      */
@@ -341,8 +342,8 @@ final class Styleguide
     }
 
     /**
-     * Contrast of a color with white and black, with the WCAG levels met.
-     * Empty when the color cannot be parsed.
+     * Contrasto di un colore con il bianco e il nero, con i livelli WCAG raggiunti.
+     * Vuoto se il colore non è interpretabile.
      *
      * @return array<'white'|'black', array{ratio: float, normal: 'AAA'|'AA'|null, large: 'AAA'|'AA'|null}>
      */
@@ -362,14 +363,14 @@ final class Styleguide
     }
 
     /**
-     * WCAG relative luminance (0–1) of an opaque color, or null.
+     * Luminanza relativa WCAG (0–1) di un colore opaco, o null.
      *
-     * Accepted: #rgb, #rrggbb and oklch(L C H) as written in theme.json by
-     * the build (L as number or percentage, C as number or percentage of 0.4,
-     * hue in degrees, "none" as 0, optional "/ 1" alpha). oklch is converted
-     * to linear sRGB and clipped to the sRGB gamut, close to what browsers do
-     * for the colors of the palette. Other formats and transparent colors
-     * return null.
+     * Accettati: #rgb, #rrggbb e oklch(L C H) come li scrive la build nel
+     * theme.json (L come numero o percentuale, C come numero o percentuale di 0.4,
+     * tinta in gradi, "none" come 0, alpha "/ 1" opzionale). oklch viene convertito
+     * in sRGB lineare e limitato al gamut sRGB, vicino a ciò che fanno i browser
+     * per i colori della palette. Altri formati e colori trasparenti
+     * restituiscono null.
      */
     public static function luminance(string $color): ?float
     {
@@ -385,7 +386,7 @@ final class Styleguide
     }
 
     /**
-     * @return array{float, float, float}|null Linear sRGB channels.
+     * @return array{float, float, float}|null Canali sRGB lineari.
      */
     private static function linearHex(string $color): ?array
     {
@@ -407,7 +408,7 @@ final class Styleguide
     }
 
     /**
-     * @return array{float, float, float}|null Linear sRGB channels (not clipped).
+     * @return array{float, float, float}|null Canali sRGB lineari (non limitati).
      */
     private static function linearOklch(string $color): ?array
     {
@@ -431,7 +432,7 @@ final class Styleguide
         $a = $c * cos($h);
         $b = $c * sin($h);
 
-        // OKLab -> LMS (cubed) -> linear sRGB (Björn Ottosson).
+        // OKLab -> LMS (al cubo) -> sRGB lineare (Björn Ottosson).
         $l_ = ($l + 0.3963377774 * $a + 0.2158037573 * $b) ** 3;
         $m_ = ($l - 0.1055613458 * $a - 0.0638541728 * $b) ** 3;
         $s_ = ($l - 0.0894841775 * $a - 1.2914855480 * $b) ** 3;

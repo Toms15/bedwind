@@ -1,4 +1,4 @@
-{{-- $customLogo and $isFrontPage (App composer) are lazy variables, always truthy: call them to get the value. --}}
+{{-- $customLogo e $isFrontPage (composer App) sono variabili lazy, sempre truthy: vanno chiamate per ottenere il valore. --}}
 @php($logo = $customLogo())
 
 <header class="banner">

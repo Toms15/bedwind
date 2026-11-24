@@ -5,30 +5,29 @@ use Roots\Acorn\Application;
 
 /*
 |--------------------------------------------------------------------------
-| Register The Auto Loader
+| Registrazione dell'autoloader
 |--------------------------------------------------------------------------
 |
-| Composer provides a convenient, automatically generated class loader for
-| our theme. We will simply require it into the script here so that we
-| don't have to worry about manually loading any of our classes later on.
+| Composer fornisce un class loader generato automaticamente per il tema.
+| Basta includerlo qui, così nessuna classe va caricata a mano in seguito.
 |
 */
 
 if (! file_exists($composer = __DIR__.'/vendor/autoload.php')) {
-    wp_die(__('Error locating autoloader. Please run <code>composer install</code>.', 'sage'));
+    wp_die(__('Autoloader non trovato. Esegui <code>composer install</code>.', 'sage'));
 }
 
 require $composer;
 
 /*
 |--------------------------------------------------------------------------
-| Register The Bootloader
+| Registrazione del bootloader
 |--------------------------------------------------------------------------
 |
-| The first thing we will do is schedule a new Acorn application container
-| to boot when WordPress is finished loading the theme. The application
-| serves as the "glue" for all the components of Laravel and is
-| the IoC container for the system binding all of the various parts.
+| Per prima cosa si programma l'avvio di un nuovo container applicativo
+| Acorn quando WordPress ha finito di caricare il tema. L'applicazione fa
+| da "collante" fra i componenti di Laravel ed è il container IoC che
+| collega fra loro tutte le parti del sistema.
 |
 */
 
@@ -40,13 +39,12 @@ Application::configure()
 
 /*
 |--------------------------------------------------------------------------
-| Register Sage Theme Files
+| Registrazione dei file del tema Sage
 |--------------------------------------------------------------------------
 |
-| Out of the box, Sage ships with categorically named theme files
-| containing common functionality and setup to be bootstrapped with your
-| theme. Simply add (or remove) files from the array below to change what
-| is registered alongside Sage.
+| Sage include file del tema divisi per categoria, con funzionalità comuni e
+| configurazione da avviare insieme al tema. Aggiungi (o rimuovi) file
+| dall'array qui sotto per cambiare cosa viene registrato insieme a Sage.
 |
 */
 
@@ -63,8 +61,8 @@ collect(
     ->each(function ($file) {
         if (! locate_template($file = "app/{$file}.php", true, true)) {
             wp_die(
-                /* translators: %s is replaced with the relative file path */
-                sprintf(__('Error locating <code>%s</code> for inclusion.', 'sage'), $file)
+                /* translators: %s viene sostituito con il percorso relativo del file */
+                sprintf(__('Impossibile trovare <code>%s</code> da includere.', 'sage'), $file)
             );
         }
     });

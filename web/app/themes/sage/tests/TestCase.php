@@ -7,8 +7,8 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 
 /**
- * Base test case: WordPress is not loaded, its functions are mocked with
- * Brain Monkey (Functions\when(), Functions\expect()).
+ * Test case di base: WordPress non viene caricato, le sue funzioni sono mock
+ * con Brain Monkey (Functions\when(), Functions\expect()).
  */
 abstract class TestCase extends BaseTestCase
 {

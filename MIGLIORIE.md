@@ -26,7 +26,7 @@
 | M13 | ✅ | Aggiornare le dipendenze Composer e WP 7.x | Dipendenze | 🟠 | M | M10 |
 | M14 | ✅ | Upgrade major di Vite / `@roots/vite-plugin` | Dipendenze | 🟠 | M | M09 |
 | M15 | ✅ | Traduzioni core via Composer, rimozione di twentytwentyfive | Dipendenze | 🟢 | M | M13 |
-| M16 | ⬜ | Metadati e branding (composer, style.css, LICENSE, vincoli PHP) | Repo | 🟢 | S | – |
+| M16 | ✅ | Metadati e branding (composer, style.css, LICENSE, vincoli PHP) | Repo | 🟢 | S | – |
 | M17 | ✅ | `excerpt_more` duplicato e helper deboli | PHP | 🟠 | S | – |
 | M18 | ✅ | Rewrite degli archivi (mensili, paginazione, flush) | PHP | 🟠 | M | – |
 | M19 | ✅ | CPT `faq`: configurazione coerente | PHP | 🟠 | S | – |
@@ -237,7 +237,11 @@
   - `style.css` riporta "Sage Starter Theme / Roots" e `LICENSE.md` dice "Roots Software LLC".
   - Il vincolo PHP è `>=8.1` alla radice e `>=8.2` nel tema.
   - Il tema ha `minimum-stability: dev`.
-- **Soluzione:** rinominare i pacchetti (ad esempio `toms15/sage-starter`), aggiornare authors e support, aggiungere il proprio copyright mantenendo la licenza MIT di Roots e allineare il vincolo a PHP `>=8.2`.
+- **Soluzione:** rinominare i pacchetti (`toms15/bedwind` per la root, `toms15/sage` per il tema), aggiornare authors e support, aggiungere il proprio copyright mantenendo la licenza MIT di Roots e allineare il vincolo a PHP `>=8.2`.
+  - `style.css`: Theme Name "Sage Starter", Version 1.0.0.
+  - `minimum-stability: stable` in root e tema.
+  - Niente `config.platform` nella root: Pint in `require-dev` richiede PHP `^8.3`.
+  - `screenshot.png` del tema da sostituire con un'immagine propria (a cura dell'utente).
 
 ---
 

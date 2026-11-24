@@ -1,42 +1,42 @@
-# Copyright (C) 2026 Roots
+# Copyright (C) 2026 Tommaso Costantini
 # This file is distributed under the MIT License.
 msgid ""
 msgstr ""
-"Project-Id-Version: Sage Starter Theme 11.0.1\n"
+"Project-Id-Version: Sage Starter 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-23T15:53:48+00:00\n"
+"POT-Creation-Date: 2026-11-24T08:38:04+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: sage\n"
 
 #. Theme Name of the theme
 #: style.css
-msgid "Sage Starter Theme"
+msgid "Sage Starter"
 msgstr ""
 
 #. Theme URI of the theme
 #: style.css
-msgid "https://roots.io/sage/"
+msgid "https://github.com/Toms15/bedwind"
 msgstr ""
 
 #. Description of the theme
 #: style.css
-msgid "Tema starter WordPress basato su Sage di Roots."
+msgid "Tema starter WordPress basato su Sage di Roots, con Tailwind CSS e blocchi ACF Pro."
 msgstr ""
 
 #. Author of the theme
 #: style.css
-msgid "Roots"
+msgid "Tommaso Costantini"
 msgstr ""
 
 #. Author URI of the theme
 #: style.css
-msgid "https://roots.io/"
+msgid "https://github.com/Toms15"
 msgstr ""
 
 #: app/blocks.php:47
@@ -155,15 +155,15 @@ msgstr ""
 msgid "Archivio %s"
 msgstr ""
 
-#: app/setup.php:121
+#: app/setup.php:126
 msgid "Navigazione principale"
 msgstr ""
 
-#: app/setup.php:187
+#: app/setup.php:192
 msgid "Principale"
 msgstr ""
 
-#: app/setup.php:192
+#: app/setup.php:197
 msgid "Piè di pagina"
 msgstr ""
 

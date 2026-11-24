@@ -19,7 +19,7 @@ This README covers the **project**: requirements, local setup, credentials, envi
 
 ## Requirements
 
-- **PHP >= 8.2** to run the site: the root `composer.json` declares >= 8.1, but Acorn 5 and the theme `require.php` raise it to 8.2. Production installs with `--no-dev`.
+- **PHP >= 8.2** to run the site: the root and theme `composer.json` declare PHP >= 8.2 (the root has no `config.platform`: Pint in `require-dev` needs 8.3, see below). Production installs with `--no-dev`.
 - **PHP >= 8.3** for root development: the root dev tools (Pint 1.32, in `require-dev`) require it, so a full `composer install` in the root fails on 8.2. The theme alone supports PHP >= 8.2 for development too.
 - **Composer 2**.
 - **Node.js** `^22.22.2 || ^24.15.0 || >=26` (`engines` in the theme `package.json`, the minimum required by Stylelint 18) and npm. The theme `.nvmrc` says `22`: see [Node version](web/app/themes/sage/README.md#node-version) in the theme README.

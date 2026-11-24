@@ -187,35 +187,42 @@ Se Herd mostra un errore fatale su `BedrockValetDriver` (per esempio perché una
 
 `WP_ENV` sceglie l'ambiente. `config/application.php` contiene i valori di **produzione** e poi carica `config/environments/{WP_ENV}.php`, se esiste, per sovrascriverli. Un `WP_ENV` vuoto vale `production`. `WP_ENVIRONMENT_TYPE` (il valore restituito da `wp_get_environment_type()`) vale di default `WP_ENV` quando questo è `production`, `staging`, `development` o `local`.
 
-| Impostazione                                                                          | `production` (`config/application.php`) | `staging` (`environments/staging.php`) | `development` (`environments/development.php`)                                     |
-| ------------------------------------------------------------------------------------- | --------------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------- |
-| `WP_DEBUG`, `WP_DEBUG_DISPLAY`, `SCRIPT_DEBUG`                                        | off                                     | off                                    | on (`WP_DEBUG`/`WP_DEBUG_DISPLAY` sovrascrivibili da `.env`)                       |
-| `WP_DEBUG_LOG`                                                                        | off                                     | off                                    | `logs/debug.log` (`false`/`0` lo disattiva, una stringa viene usata come percorso) |
-| `SAVEQUERIES`, `WP_DISABLE_FATAL_ERROR_HANDLER`                                       | off                                     | off                                    | on                                                                                 |
-| `DISALLOW_INDEXING` (motori di ricerca bloccati)                                      | no                                      | sì                                     | sì                                                                                 |
-| `DISALLOW_FILE_MODS` (niente installazioni e aggiornamenti di plugin/temi dall'admin) | sì                                      | sì                                     | no                                                                                 |
-| `DISALLOW_FILE_EDIT`, `AUTOMATIC_UPDATER_DISABLED`                                    | sì                                      | sì                                     | sì                                                                                 |
+| Impostazione                                                                          | `production` (`environments/production.php`)                                             | `staging` (`environments/staging.php`)          | `development` (`environments/development.php`)                               |
+| ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------- | ---------------------------------------------------------------------------- |
+| `WP_DEBUG`, `WP_DEBUG_DISPLAY`, `SCRIPT_DEBUG`                                        | off                                                                                      | off                                             | on (`WP_DEBUG`/`WP_DEBUG_DISPLAY` sovrascrivibili da `.env`)                 |
+| `WP_DEBUG_LOG`                                                                        | `logs/debug.log`, solo errori e warning, mai a schermo (stessa semantica di development) | off                                             | `logs/debug.log` (`false`/`0` lo disattiva, altrimenti un percorso assoluto) |
+| `SAVEQUERIES`, `WP_DISABLE_FATAL_ERROR_HANDLER`                                       | off                                                                                      | off                                             | on                                                                           |
+| `DISALLOW_INDEXING` (motori di ricerca bloccati)                                      | no (`false` esplicito)                                                                   | sì                                              | sì                                                                           |
+| `DISALLOW_FILE_MODS` (niente installazioni e aggiornamenti di plugin/temi dall'admin) | sì                                                                                       | sì                                              | no                                                                           |
+| `DISALLOW_FILE_EDIT`, `AUTOMATIC_UPDATER_DISABLED`                                    | sì                                                                                       | sì                                              | sì                                                                           |
+| `WP_POST_REVISIONS`                                                                   | 10 (sovrascrivibile da `.env`)                                                           | illimitate (sovrascrivibile da `.env`)          | illimitate (sovrascrivibile da `.env`)                                       |
+| `FORCE_SSL_ADMIN`                                                                     | sì (`FORCE_SSL_ADMIN=false` nel `.env` lo disattiva)                                     | default di WordPress (sì se il sito è in HTTPS) | default di WordPress (sì se il sito è in HTTPS)                              |
+| `DISABLE_WP_CRON`                                                                     | da `.env`, default no                                                                    | da `.env`, default no                           | da `.env`, default no                                                        |
 
-In ogni ambiente WordPress e i plugin si aggiornano con Composer, mai dall'admin; lo staging differisce dalla produzione solo per il blocco dei motori di ricerca. Non c'è un file `local`: in locale usa `development`.
+`config/application.php` resta la base con i valori di produzione (vale anche per lo staging); `environments/production.php` li ripete in modo esplicito e aggiunge ciò che vale solo in produzione: log su file, 10 revisioni, `FORCE_SSL_ADMIN`. `Config::define()` negli ambienti sovrascrive la base perché viene eseguito prima di `Config::apply()`. In ogni ambiente WordPress e i plugin si aggiornano con Composer, mai dall'admin. Lo staging differisce dalla produzione per il blocco dei motori di ricerca, il log spento, le revisioni illimitate e `FORCE_SSL_ADMIN` lasciato al default di WordPress. Non c'è un file `local`: in locale usa `development`.
+
+Il percorso del log è calcolato da `config/debug-log.php`, condiviso da development e production. In produzione WordPress non configura il log da solo (con `WP_DEBUG` off `wp_debug_mode()` non tocca `log_errors`/`error_log`), quindi lo fa `production.php`; il livello resta quello che `wp_debug_mode()` imposta con `WP_DEBUG` off: errori e warning, senza notice e deprecation. Con `WP_DEBUG_LOG=false` WordPress non scrive un suo log e valgono le impostazioni di `php.ini` del server.
 
 ### Variabili d'ambiente
 
 Lette da `config/application.php` e `config/environments/` (`.env`, poi `.env.local`):
 
-| Variabile                                      | Obbligatoria                 | Note                                                                        |
-| ---------------------------------------------- | ---------------------------- | --------------------------------------------------------------------------- |
-| `WP_HOME`, `WP_SITEURL`                        | sì                           | URL del sito e URL di WordPress (`"${WP_HOME}/wp"`)                         |
-| `DB_NAME`, `DB_USER`, `DB_PASSWORD`            | sì, salvo con `DATABASE_URL` |                                                                             |
-| `DATABASE_URL`                                 | no                           | DSN (`mysql://user:password@host:port/name`) al posto delle chiavi `DB_*`   |
-| `DB_HOST`                                      | no                           | default `localhost`                                                         |
-| `DB_PREFIX`                                    | no                           | prefisso delle tabelle, default `wp_`                                       |
-| `DB_SSL`                                       | no                           | `true` attiva `MYSQLI_CLIENT_SSL`                                           |
-| `WP_ENV`                                       | no                           | `development`, `staging` o `production` (default)                           |
-| `WP_ENVIRONMENT_TYPE`                          | no                           | default `WP_ENV` quando è `production`, `staging`, `development` o `local`  |
-| `DISABLE_WP_CRON`                              | no                           | esegue WP-Cron da un cron di sistema invece che al caricamento delle pagine |
-| `WP_POST_REVISIONS`                            | no                           | `true` (default), `false` o il numero di revisioni da conservare            |
-| `WP_DEBUG`, `WP_DEBUG_DISPLAY`, `WP_DEBUG_LOG` | no                           | solo in development (produzione e staging li forzano a off)                 |
-| `AUTH_KEY` … `NONCE_SALT`                      | sì                           | otto salt, diversi per ogni ambiente                                        |
+| Variabile                           | Obbligatoria                 | Note                                                                                                                                  |
+| ----------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `WP_HOME`, `WP_SITEURL`             | sì                           | URL del sito e URL di WordPress (`"${WP_HOME}/wp"`)                                                                                   |
+| `DB_NAME`, `DB_USER`, `DB_PASSWORD` | sì, salvo con `DATABASE_URL` |                                                                                                                                       |
+| `DATABASE_URL`                      | no                           | DSN (`mysql://user:password@host:port/name`) al posto delle chiavi `DB_*`                                                             |
+| `DB_HOST`                           | no                           | default `localhost`                                                                                                                   |
+| `DB_PREFIX`                         | no                           | prefisso delle tabelle, default `wp_`                                                                                                 |
+| `DB_SSL`                            | no                           | `true` attiva `MYSQLI_CLIENT_SSL`                                                                                                     |
+| `WP_ENV`                            | no                           | `development`, `staging` o `production` (default)                                                                                     |
+| `WP_ENVIRONMENT_TYPE`               | no                           | default `WP_ENV` quando è `production`, `staging`, `development` o `local`                                                            |
+| `DISABLE_WP_CRON`                   | no                           | esegue WP-Cron da un cron di sistema invece che al caricamento delle pagine                                                           |
+| `WP_POST_REVISIONS`                 | no                           | `true`, `false` o il numero di revisioni da conservare (default 10 in production, `true` altrove)                                     |
+| `FORCE_SSL_ADMIN`                   | no                           | solo in production, default `true`: admin e login in HTTPS                                                                            |
+| `WP_DEBUG`, `WP_DEBUG_DISPLAY`      | no                           | solo in development (produzione e staging li forzano a off)                                                                           |
+| `WP_DEBUG_LOG`                      | no                           | development e production: `true`/`1`/assente = `logs/debug.log`, `false`/`0` = off, altrimenti un percorso assoluto; in staging è off |
+| `AUTH_KEY` … `NONCE_SALT`           | sì                           | otto salt, diversi per ogni ambiente                                                                                                  |
 
 La build del tema legge dal `.env` del progetto solo `WP_HOME` (e `APP_URL`, se impostata). `APP_URL` e `VITE_THEME_SLUG` si possono passare anche come variabili di shell a `npm run dev`/`build`: vedi [Build](web/app/themes/sage/README.md#build).
 
@@ -360,15 +367,42 @@ AUTH_KEY='...'
 
 Per una copia di staging usa `WP_ENV='staging'`: le differenze sono descritte in [Ambienti](#ambienti).
 
+Se HTTPS è terminato da un proxy o da un load balancer, il proxy deve impostare `X-Forwarded-Proto: https` (`config/application.php` lo traduce in `$_SERVER['HTTPS']`), sovrascrivendo l'header ricevuto dal client invece di inoltrarlo: senza, `FORCE_SSL_ADMIN` manda l'admin in redirect loop. Su un server senza HTTPS imposta `FORCE_SSL_ADMIN=false`, solo in via temporanea.
+
+#### PHP in produzione
+
+Imposta `display_errors=Off` e `display_startup_errors=Off` nel `php.ini` o nel pool di PHP-FPM di produzione (es. `php_admin_flag[display_errors] = off`). Gli errori del bootstrap (autoload di Composer, `.env` incompleto) arrivano prima che `config/application.php` applichi la configurazione di Bedrock: con `display_errors` attivo nel server verrebbero mostrati a schermo, con i percorsi dei file.
+
+#### Cron di sistema (facoltativo)
+
+Di default WP-Cron parte al caricamento delle pagine. Per eseguirlo a orari regolari anche senza traffico, imposta `DISABLE_WP_CRON=true` nel `.env` e aggiungi al crontab dell'utente PHP:
+
+```cron
+*/5 * * * * cd /percorso/del/progetto && wp cron event run --due-now > /dev/null 2>&1
+```
+
 ### 4. Permessi
 
 L'utente PHP deve poter scrivere in:
 
 - `web/app/uploads/` (media);
 - `web/app/cache/` (Acorn: view Blade compilate e cache di bootstrap in `web/app/cache/acorn/`);
-- `logs/`, solo se `WP_DEBUG_LOG` è attivo sul server.
+- `logs/` (in produzione il log degli errori è attivo di default; con `WP_DEBUG_LOG=false` o un percorso diverso non serve).
 
 Tutto il resto può essere in sola lettura per l'utente PHP.
+
+Se `logs/` non è scrivibile il sito funziona lo stesso, ma PHP scrive gli errori nel log di PHP-FPM o del web server. `logs/debug.log` non viene ruotato da WordPress e cresce senza limiti: ruotalo con logrotate, usando `copytruncate` perché PHP tiene il file aperto. Per esempio in `/etc/logrotate.d/sage`:
+
+```text
+/percorso/del/progetto/logs/debug.log {
+    weekly
+    rotate 8
+    compress
+    missingok
+    notifempty
+    copytruncate
+}
+```
 
 ### 5. Dopo ogni deploy
 

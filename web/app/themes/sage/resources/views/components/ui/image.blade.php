@@ -2,7 +2,10 @@
   Componente immagine responsive, basato su wp_get_attachment_image().
 
   Props:
-  - id (int|null)        ID dell'allegato immagine.
+  - id (mixed)           L'allegato immagine: ID (int o stringa di cifre), array con
+                         chiave 'ID'/'id' (formato "Array" di ACF) o WP_Post di tipo
+                         attachment. Altri valori valgono come id vuoto (vedi fallback).
+                         Formato consigliato nei campi ACF: "ID" (vedi sotto).
   - size (string|array)  Dimensione registrata o [larghezza, altezza]. Default 'large'.
   - sizes (string|null)  Attributo sizes personalizzato (es. "(min-width: 64rem) 50vw, 100vw").
                          Senza, WP calcola quello della dimensione richiesta.
@@ -14,6 +17,12 @@
   - fallback (bool)      Con id vuoto o non immagine stampa resources/images/fallback.svg
                          (alt "", 1280×720, lazy). false: non stampa nulla. Default true.
   - img-id (string|null) Attributo HTML id dell'<img>: `id` è già l'ID dell'allegato.
+
+  Perché "ID" come return_format dei campi immagine/gallery di ACF: il componente
+  ha bisogno solo dell'ID, da cui wp_get_attachment_image() ricava src, srcset,
+  sizes e alt; con "Array" ACF calcola a ogni lettura URL e metadati di tutte le
+  dimensioni, che qui non servono. L'array è accettato per i campi già esistenti.
+  La normalizzazione è \App\get_attachment_id() (app/helpers.php, con test Pest).
 
   Gli attributi extra (class, data-*, ...) vengono passati all'<img>. Il merge
   delle classi con "attachment-{size} size-{size}" vale solo con size stringa.
@@ -39,7 +48,7 @@
 ])
 
 @php
-  $id = (int) $id;
+  $id = \App\get_attachment_id($id);
 
   // Sull'<img> si possono stampare solo attributi scalari.
   $attrs = array_filter($attributes->getAttributes(), 'is_scalar');

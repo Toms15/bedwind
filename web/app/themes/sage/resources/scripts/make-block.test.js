@@ -12,6 +12,7 @@ import { afterEach, beforeEach, describe, test } from 'node:test';
 import { getIconSvg } from './icons.js';
 import {
   answersFromFlags,
+  askMissing,
   blockStrings,
   buildFiles,
   buildModule,
@@ -19,6 +20,8 @@ import {
   buildView,
   buildViewJs,
   commentText,
+  GALLERY_SIZES,
+  HELP,
   formatFiles,
   createKeyFactory,
   existingKeys,
@@ -40,6 +43,7 @@ import {
   validateSlug,
   validateText,
   writeFiles,
+  SUB_FIELD_TYPES,
 } from './make-block.js';
 
 let dir;
@@ -484,6 +488,26 @@ describe('generazione dei file', () => {
     // Lo slug ora esiste (cartella e field group): un secondo giro viene rifiutato.
     await assert.rejects(main([...argv, '--yes'], options), /già usato/);
   });
+
+  test('prossimi passi: testo alternativo degli allegati solo con image o gallery', async () => {
+    const run = async (title, fields) => {
+      const lines = [];
+
+      await main(
+        [
+          ...['--title', title, '--description', 'Prova', '--category', 'commons'],
+          ...['--icon', 'cube', '--fields', fields, '--no-translate', '--yes'],
+        ],
+        { dir, interactive: false, log: (line) => lines.push(line) },
+      );
+
+      return lines.join('\n');
+    };
+
+    assert.match(await run('Con foto', 'Foto:image'), /testo alternativo/);
+    assert.match(await run('Con galleria', 'Voci:repeater[Album:gallery]'), /testo alternativo/);
+    assert.doesNotMatch(await run('Senza foto', 'Testo:text'), /testo alternativo/);
+  });
 });
 
 describe('traduzioni', () => {
@@ -612,16 +636,19 @@ describe('testi nei commenti generati', () => {
   });
 
   test('caratteri di controllo rifiutati in titolo, descrizione ed etichette', () => {
-    assert.equal(validateText('Card', 'Il titolo'), undefined);
-    assert.match(validateText('Ca\nrd', 'Il titolo'), /caratteri di controllo/);
+    assert.equal(validateText('Card', 'titolo'), undefined);
+    assert.equal(
+      validateText('Ca\nrd', 'titolo'),
+      'Caratteri di controllo non ammessi (titolo): usa testo su una riga, senza a capo né tabulazioni.',
+    );
     assert.throws(
       () =>
         answersFromFlags({ title: 'A\u0000b', description: 'd\te', category: 'commons' }, { dir }),
-      /--title contiene caratteri di controllo[\s\S]*--description contiene/,
+      /non ammessi \(--title\)[\s\S]*non ammessi \(--description\)/,
     );
     assert.match(
       validateFields(parseFieldsSpec('Eti\u001bchetta=x:text')).join('\n'),
-      /etichetta contiene caratteri di controllo/,
+      /Caratteri di controllo non ammessi \(etichetta\)/,
     );
   });
 });
@@ -686,5 +713,190 @@ describe('titoli, slug, icone e scrittura', () => {
       fs.readFileSync(path.join(dir, 'resources/views/modules/prova.blade.php'), 'utf8'),
       'esistente',
     );
+  });
+});
+
+describe('campo gallery', () => {
+  const block = () => ({
+    title: 'Prova galleria',
+    slug: 'prova-galleria',
+    description: 'd',
+    category: 'commons',
+    icon: 'images',
+    keywords: [],
+    fields: parseFieldsSpec(
+      'Titolo=title:text!,Galleria:gallery,Voci:repeater[Testo:text!,Foto:gallery]',
+    ),
+    viewJs: false,
+    style: false,
+  });
+
+  test('--fields: tipo gallery (e alias galleria) anche nel repeater', () => {
+    const fields = parseFieldsSpec('Galleria:gallery!,Foto:galleria,Voci:repeater[Foto:gallery]');
+
+    assert.deepEqual(
+      fields.map(({ name, type, required }) => [name, type, required]),
+      [
+        ['galleria', 'gallery', true],
+        ['foto', 'gallery', false],
+        ['voci', 'repeater', false],
+      ],
+    );
+    assert.equal(fields[2].subFields[0].type, 'gallery');
+    assert.deepEqual(validateFields(fields), []);
+    assert.ok(SUB_FIELD_TYPES.includes('gallery'));
+    assert.match(HELP, /Galleria:gallery/);
+    assert.match(HELP, /Tipi: .*gallery/);
+  });
+
+  test('image_id è riservato: è la variabile del ciclo della gallery nel modulo', () => {
+    assert.match(validateFields(parseFieldsSpec('Img=image_id:image')).join('\n'), /riservato/);
+  });
+
+  test('field group: return_format id, preview_size e library come image, min/max vuoti', () => {
+    const files = buildFiles(block(), { dir });
+    const group = JSON.parse(files.find((file) => file.path.startsWith('acf-json/')).content);
+    const gallery = group.fields.find(({ name }) => name === 'galleria');
+    const repeater = group.fields.find(({ name }) => name === 'voci');
+    const image = JSON.parse(
+      buildFiles({ ...block(), fields: parseFieldsSpec('Immagine:image') }, { dir }).find((file) =>
+        file.path.startsWith('acf-json/'),
+      ).content,
+    ).fields[0];
+
+    assert.equal(gallery.type, 'gallery');
+    assert.equal(gallery.return_format, 'id');
+    assert.equal(gallery.library, image.library);
+    assert.equal(gallery.preview_size, image.preview_size);
+    assert.equal(gallery.min, '');
+    assert.equal(gallery.max, '');
+    assert.equal(gallery.insert, 'append');
+    // La gallery non supporta i binding: ACF non salva allow_in_bindings.
+    assert.equal(Object.hasOwn(gallery, 'allow_in_bindings'), false);
+
+    const sub = repeater.sub_fields.find(({ name }) => name === 'foto');
+
+    assert.equal(sub.type, 'gallery');
+    assert.equal(sub.return_format, 'id');
+    assert.equal(sub.parent_repeater, repeater.key);
+    // Una gallery fra i sotto-campi rende il repeater a blocchi, non a tabella.
+    assert.equal(repeater.layout, 'block');
+  });
+
+  test('view: array di ID interi di immagini, array vuoto altrimenti', () => {
+    const view = buildView(block());
+
+    assert.ok(
+      view.includes(
+        '$galleria = is_array($galleria) ? array_values(array_filter(array_map(\\App\\get_attachment_id(...), $galleria), fn (int $id) => $id && wp_attachment_is_image($id))) : [];',
+      ),
+      view,
+    );
+    assert.ok(
+      view.includes(
+        "'foto' => is_array($row['foto'] ?? null) ? array_values(array_filter(array_map(\\App\\get_attachment_id(...), $row['foto']), fn (int $id) => $id && wp_attachment_is_image($id))) : [],",
+      ),
+      view,
+    );
+  });
+
+  test('view: il campo image passa da get_attachment_id() come la gallery', () => {
+    const view = buildView({
+      slug: 'prova',
+      title: 'Prova',
+      fields: parseFieldsSpec('Foto:image,Voci:repeater[Testo:text!,Scatto:image]'),
+    });
+
+    assert.ok(view.includes('$foto = \\App\\get_attachment_id($foto);'), view);
+    assert.ok(view.includes("'scatto' => \\App\\get_attachment_id($row['scatto'] ?? null),"), view);
+    assert.ok(!view.includes('is_numeric'), view);
+  });
+
+  test('modulo: griglia di <x-ui.image> con sizes coerente con le colonne', () => {
+    const module = buildModule(block());
+
+    assert.match(module, /@var list<int> \$galleria ID delle immagini di "Galleria"/);
+    assert.match(module, /@var list<array\{testo: string, foto: list<int>\}> \$voci/);
+    assert.equal(
+      module.split('<div class="mb-6 grid grid-cols-2 gap-4 md:grid-cols-3">').length - 1,
+      2,
+    );
+    assert.ok(module.includes('@foreach ($galleria as $image_id)'));
+    assert.ok(module.includes("@foreach ($item['foto'] as $image_id)"));
+    assert.ok(
+      module.includes(
+        `<x-ui.image :id="$image_id" size="medium_large" sizes="${GALLERY_SIZES.block}" class="h-auto w-full" />`,
+      ),
+    );
+    assert.ok(
+      module.includes(
+        `<x-ui.image :id="$image_id" size="medium_large" sizes="${GALLERY_SIZES.item}" class="h-auto w-full" />`,
+      ),
+    );
+  });
+
+  test('i file con la gallery passano dalla formattazione', async () => {
+    const files = await formatFiles(buildFiles(block(), { dir }), dir);
+
+    assert.match(files[2].content, /sizes="\(min-width: 48rem\) 33vw, 50vw"/);
+  });
+});
+
+describe('parole chiave', () => {
+  test('--keywords: caratteri di controllo rifiutati come in titolo ed etichette', () => {
+    const flags = { title: 'Prova', description: 'd', category: 'commons' };
+
+    assert.deepEqual(
+      answersFromFlags({ ...flags, keywords: 'Uno, due,uno' }, { dir }).answers.keywords,
+      ['uno', 'due'],
+    );
+
+    for (const keywords of ['a,\u001b[31mrosso', 'a\tb', 'a\nb', 'a\u2028b']) {
+      assert.throws(
+        () => answersFromFlags({ ...flags, keywords }, { dir }),
+        /Caratteri di controllo non ammessi \(--keywords\)/,
+        JSON.stringify(keywords),
+      );
+    }
+  });
+
+  test('domanda interattiva delle parole chiave: stessa validazione dei flag', async () => {
+    const asked = [];
+    const prompts = {
+      isCancel: () => false,
+      log: { step() {}, info() {}, warn() {} },
+      text: async (options) => {
+        asked.push(options);
+
+        return 'Uno, due';
+      },
+    };
+    const answers = await askMissing(
+      prompts,
+      {
+        title: 'Prova',
+        slug: 'prova',
+        description: 'd',
+        category: 'commons',
+        icon: 'house',
+        fields: [],
+        viewJs: false,
+        style: false,
+      },
+      { dir },
+    );
+
+    assert.equal(asked.length, 1);
+    assert.match(asked[0].message, /Parole chiave/);
+    assert.deepEqual(answers.keywords, ['uno', 'due']);
+    assert.equal(asked[0].validate('galleria, foto'), undefined);
+
+    for (const keywords of ['a,\u001b[31mrosso', 'a\tb', 'a\nb', 'a\u2028b']) {
+      assert.equal(
+        asked[0].validate(keywords),
+        'Caratteri di controllo non ammessi (parole chiave): usa testo su una riga, senza a capo né tabulazioni.',
+        JSON.stringify(keywords),
+      );
+    }
   });
 });

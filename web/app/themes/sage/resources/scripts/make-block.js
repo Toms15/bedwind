@@ -57,6 +57,7 @@ export const FIELD_TYPES = {
   textarea: 'Area di testo',
   wysiwyg: 'Editor WYSIWYG',
   image: 'Immagine',
+  gallery: 'Galleria',
   link: 'Link',
   true_false: 'Vero/falso',
   select: 'Select',
@@ -64,13 +65,22 @@ export const FIELD_TYPES = {
 };
 
 /** Tipi ammessi come sotto-campi di un repeater (niente select né repeater annidati). */
-export const SUB_FIELD_TYPES = ['text', 'textarea', 'wysiwyg', 'image', 'link', 'true_false'];
+export const SUB_FIELD_TYPES = [
+  'text',
+  'textarea',
+  'wysiwyg',
+  'image',
+  'gallery',
+  'link',
+  'true_false',
+];
 
 /** Alias accettati in --fields, oltre ai tipi ACF. */
 const TYPE_ALIASES = {
   testo: 'text',
   editor: 'wysiwyg',
   immagine: 'image',
+  galleria: 'gallery',
   bool: 'true_false',
   boolean: 'true_false',
   'true-false': 'true_false',
@@ -104,6 +114,7 @@ export const RESERVED_NAMES = new Set([
   'rows',
   'row',
   'item',
+  'image_id',
   'attributes',
   'slot',
   'loop',
@@ -126,12 +137,12 @@ const CONTROL_CHARS = /[\u0000-\u001f\u007f-\u009f\u2028\u2029]/;
  * Valida un testo libero (titolo, etichetta, …): niente caratteri di controllo.
  *
  * @param {string} value
- * @param {string} what Nome del valore nel messaggio (es. "Il titolo").
+ * @param {string} what Nome del valore nel messaggio, senza articolo (es. "titolo", "--title").
  * @returns {string|undefined}
  */
 export function validateText(value, what) {
   return CONTROL_CHARS.test(String(value ?? ''))
-    ? `${what} contiene caratteri di controllo (a capo, tabulazioni, …): usa testo su una riga.`
+    ? `Caratteri di controllo non ammessi (${what}): usa testo su una riga, senza a capo né tabulazioni.`
     : undefined;
 }
 
@@ -280,8 +291,8 @@ export function normalizeType(type) {
  * - select: scelte fra tonde separate da `|`, come "Etichetta" o "valore=Etichetta";
  * - repeater: sotto-campi fra quadre, con lo stesso formato e i tipi di SUB_FIELD_TYPES.
  *
- * Esempio: "Titolo=title:text!,Immagine:image,cta:link,Stile:select(Chiaro|Scuro),
- * Voci:repeater[Testo:text!,Icona:image]".
+ * Esempio: "Titolo=title:text!,Immagine:image,Galleria:gallery,cta:link,
+ * Stile:select(Chiaro|Scuro),Voci:repeater[Testo:text!,Icona:image,Foto:gallery]".
  *
  * Restituisce i campi senza validarli (vedi validateFields()).
  *
@@ -388,9 +399,9 @@ export function validateFields(fields, { topLevel = true } = {}) {
     }
 
     for (const [value, what] of [
-      [field.label, "l'etichetta"],
-      [field.instructions, 'le istruzioni'],
-      ...(field.choices ?? []).map((choice) => [choice.label, `la scelta "${choice.value}"`]),
+      [field.label, 'etichetta'],
+      [field.instructions, 'istruzioni'],
+      ...(field.choices ?? []).map((choice) => [choice.label, `scelta "${choice.value}"`]),
     ]) {
       const textError = validateText(value, what);
 
@@ -747,6 +758,24 @@ function typeSettings(field, key, nextKey) {
         allow_in_bindings: 0,
         preview_size: 'medium',
       };
+    case 'gallery':
+      // Come image (return_format id, library, preview_size); min/max vuoti = nessun limite.
+      // La gallery non supporta i binding: niente allow_in_bindings (come salva ACF).
+      return {
+        return_format: 'id',
+        library: 'all',
+        min: '',
+        max: '',
+        min_width: '',
+        min_height: '',
+        min_size: '',
+        max_width: '',
+        max_height: '',
+        max_size: '',
+        mime_types: '',
+        insert: 'append',
+        preview_size: 'medium',
+      };
     case 'link':
       return { return_format: 'array', allow_in_bindings: 0 };
     case 'true_false':
@@ -773,7 +802,9 @@ function typeSettings(field, key, nextKey) {
         save_options: 0,
       };
     case 'repeater': {
-      const wide = field.subFields.some((sub) => ['textarea', 'wysiwyg'].includes(sub.type));
+      const wide = field.subFields.some((sub) =>
+        ['textarea', 'wysiwyg', 'gallery'].includes(sub.type),
+      );
 
       return {
         layout: wide || field.subFields.length > 3 ? 'block' : 'table',
@@ -901,7 +932,12 @@ function readExpression(field, value, check = value) {
     case 'wysiwyg':
       return `is_string(${check}) ? ${value} : ''`;
     case 'image':
-      return `is_numeric(${check}) ? (int) ${value} : 0`;
+      // Come la gallery: regge anche il formato Array/oggetto di ACF.
+      return `\\App\\get_attachment_id(${check})`;
+    case 'gallery':
+      // ID > 0 di allegati che sono immagini; get_attachment_id() tollera anche
+      // il formato Array/oggetto, se il return_format viene cambiato in ACF.
+      return `is_array(${check}) ? array_values(array_filter(array_map(\\App\\get_attachment_id(...), ${value}), fn (int $id) => $id && wp_attachment_is_image($id))) : []`;
     case 'link':
       return `$to_link(${check})`;
     case 'true_false':
@@ -921,6 +957,8 @@ function phpDocType(field) {
   switch (field.type) {
     case 'image':
       return 'int';
+    case 'gallery':
+      return 'list<int>';
     case 'link':
       return 'array{url: string, target: string, label: string}|null';
     case 'true_false':
@@ -940,6 +978,8 @@ const fieldNote = (field) => {
   switch (field.type) {
     case 'image':
       return `ID dell'immagine "${label}" (0 se assente)`;
+    case 'gallery':
+      return `ID delle immagini di "${label}" (vuoto se non ce ne sono)`;
     case 'link':
       return `Link "${label}" (null se l'URL non è valido)`;
     case 'repeater':
@@ -1065,8 +1105,21 @@ export function buildView({ slug, title: rawTitle, fields }) {
   ].join('\n');
 }
 
-/** Markup di un campo nel modulo; `value` è l'espressione Blade del valore. */
-function fieldMarkup(field, value, { heading, indent }) {
+/**
+ * Attributo sizes delle immagini di una gallery, coerente con le colonne della
+ * griglia (2, poi 3 da md). Nel repeater la voce occupa già 1/2 (md) o 1/3 (lg)
+ * della larghezza, quindi le immagini sono più piccole.
+ */
+export const GALLERY_SIZES = {
+  block: '(min-width: 48rem) 33vw, 50vw',
+  item: '(min-width: 64rem) 11vw, (min-width: 48rem) 17vw, 50vw',
+};
+
+/**
+ * Markup di un campo nel modulo; `value` è l'espressione Blade del valore,
+ * `nested` indica un sotto-campo del repeater.
+ */
+function fieldMarkup(field, value, { heading, indent, nested = false }) {
   const pad = ' '.repeat(indent);
 
   switch (field.type) {
@@ -1096,6 +1149,16 @@ function fieldMarkup(field, value, { heading, indent }) {
       return [
         `${pad}@if (${value})`,
         `${pad}  <x-ui.image :id="${value}" class="mb-6 h-auto w-full" />`,
+        `${pad}@endif`,
+      ];
+    case 'gallery':
+      return [
+        `${pad}@if (${value})`,
+        `${pad}  <div class="mb-6 grid grid-cols-2 gap-4 md:grid-cols-3">`,
+        `${pad}    @foreach (${value} as $image_id)`,
+        `${pad}      <x-ui.image :id="$image_id" size="medium_large" sizes="${nested ? GALLERY_SIZES.item : GALLERY_SIZES.block}" class="h-auto w-full" />`,
+        `${pad}    @endforeach`,
+        `${pad}  </div>`,
         `${pad}@endif`,
       ];
     case 'link':
@@ -1158,6 +1221,7 @@ export function buildModule({ slug, title: rawTitle, fields, viewJs = false }) {
       const items = field.subFields.flatMap((sub) =>
         fieldMarkup(sub, `$item['${sub.name}']`, {
           indent: 10,
+          nested: true,
           heading: sub === titleSub ? { tag: itemTag, class: 'mb-2' } : undefined,
         }),
       );
@@ -1416,9 +1480,10 @@ Uso: npm run make:block [-- <flag>]
   --category <slug>      Categoria del tema (app/blocks.php)
   --icon <slug>          Icona Phosphor, peso fill ("" = casuale fra quelle non usate)
   --keywords <a,b>       Parole chiave in italiano (default: dal titolo)
-  --fields <spec>        Campi ACF, es. "Titolo=title:text!,Immagine:image,cta:link,
-                         Stile:select(Chiaro|Scuro),Voci:repeater[Testo:text!,Icona:image]"
-                         (<Etichetta>[=<name>]:<tipo>[!]; "" = nessun campo)
+  --fields <spec>        Campi ACF, es. "Titolo=title:text!,Immagine:image,Galleria:gallery,
+                         cta:link,Stile:select(Chiaro|Scuro),Voci:repeater[Testo:text!,Icona:image]"
+                         (<Etichetta>[=<name>]:<tipo>[!]; "" = nessun campo;
+                         image e gallery restituiscono ID)
   --view-js, --no-view-js  Crea (o no) view.js
   --style, --no-style      Crea (o no) style.css
   -y, --yes              Salta la conferma finale
@@ -1427,6 +1492,7 @@ Uso: npm run make:block [-- <flag>]
   -h, --help             Questo aiuto
 
 Tipi: ${Object.keys(FIELD_TYPES).join(', ')} (sotto-campi del repeater: ${SUB_FIELD_TYPES.join(', ')}).
+Titolo, descrizione, parole chiave ed etichette: testo su una riga, senza caratteri di controllo.
 Senza un terminale interattivo servono almeno --title, --description e --category.
 Un valore che inizia con "-" va scritto con "=": --title="-…".`;
 
@@ -1530,6 +1596,12 @@ export function answersFromFlags(flags, { dir = themeDir, interactive = false, r
   }
 
   if (flags.keywords !== undefined || (answers.title && !interactive)) {
+    const textError = flags.keywords !== undefined && validateText(flags.keywords, '--keywords');
+
+    if (textError) {
+      errors.push(textError);
+    }
+
     answers.keywords =
       flags.keywords !== undefined ? parseKeywords(flags.keywords) : defaultKeywords(answers.title);
   }
@@ -1612,7 +1684,7 @@ async function askField(prompts, { taken, topLevel }) {
       prompts.text({
         message: 'Etichetta (in italiano)',
         validate: (value) =>
-          value?.trim() ? validateText(value, "L'etichetta") : "L'etichetta è obbligatoria.",
+          value?.trim() ? validateText(value, 'etichetta') : "L'etichetta è obbligatoria.",
       }),
     ),
   );
@@ -1708,7 +1780,7 @@ async function askField(prompts, { taken, topLevel }) {
  * @param {{ dir?: string }} [options]
  * @returns {Promise<BlockAnswers>}
  */
-async function askMissing(prompts, answers, { dir = themeDir } = {}) {
+export async function askMissing(prompts, answers, { dir = themeDir } = {}) {
   const slugs = existingSlugs(dir);
 
   answers.title ??= capitalize(
@@ -1718,7 +1790,7 @@ async function askMissing(prompts, answers, { dir = themeDir } = {}) {
         message: 'Titolo del blocco (in italiano)',
         placeholder: 'es. Card in evidenza',
         validate: (value) =>
-          value?.trim() ? validateText(value, 'Il titolo') : 'Il titolo è obbligatorio.',
+          value?.trim() ? validateText(value, 'titolo') : 'Il titolo è obbligatorio.',
       }),
     ),
   );
@@ -1748,7 +1820,7 @@ async function askMissing(prompts, answers, { dir = themeDir } = {}) {
       prompts.text({
         message: 'Descrizione (in italiano)',
         validate: (value) =>
-          value?.trim() ? validateText(value, 'La descrizione') : 'La descrizione è obbligatoria.',
+          value?.trim() ? validateText(value, 'descrizione') : 'La descrizione è obbligatoria.',
       }),
     ),
   );
@@ -1798,6 +1870,7 @@ async function askMissing(prompts, answers, { dir = themeDir } = {}) {
         placeholder: suggested,
         defaultValue: suggested,
         initialValue: suggested,
+        validate: (input) => validateText(input, 'parole chiave'),
       }),
     );
 
@@ -2087,6 +2160,11 @@ export async function main(argv, { dir = themeDir, interactive, log = console.lo
       ? ['Riavvia npm run dev: i nuovi asset sono entry di Vite.']
       : []),
     'Il field group esiste solo in acf-json (come gli altri): in ACF → Gruppi di campi appare come "Sincronizzazione disponibile"; sincronizzarlo non è necessario.',
+    ...(usesType(answers.fields, 'image') || usesType(answers.fields, 'gallery')
+      ? [
+          'Compila il testo alternativo degli allegati usati nei campi image e gallery (Media → Dettagli allegato): il blocco lo prende da lì.',
+        ]
+      : []),
     'Logica non banale? Spostala in app/ con un test Pest (CONVENTIONS, checklist punto 7).',
     'La styleguide mostra i componenti: aggiornala solo se hai creato un nuovo componente.',
     'npm run lint, composer lint, poi inserisci il blocco in una pagina e verifica editor e frontend.',

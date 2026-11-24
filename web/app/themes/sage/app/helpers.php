@@ -127,3 +127,41 @@ function get_trimmed_excerpt(int $num, int|\WP_Post|null $post = null): string
 
     return wp_trim_words($text, $num, '…');
 }
+
+/**
+ * Ricava l'ID di un allegato dai formati di ritorno dei campi immagine di ACF.
+ *
+ * Accetta:
+ *  - un intero (ID, formato "id" di ACF), restituito così com'è se positivo;
+ *  - una stringa di sole cifre (es. un valore salvato come testo, "42"),
+ *    purché rientri negli int: "99999999999999999999" restituisce 0;
+ *  - un array con chiave 'ID' o 'id' (formato "array" di ACF), con uno dei valori sopra;
+ *  - un WP_Post di tipo attachment (formato "object" delle gallery).
+ * Qualsiasi altro valore (null, '', 0, negativi, float, bool, stringhe come
+ * "42abc", array senza ID, post che non sono allegati) restituisce 0.
+ *
+ * Non verifica che l'allegato esista né che sia un'immagine:
+ * lo fa chi stampa l'immagine (wp_attachment_is_image()).
+ *
+ * @param  mixed  $value  Il valore del campo.
+ * @return int L'ID dell'allegato, 0 se non ricavabile.
+ */
+function get_attachment_id(mixed $value): int
+{
+    if ($value instanceof \WP_Post) {
+        return $value->post_type === 'attachment' ? max(0, (int) $value->ID) : 0;
+    }
+
+    if (is_array($value)) {
+        $value = $value['ID'] ?? $value['id'] ?? null;
+    }
+
+    if (is_string($value) && preg_match('/^\d+$/', trim($value))) {
+        // Senza zeri iniziali, per confrontarla con il suo cast: una stringa
+        // fuori dal range degli int diventerebbe PHP_INT_MAX, non il suo valore.
+        $digits = ltrim(trim($value), '0');
+        $value = $digits !== '' && (string) (int) $digits === $digits ? (int) $digits : 0;
+    }
+
+    return is_int($value) && $value > 0 ? $value : 0;
+}

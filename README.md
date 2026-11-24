@@ -260,13 +260,14 @@ npm run dev      # dev server Vite con hot reload
 npm run build    # build di produzione in public/build
 npm run lint     # ESLint, Stylelint, blade-formatter --check-formatted, prettier --check
 npm run format   # Prettier + blade-formatter (scrive i file)
+npm run make:block         # wizard per un nuovo blocco ACF (domande o flag, vedi CONVENTIONS)
 npm run blocks:manifest    # rigenera il manifest dei blocchi dai block.json
 npm run icons              # rigenera il manifest delle icone Phosphor usate
 npm run translate          # rigenera sage.pot e aggiorna i file .po
 npm run translate:compile  # compila .mo, .l10n.php e .json
 ```
 
-I singoli script `lint:*`, `format:*`, `blocks:*`, `icons:*`, `test:js` e `translate:*` sono descritti nel README del tema.
+I singoli script `lint:*`, `format:*`, `make:block`, `blocks:*`, `icons:*`, `test:js` e `translate:*` sono descritti nel README del tema.
 
 ### Qualità PHP (dalla root del progetto)
 

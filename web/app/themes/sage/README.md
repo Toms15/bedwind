@@ -4,7 +4,7 @@ Tema starter WordPress basato su [Sage](https://roots.io/sage/) 11 di [Roots](ht
 
 ## Questo tema
 
-Questo README riguarda lo **sviluppo del tema**. Il setup del progetto (Herd, credenziali ACF Pro, `.env`, ambienti, CI, deploy) è nel [README del progetto](../../../../README.md); le convenzioni di codice (blocchi, i18n, PHP, escaping, componenti, styleguide, rinomina del tema) e la **checklist per un nuovo blocco** sono in [CONVENTIONS.md](CONVENTIONS.md).
+Questo README riguarda lo **sviluppo del tema**. Il setup del progetto (Herd, credenziali ACF Pro, `.env`, ambienti, CI, deploy) è nel [README del progetto](../../../../README.md); le convenzioni di codice (blocchi, i18n, PHP, escaping, componenti, styleguide, rinomina del tema) e la **checklist per un nuovo blocco** (che parte da `npm run make:block`) sono in [CONVENTIONS.md](CONVENTIONS.md).
 
 Tutti i comandi seguenti si eseguono da questa cartella (`web/app/themes/sage`), salvo dove indicato.
 
@@ -32,15 +32,16 @@ Tutti i comandi seguenti si eseguono da questa cartella (`web/app/themes/sage`),
 
 ## Build
 
-| Script                          | Cosa fa                                                                                  |
-| ------------------------------- | ---------------------------------------------------------------------------------------- |
-| `npm run dev`                   | Dev server Vite con hot reload (HTTPS sulla porta 5173 con il certificato di Herd)       |
-| `npm run build`                 | Build di produzione in `public/build/` (asset con hash, `manifest.json`, theme.json)     |
-| `npm run blocks:manifest`       | Rigenera `resources/views/blocks/blocks-manifest.php` dai file `block.json` (versionato) |
-| `npm run blocks:manifest:check` | Termina con un errore se il manifest non è aggiornato, senza scriverlo (usato in CI)     |
-| `npm run icons`                 | Rigenera `resources/icons/phosphor.php` con le icone Phosphor usate (versionato)         |
-| `npm run icons:check`           | Termina con un errore se il manifest delle icone non è aggiornato (usato in CI)          |
-| `npm run test:js`               | Test degli script Node in `resources/scripts/` (`node --test`, usato in CI)              |
+| Script                          | Cosa fa                                                                                                                             |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`                   | Dev server Vite con hot reload (HTTPS sulla porta 5173 con il certificato di Herd)                                                  |
+| `npm run build`                 | Build di produzione in `public/build/` (asset con hash, `manifest.json`, theme.json)                                                |
+| `npm run blocks:manifest`       | Rigenera `resources/views/blocks/blocks-manifest.php` dai file `block.json` (versionato)                                            |
+| `npm run blocks:manifest:check` | Termina con un errore se il manifest non è aggiornato, senza scriverlo (usato in CI)                                                |
+| `npm run icons`                 | Rigenera `resources/icons/phosphor.php` con le icone Phosphor usate (versionato)                                                    |
+| `npm run icons:check`           | Termina con un errore se il manifest delle icone non è aggiornato (usato in CI)                                                     |
+| `npm run test:js`               | Test degli script Node in `resources/scripts/` (`node --test`, usato in CI)                                                         |
+| `npm run make:block`            | Wizard per un nuovo blocco ACF: file, field group, traduzioni e manifest ([CONVENTIONS](CONVENTIONS.md#nuovo-blocco-con-il-wizard)) |
 
 - `npm run dev` scrive `public/hot` e lo rimuove quando Vite si ferma: finché il file esiste il tema carica gli asset dal dev server, altrimenti da `public/build/`. Senza nessuno dei due il sito non ha CSS/JS.
 - Entry point (`vite.config.js`): `resources/css/app.css`, `resources/js/app.js` (frontend, `@vite` in `layouts/app.blade.php`), `resources/css/editor.css`, `resources/js/editor.js` (editor a blocchi, `app/setup.php`), `resources/css/styleguide.css` (solo su `/styleguide/` in development), più gli eventuali `resources/views/blocks/*/view.js` e `style.css` di ogni blocco (trovati con un glob all'avvio di Vite, caricati solo nelle pagine che mostrano il blocco: vedi [CONVENTIONS](CONVENTIONS.md#asset-dei-blocchi)). Alias: `@scripts`, `@styles`, `@fonts`, `@images`.

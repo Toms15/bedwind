@@ -4,6 +4,7 @@ Convenzioni adottate per questo tema. Gli strumenti (build, lint, qualità PHP, 
 
 - [Blocchi ACF](#blocchi-acf)
 - [Asset dei blocchi](#asset-dei-blocchi)
+- [Nuovo blocco con il wizard](#nuovo-blocco-con-il-wizard)
 - [Checklist per un nuovo blocco](#checklist-per-un-nuovo-blocco)
 - [Internazionalizzazione](#internazionalizzazione)
 - [PHP](#php)
@@ -92,11 +93,54 @@ La maggior parte dei blocchi non ha bisogno di asset propri: bastano le classi T
 
 Entrambi sono entry di Vite (`vite.config.js` cerca `resources/views/blocks/*/{view.js,style.css}` con un glob all'avvio: dopo aver aggiunto il primo asset di un blocco riavvia `npm run dev`, poi esegui `npm run build`) e vengono caricati da `App\Blocks\BlockAssets`, chiamato da `BlockRenderer::render()`, solo quando la view del blocco viene renderizzata nel frontend: le pagine senza il blocco non li caricano, e nell'editor (placeholder) non viene caricato nulla. Con il dev server arrivano da Vite (una modifica ricarica la pagina); un asset assente dal manifest della build viene saltato.
 
+## Nuovo blocco con il wizard
+
+Un nuovo blocco parte da `npm run make:block` (`resources/scripts/make-block.js`, test in `make-block.test.js`), che genera i file seguendo queste convenzioni. Chiede solo i valori non passati come flag:
+
+| Domanda / flag                                     | Note                                                                                                                                                                  |
+| -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--title`                                          | Titolo in italiano                                                                                                                                                    |
+| `--slug`                                           | Proposto dal titolo (kebab-case); rifiutato se esiste già una cartella in `resources/views/blocks/` o un field group con location `acf/<slug>`: niente sovrascritture |
+| `--description`, `--keywords`                      | In italiano; le parole chiave sono proposte dal titolo (separate da virgola)                                                                                          |
+| `--category`                                       | Una delle categorie registrate in `app/blocks.php` (lette dal file)                                                                                                   |
+| `--icon`                                           | Slug [Phosphor](https://phosphoricons.com), peso **fisso `fill`**, con suggerimenti per i refusi; vuoto = casuale fra le icone non usate dagli altri blocchi          |
+| `--fields`                                         | Campi ACF, uno alla volta nel wizard (vedi sotto)                                                                                                                     |
+| `--view-js`/`--no-view-js`, `--style`/`--no-style` | [Asset del blocco](#asset-dei-blocchi) facoltativi                                                                                                                    |
+| `--yes`, `--dry-run`, `--no-translate`             | Salta la conferma; mostra i file senza scriverli; non esegue gli script di traduzione                                                                                 |
+
+Senza un terminale interattivo (script, agenti, CI) non c'è nessuna domanda: servono almeno `--title`, `--description`, `--category` e `--yes` (o `--dry-run`), gli altri valori prendono il default. Aiuto: `npm run make:block -- --help`. Un valore che inizia con `-` va passato nella forma `--title="-…"` (con `=`), altrimenti viene letto come un flag. Se dal titolo non si ricava uno slug (nessuna lettera a-z né cifra, es. `"€€"`), passalo con `--slug`. Titolo, descrizione, etichette e istruzioni sono testo su una riga: i caratteri di controllo (a capo, tabulazioni) vengono rifiutati. Un'icona già usata da un altro blocco è ammessa, con un avviso che dice quale blocco la usa.
+
+```bash
+npm run make:block -- --title "Card in evidenza" --description "Elenco di card con immagine" \
+  --category static-content --icon cards \
+  --fields "Titolo=title:text!,Card=cards:repeater[Titolo:text!,Immagine:image,Link:link]" --yes
+```
+
+**Formato di `--fields`**: campi separati da virgole, ognuno `<Etichetta>[=<name>]:<tipo>[!]`:
+
+- l'etichetta è in italiano; il `name` (snake_case, univoco) se omesso è l'etichetta convertita (`Testo del pulsante` → `testo_del_pulsante`);
+- `!` = obbligatorio;
+- tipi: `text`, `textarea`, `wysiwyg`, `image` (ID), `link`, `true_false`, `select`, `repeater`;
+- `select` con le scelte fra tonde separate da `|`: `Stile:select(Chiaro|Scuro)` o `Stile:select(chiaro=Chiaro|scuro=Scuro)`;
+- `repeater` con i sotto-campi fra quadre, con i tipi semplici (`text`, `textarea`, `wysiwyg`, `image`, `link`, `true_false`): `Voci:repeater[Testo:text!,Immagine:image]`;
+- un campo `title` (di tipo `text`) è il titolo del blocco: il wizard aggiunge anche `title_formatting` (come in _Solo testo_), il modulo lo stampa con `<x-ui.title :tag="$contents['title_tag']">` e il placeholder dell'editor lo mostra. Sono riservati i nomi del gruppo condiviso (`padding`, `margin`, …), `title_formatting`, `buttons` e le variabili della view (`block`, `data`, `settings`, `contents`, `spacings`, `section_style`, `to_link`, `row`, `rows`, `item`, …).
+
+**Cosa genera**:
+
+- `block.json` come al punto 1 della checklist, con `icon` = SVG Phosphor fill (`getIconSvg()`);
+- la view, che legge e valida ogni campo (`sanitize_url()` e target `_self`/`_blank` per i link, ID intero per le immagini, valori ammessi per i select, righe vuote del repeater scartate), e il modulo con `<section>`/`container`, `<x-ui.title>` (`title_tag` per il titolo; per il primo campo testo di ogni voce del repeater `next_heading`, oppure `title_tag` se il blocco non ha un campo `title`, così i livelli dei titoli non saltano), `<x-ui.image>` e `<x-ui.button>`. `true_false` e `select` non hanno markup: sono elencati in un commento come varianti da usare;
+- `acf-json/group_<id>.json` (_Blocco: <titolo>_, location `acf/<slug>`, ordine 0, chiavi nel formato di `uniqid()` univoche rispetto a quelle esistenti, `modified`), senza i campi del gruppo condiviso;
+- `view.js` (con `data-block="<slug>"` sulla `<section>`) e `style.css` minimi e commentati, se richiesti;
+- titolo ed etichette finiscono anche nei commenti dei file generati (docblock, `{{-- --}}`, `@var`): lì sono ridotti a una riga e senza le sequenze che chiudono un commento o aprono codice (`*/`, `?>`, `--}}`, `{{`, `{!!`, `@`, …), così nessun testo diventa codice eseguibile;
+- tutti i file formattati con Prettier e blade-formatter (un errore di formattazione interrompe il wizard senza scrivere nulla); i file sono scritti senza sovrascrivere e, se una scrittura fallisce, quelli già creati vengono rimossi; poi `npm run translate` e `translate:compile`, il manifest dei blocchi e quello delle icone. Il blocco è subito nell'inserter: i blocchi `acf/*` sono sempre ammessi (`allowed_block_types`).
+
+**Cosa resta manuale**: le traduzioni in `en_US.po` (il wizard elenca le stringhe con `msgstr` vuoto; poi `npm run translate:compile`), il markup e lo stile definitivi del modulo, le istruzioni, larghezze e opzioni dei campi in ACF, la logica non banale in `app/` con i test (punto 7), la verifica in una pagina (punto 10). L'icona dei blocchi già esistenti si riconosce confrontando il loro SVG con quelli del pacchetto (nessun metadato in più nel `block.json`).
+
 ## Checklist per un nuovo blocco
 
-Slug di esempio: `cards`. Dove possibile copia da `only-text`.
+Slug di esempio: `cards`. Il punto di partenza è `npm run make:block` ([wizard](#nuovo-blocco-con-il-wizard)), che esegue i punti 1, 2 (con il field group in `acf-json/`), 3, 4, 5, 6 e 8 (salvo la traduzione in `en_US.po`); la checklist resta il riferimento per controllare il risultato e per i blocchi scritti a mano, copiando da `only-text`.
 
-1. **Metadati**: crea `resources/views/blocks/cards/block.json` con `"name": "acf/cards"`, `title`/`description`/`keywords` in italiano, una `category` del tema, `"textdomain": "sage"`, `"apiVersion": 3`, `supports` con solo `"anchor": true` e `"align": false` (niente `supports.jsx`: i blocchi del tema non usano InnerBlocks e `blockVersion` 3 lo ignora), `acf.blockVersion: 3` e `acf.renderCallback: "App\\Blocks\\BlockRenderer::render"`. Non serve registrarlo in PHP: `app/blocks.php` registra i blocchi del manifest, che `npm run dev`/`npm run build` (o `npm run blocks:manifest`) rigenerano dai `block.json`. Committa anche `resources/views/blocks/blocks-manifest.php`.
+1. **Metadati**: crea `resources/views/blocks/cards/block.json` con `"name": "acf/cards"`, `title`/`description`/`keywords` in italiano, una `category` del tema, `icon` = SVG di un'icona Phosphor con peso `fill`, `"textdomain": "sage"`, `"apiVersion": 3`, `supports` con solo `"anchor": true` e `"align": false` (niente `supports.jsx`: i blocchi del tema non usano InnerBlocks e `blockVersion` 3 lo ignora), `acf.blockVersion: 3` e `acf.renderCallback: "App\\Blocks\\BlockRenderer::render"`. Non serve registrarlo in PHP: `app/blocks.php` registra i blocchi del manifest, che `npm run dev`/`npm run build` (o `npm run blocks:manifest`) rigenerano dai `block.json`. Committa anche `resources/views/blocks/blocks-manifest.php`.
 2. **Campi**: in locale, in _ACF → Gruppi di campi_, crea un gruppo con il nome del blocco (es. _Blocco: Card_) con etichette in italiano, posizione _Blocco è uguale a_ il nuovo blocco (`acf/cards`) e ordine 0. Spaziature e colori arrivano dal gruppo condiviso _Impostazioni blocco_: non aggiungerli. Per titolo, testo o pulsanti usa i nomi `title`, `title_formatting`, `content`, `buttons` (letti da `BlockRenderer::data()`). Il salvataggio scrive `acf-json/group_*.json`: committalo. Non cambiare mai chiave o nome dei campi già usati da blocchi salvati (vedi [Blocchi ACF](#blocchi-acf)).
 3. **View del blocco**: crea `resources/views/blocks/cards/cards.blade.php`: `BlockRenderer::data($block)`, lettura e validazione dei campi del blocco, sanificazione di URL (`sanitize_url()`) e colori (`sanitize_hex_color()`), poi `@include('modules.cards', [...])`.
 4. **Asset (facoltativi)**: solo se il blocco ha bisogno di JS o CSS propri, aggiungi `resources/views/blocks/cards/view.js` e/o `style.css` (vedi [Asset dei blocchi](#asset-dei-blocchi)), poi riavvia `npm run dev`.
@@ -194,7 +238,7 @@ Le icone sono quelle di [Phosphor](https://phosphoricons.com) (pacchetto npm `@p
 | Suggerimenti per un refuso     | —                                                               | `suggestIcons(query)`                                  |
 | Icona casuale                  | `random($exclude)`                                              | `randomIcon({ exclude, random })`                      |
 
-L'icona di un blocco va nel `block.json` come SVG inline (`"icon": "<svg …>…</svg>"`, formato accettato da ACF), quindi non passa dal manifest delle icone.
+L'icona di un blocco va nel `block.json` come SVG inline (`"icon": "<svg …>…</svg>"`, formato accettato da ACF), sempre con il peso `fill` (`getIconSvg(name, 'fill')`, come fa `npm run make:block`; `only-text` usa `article`), quindi non passa dal manifest delle icone.
 
 ## Styleguide
 

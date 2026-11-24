@@ -7,9 +7,9 @@ export default defineConfig([
 
   js.configs.recommended,
 
-  // Codice del browser (bundle Vite): frontend ed editor a blocchi.
+  // Codice del browser (bundle Vite): frontend, editor a blocchi e view.js dei blocchi.
   {
-    files: ['resources/js/**/*.js'],
+    files: ['resources/js/**/*.js', 'resources/views/blocks/*/view.js'],
     languageOptions: {
       globals: {
         ...globals.browser,

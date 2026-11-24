@@ -57,7 +57,8 @@
 | M44 | ✅ | README e CONVENTIONS in italiano, descrizione e topics del repo GitHub | Docs | 🟠 | S | M43 |
 | M45 | ✅ | File `config/environments/production.php` | Config | 🟠 | S | – |
 | M46 | ✅ | Set di icone Phosphor Icons (componente Blade, solo icone usate) | Frontend | 🟠 | M | M31 |
-| M47 | ⬜ | Flusso guidato per nuovi blocchi ACF e setup iniziale a domande e risposte | DX | 🟠 | L | M29, M30, M46 |
+| M47 | ✅ | Wizard per nuovi blocchi ACF (`npm run make:block`) | DX | 🟠 | M | M29, M30, M46 |
+| M48 | ⬜ | Setup guidato del progetto (`php bin/setup.php`) | DX | 🟠 | M | M47 |
 
 **Ordine consigliato.** Fase 0 (M01–M10), poi Fase 1 (M11–M16), Fase 2 (M17–M27), Fase 3 (M28–M34), Fase 4 (M35–M39).
 

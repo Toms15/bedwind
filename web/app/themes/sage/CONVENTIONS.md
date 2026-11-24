@@ -1,50 +1,50 @@
-# Conventions
+# Convenzioni
 
-Conventions decided for this theme. Tooling (build, lint, PHP quality, translation scripts) is described in the [README](README.md); the project setup in the [project README](../../../../README.md).
+Convenzioni adottate per questo tema. Gli strumenti (build, lint, qualità PHP, script di traduzione) sono descritti nel [README](README.md); il setup del progetto nel [README del progetto](../../../../README.md).
 
-- [ACF blocks](#acf-blocks)
-- [Block assets](#block-assets)
-- [New block checklist](#new-block-checklist)
-- [Internationalization](#internationalization)
+- [Blocchi ACF](#blocchi-acf)
+- [Asset dei blocchi](#asset-dei-blocchi)
+- [Checklist per un nuovo blocco](#checklist-per-un-nuovo-blocco)
+- [Internazionalizzazione](#internazionalizzazione)
 - [PHP](#php)
-- [Security and escaping](#security-and-escaping)
-- [Components](#components)
+- [Sicurezza ed escaping](#sicurezza-ed-escaping)
+- [Componenti](#componenti)
 - [Styleguide](#styleguide)
-- [Renaming the theme](#renaming-the-theme)
+- [Rinominare il tema](#rinominare-il-tema)
 
-## ACF blocks
+## Blocchi ACF
 
-Every block is an ACF block (`acf/<slug>`) split in three files, plus two optional assets. Reference implementation: the `only-text` block.
+Ogni blocco è un blocco ACF (`acf/<slug>`) diviso in tre file, più due asset facoltativi. Implementazione di riferimento: il blocco `only-text`.
 
-| File                                             | Role                                                                                    |
-| ------------------------------------------------ | --------------------------------------------------------------------------------------- |
-| `resources/views/blocks/<slug>/block.json`       | Block metadata, registered by `app/blocks.php` through the block manifest               |
-| `resources/views/blocks/<slug>/<slug>.blade.php` | Block view: prepares the data, no markup                                                |
-| `resources/views/modules/<slug>.blade.php`       | Module: the markup, receives ready-to-print data                                        |
-| `resources/views/blocks/<slug>/view.js`          | Optional: frontend script module, loaded only where the block is rendered               |
-| `resources/views/blocks/<slug>/style.css`        | Optional: frontend stylesheet, loaded only where the block is rendered                  |
-| `resources/views/blocks/blocks-manifest.php`     | Generated from every `block.json` (`npm run blocks:manifest`): versioned, never edit it |
+| File                                             | Ruolo                                                                                            |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| `resources/views/blocks/<slug>/block.json`       | Metadati del blocco, registrato da `app/blocks.php` tramite il manifest dei blocchi              |
+| `resources/views/blocks/<slug>/<slug>.blade.php` | View del blocco: prepara i dati, nessun markup                                                   |
+| `resources/views/modules/<slug>.blade.php`       | Modulo: il markup, riceve dati pronti da stampare                                                |
+| `resources/views/blocks/<slug>/view.js`          | Facoltativo: script module del frontend, caricato solo dove il blocco viene renderizzato         |
+| `resources/views/blocks/<slug>/style.css`        | Facoltativo: foglio di stile del frontend, caricato solo dove il blocco viene renderizzato       |
+| `resources/views/blocks/blocks-manifest.php`     | Generato da tutti i `block.json` (`npm run blocks:manifest`): versionato, non modificarlo a mano |
 
-**Block manifest**: `app/blocks.php` registers the blocks with `wp_register_block_types_from_metadata_collection()` (WordPress 6.8+), reading the metadata of every block from `blocks-manifest.php` instead of globbing the folders and decoding each `block.json` on every request (without the function or the manifest it falls back to one `register_block_type()` per folder). The registration still goes through `register_block_type_from_metadata()` and its filters, so ACF and the translations (`textdomain`) work as with `block.json`. Only the blocks listed in the manifest are registered and with the metadata it contains: Vite rewrites it at every build and, with `npm run dev`, whenever a `block.json` is added, changed or removed; otherwise run `npm run blocks:manifest`. Commit it with the `block.json` changes: CI fails if it is stale (`npm run blocks:manifest:check`).
+**Manifest dei blocchi**: `app/blocks.php` registra i blocchi con `wp_register_block_types_from_metadata_collection()` (WordPress 6.8+), leggendo i metadati di ogni blocco da `blocks-manifest.php` invece di cercare le cartelle con un glob e decodificare ogni `block.json` a ogni richiesta (senza la funzione o senza il manifest ripiega su un `register_block_type()` per cartella). La registrazione passa comunque da `register_block_type_from_metadata()` e dai suoi filtri, quindi ACF e le traduzioni (`textdomain`) funzionano come con `block.json`. Vengono registrati solo i blocchi elencati nel manifest, con i metadati che contiene: Vite lo riscrive a ogni build e, con `npm run dev`, ogni volta che un `block.json` viene aggiunto, modificato o rimosso; altrimenti esegui `npm run blocks:manifest`. Committalo insieme alle modifiche ai `block.json`: la CI fallisce se non è aggiornato (`npm run blocks:manifest:check`).
 
 **`block.json`**
 
-- `"name": "acf/<slug>"`, `"textdomain": "sage"`, `title`, `description` and `keywords` in Italian;
+- `"name": "acf/<slug>"`, `"textdomain": "sage"`, `title`, `description` e `keywords` in italiano;
 - `"supports": { "anchor": true, "align": false }`:
-  - `align: false`: the theme blocks do not use the block alignment (the section is already `w-full` with its `container`), so the alignment toolbar is hidden (ACF registers `align: true` by default);
-  - the theme blocks do not use InnerBlocks, so no `supports.jsx` in `block.json`: ACF still registers it as `true` by default, but with `blockVersion` 3 the editor ignores it, so do not declare it (not even as `false`). The render callback does not pass the InnerBlocks `$content` to the views; the ACF `content` field is unrelated and read with `get_field()`;
-- `"acf": { "blockVersion": 3, "renderCallback": "App\\Blocks\\BlockRenderer::render" }`: one render callback for every block. In the editor it shows the `<x-acf.placeholder>` (block name, description, title field) instead of a preview; on the frontend it renders the view `blocks.<slug>.<slug>` (`blocks/<slug>/<slug>.blade.php`) with `$block` (the file name must match the slug, the `acf/` prefix of `name` is stripped), nothing if the view is missing;
-- `category`: one of the theme categories registered in `app/blocks.php` (`carousels`, `dynamic-content`, `static-content`, `commons`, `heroes`, `dividers`), shown first in the inserter.
+  - `align: false`: i blocchi del tema non usano l'allineamento dei blocchi (la sezione è già `w-full` con il suo `container`), quindi la toolbar di allineamento è nascosta (ACF registra `align: true` di default);
+  - i blocchi del tema non usano InnerBlocks, quindi niente `supports.jsx` in `block.json`: ACF lo registra comunque come `true` di default, ma con `blockVersion` 3 l'editor lo ignora, quindi non va dichiarato (nemmeno come `false`). Il render callback non passa alle view il `$content` delle InnerBlocks; il campo ACF `content` è un'altra cosa e si legge con `get_field()`;
+- `"acf": { "blockVersion": 3, "renderCallback": "App\\Blocks\\BlockRenderer::render" }`: un unico render callback per tutti i blocchi. Nell'editor mostra il `<x-acf.placeholder>` (nome del blocco, descrizione, campo titolo) invece di un'anteprima; nel frontend renderizza la view `blocks.<slug>.<slug>` (`blocks/<slug>/<slug>.blade.php`) con `$block` (il nome del file deve coincidere con lo slug, il prefisso `acf/` di `name` viene tolto), e nulla se la view manca;
+- `category`: una delle categorie del tema registrate in `app/blocks.php` (`carousels`, `dynamic-content`, `static-content`, `commons`, `heroes`, `dividers`), mostrate per prime nell'inserter.
 
-ACF blocks are allowed in every editor; core blocks only in the post types of `sage/core_blocks_post_types` (`post`, `faq`) and in the widget/site editors; other blocks (e.g. third-party) only if listed by `sage/extra_blocks` (`app/blocks.php`).
+I blocchi ACF sono consentiti in ogni editor; i blocchi core solo nei post type di `sage/core_blocks_post_types` (`post`, `faq`) e negli editor dei widget e del sito; gli altri blocchi (es. di terze parti) solo se elencati da `sage/extra_blocks` (`app/blocks.php`).
 
-**Block view** (`blocks/<slug>/<slug>.blade.php`): a single `@php` block, wrapped in `{{-- blade-formatter-disable --}}`/`{{-- blade-formatter-enable --}}`, that
+**View del blocco** (`blocks/<slug>/<slug>.blade.php`): un unico blocco `@php`, racchiuso fra `{{-- blade-formatter-disable --}}`/`{{-- blade-formatter-enable --}}`, che
 
-- calls `\App\Blocks\BlockRenderer::data($block)`, which returns the common data grouped as `settings` (`id`, `background_color`, `text_color`), `contents` (`title`, `title_formatting`, `title_tag`, `next_heading`, `content`, `buttons`) and `spacings` (`padding`, `margin` as Tailwind classes);
-- reads and validates the block-specific fields (`get_field()`), sanitizes URLs and colors (see [Security and escaping](#security-and-escaping)) and drops invalid items;
-- is followed by `@include('modules.<slug>', [...])`, passing only what the module prints.
+- chiama `\App\Blocks\BlockRenderer::data($block)`, che restituisce i dati comuni raggruppati in `settings` (`id`, `background_color`, `text_color`), `contents` (`title`, `title_formatting`, `title_tag`, `next_heading`, `content`, `buttons`) e `spacings` (`padding`, `margin` come classi Tailwind);
+- legge e valida i campi specifici del blocco (`get_field()`), sanifica URL e colori (vedi [Sicurezza ed escaping](#sicurezza-ed-escaping)) e scarta le voci non valide;
+- è seguito da `@include('modules.<slug>', [...])`, che passa solo ciò che il modulo stampa.
 
-**Module** (`modules/<slug>.blade.php`): a `{{-- --}}` header with the `@var` of every variable, then:
+**Modulo** (`modules/<slug>.blade.php`): un'intestazione `{{-- --}}` con il `@var` di ogni variabile, poi:
 
 ```blade
 <section
@@ -66,118 +66,119 @@ ACF blocks are allowed in every editor; core blocks only in the post types of `s
 </section>
 ```
 
-- `id`: `settings.id` is the block **anchor** when set, otherwise the ACF block id (`block_…`), so every section has an id;
-- the outer `<section>` always has `w-full overflow-x-clip` plus the padding/margin classes of the block; the content sits in `<div class="container mx-auto px-6 3xl:px-0">`;
-- classes are composed with `@class(array_filter([...]))` (empty presets are dropped); a multi-line `@class` is wrapped in the blade-formatter markers, inside the tag, with the array at 2 spaces;
-- headings: the block title uses `<x-ui.title :tag="$contents['title_tag']">` (ACF `title_formatting`, h1–h6/p, default `h2`); child headings (subtitles, card titles) use `$contents['next_heading']`, from `\App\get_next_heading_level($title_tag)` (one level down, `p` after `h6`). Pass `next_heading` further down with `\App\get_next_heading_level($contents['next_heading'])` for nested levels.
+- `id`: `settings.id` è l'**anchor** del blocco se impostato, altrimenti l'id del blocco ACF (`block_…`), quindi ogni sezione ha un id;
+- la `<section>` esterna ha sempre `w-full overflow-x-clip` più le classi di padding/margin del blocco; il contenuto sta in `<div class="container mx-auto px-6 3xl:px-0">`;
+- le classi si compongono con `@class(array_filter([...]))` (i preset vuoti vengono scartati); un `@class` su più righe va racchiuso fra i marcatori di blade-formatter, dentro il tag, con l'array a 2 spazi;
+- titoli: il titolo del blocco usa `<x-ui.title :tag="$contents['title_tag']">` (`title_formatting` di ACF, h1–h6/p, default `h2`); i titoli figli (sottotitoli, titoli delle card) usano `$contents['next_heading']`, calcolato da `\App\get_next_heading_level($title_tag)` (un livello sotto, `p` dopo `h6`). Per i livelli annidati passa `next_heading` più in basso con `\App\get_next_heading_level($contents['next_heading'])`.
 
-**Field groups** live in `acf-json/` (ACF local JSON, saved there by `acf/settings/save_json` in `app/setup.php`). Labels, instructions and choices are in **Italian** (translated at runtime, see [Internationalization](#internationalization)). Two kinds of groups:
+**Field group**: stanno in `acf-json/` (local JSON di ACF, salvati lì da `acf/settings/save_json` in `app/setup.php`). Etichette, istruzioni e scelte sono in **italiano** (tradotte a runtime, vedi [Internazionalizzazione](#internazionalizzazione)). Ci sono due tipi di gruppi:
 
-| Group                          | File                       | Location                                     | Fields                                                                                                                          |
-| ------------------------------ | -------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| _Impostazioni blocco_ (shared) | `group_69c1778d2ba98.json` | _Block is equal to All_                      | accordion _Spaziature e colori_, `padding`, `padding_dimension`, `margin`, `margin_dimension`, `background_color`, `text_color` |
-| _Blocco: …_ (one per block)    | `group_<id>.json`          | _Block is equal to_ the block (`acf/<slug>`) | the block fields, e.g. _Blocco: Solo testo_ (`group_6b0457c69122b.json`): `title`, `title_formatting`, `content`, `buttons`     |
+| Gruppo                            | File                       | Posizione                                    | Campi                                                                                                                           |
+| --------------------------------- | -------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| _Impostazioni blocco_ (condiviso) | `group_69c1778d2ba98.json` | _Blocco è uguale a Tutti_                    | accordion _Spaziature e colori_, `padding`, `padding_dimension`, `margin`, `margin_dimension`, `background_color`, `text_color` |
+| _Blocco: …_ (uno per blocco)      | `group_<id>.json`          | _Blocco è uguale a_ il blocco (`acf/<slug>`) | i campi del blocco, es. _Blocco: Solo testo_ (`group_6b0457c69122b.json`): `title`, `title_formatting`, `content`, `buttons`    |
 
-- the shared group has `menu_order` 100, the block groups 0: in the block form the block fields come first, the shared settings last, in a closed accordion;
-- only spacings and colors are shared: a new block gets nothing else. `BlockRenderer::data()` still reads `title`, `title_formatting`, `content` and `buttons` by name (`null`/`[]` when the block has no such field): to use them in a new block, create fields **with the same names** in its own group (new keys; a field key belongs to one group), or a seamless _Clone_ of the _Solo testo_ fields;
-- **never change the key or the name of an existing field**, not even when moving it to another group: block data in `post_content` stores every value by name with a `_<name>` → field key reference, and `get_field()` and the block form resolve the field by that key (`acf_get_field()` finds it in any group). A new key or name orphans the saved values. Move fields between groups by editing the JSON (or with _Move_ in the field group screen), keeping key and name, and update `modified`;
-- the groups are only in `acf-json/` (not in the database): _Sync available_ in _ACF → Field Groups_ lists them because there is no database copy; syncing imports them with the same keys (no duplicates), but it is not needed.
+- il gruppo condiviso ha `menu_order` 100, i gruppi dei blocchi 0: nel form del blocco i campi del blocco vengono prima, le impostazioni condivise per ultime, in un accordion chiuso;
+- sono condivisi solo spaziature e colori: un nuovo blocco non riceve nient'altro. `BlockRenderer::data()` legge comunque `title`, `title_formatting`, `content` e `buttons` per nome (`null`/`[]` quando il blocco non ha quei campi): per usarli in un nuovo blocco crea nel suo gruppo campi **con gli stessi nomi** (chiavi nuove: una chiave di campo appartiene a un solo gruppo), oppure un _Clone_ seamless dei campi di _Solo testo_;
+- **non cambiare mai la chiave o il nome di un campo esistente**, nemmeno spostandolo in un altro gruppo: i dati dei blocchi in `post_content` salvano ogni valore per nome con un riferimento `_<name>` → chiave del campo, e `get_field()` e il form del blocco risolvono il campo da quella chiave (`acf_get_field()` lo trova in qualunque gruppo). Una chiave o un nome nuovi rendono orfani i valori salvati. I campi si spostano fra gruppi modificando il JSON (o con _Sposta_ nella schermata del field group), mantenendo chiave e nome, e aggiornando `modified`;
+- i gruppi esistono solo in `acf-json/` (non nel database): _Sincronizzazione disponibile_ in _ACF → Gruppi di campi_ li elenca perché non c'è una copia nel database; sincronizzarli li importa con le stesse chiavi (senza duplicati), ma non è necessario.
 
-## Block assets
+## Asset dei blocchi
 
-Most blocks need no assets of their own: Tailwind classes in the module and `resources/js/app.js` cover them. When a block does need its own JS or CSS, put it in the block folder:
+La maggior parte dei blocchi non ha bisogno di asset propri: bastano le classi Tailwind nel modulo e `resources/js/app.js`. Quando un blocco ha bisogno di JS o CSS propri, mettili nella cartella del blocco:
 
-- `view.js`: enqueued as a script module (`wp_enqueue_script_module()`, `type="module"` in the footer, handle `sage-block-<slug>`). It runs once per page even with several instances of the block: select them all (`document.querySelectorAll('.cards')`). Do not import CSS from it (in build Vite would emit a separate file that is not enqueued): use `style.css`;
-- `style.css`: enqueued as a stylesheet (`wp_enqueue_style()`, handle `sage-block-<slug>`); WordPress 6.9+ moves the styles enqueued while rendering into the `<head>`. Tailwind utilities are already in `app.css`: use it for what they cannot express. To use the theme tokens, start it with `@reference "../../../css/app.css";`.
+- `view.js`: caricato come script module (`wp_enqueue_script_module()`, `type="module"` nel footer, handle `sage-block-<slug>`). Viene eseguito una volta per pagina anche con più istanze del blocco: selezionale tutte (`document.querySelectorAll('.cards')`). Non importare CSS da qui (in build Vite produrrebbe un file separato che non viene caricato): usa `style.css`;
+- `style.css`: caricato come foglio di stile (`wp_enqueue_style()`, handle `sage-block-<slug>`); da WordPress 6.9 gli stili caricati durante il rendering vengono spostati nell'`<head>`. Le utility Tailwind sono già in `app.css`: usalo per ciò che non riescono a esprimere. Per usare i token del tema inizia il file con `@reference "../../../css/app.css";`.
 
-Both are Vite entries (`vite.config.js` globs `resources/views/blocks/*/{view.js,style.css}` when it starts: restart `npm run dev` after adding the first asset of a block, then run `npm run build`) and are enqueued by `App\Blocks\BlockAssets` from `BlockRenderer::render()`, only when the block view is rendered on the frontend: pages without the block do not load them, and in the editor (placeholder) nothing is enqueued. With the dev server they come from Vite (a change reloads the page); an asset missing from the build manifest is skipped.
+Entrambi sono entry di Vite (`vite.config.js` cerca `resources/views/blocks/*/{view.js,style.css}` con un glob all'avvio: dopo aver aggiunto il primo asset di un blocco riavvia `npm run dev`, poi esegui `npm run build`) e vengono caricati da `App\Blocks\BlockAssets`, chiamato da `BlockRenderer::render()`, solo quando la view del blocco viene renderizzata nel frontend: le pagine senza il blocco non li caricano, e nell'editor (placeholder) non viene caricato nulla. Con il dev server arrivano da Vite (una modifica ricarica la pagina); un asset assente dal manifest della build viene saltato.
 
-## New block checklist
+## Checklist per un nuovo blocco
 
-Example slug: `cards`. Copy from `only-text` where possible.
+Slug di esempio: `cards`. Dove possibile copia da `only-text`.
 
-1. **Metadata**: create `resources/views/blocks/cards/block.json` with `"name": "acf/cards"`, Italian `title`/`description`/`keywords`, a theme `category`, `"textdomain": "sage"`, `"apiVersion": 3`, `supports` with `"anchor": true` and `"align": false` only (no `supports.jsx`: the theme blocks do not use InnerBlocks and `blockVersion` 3 ignores it), `acf.blockVersion: 3` and `acf.renderCallback: "App\\Blocks\\BlockRenderer::render"`. No PHP registration needed: `app/blocks.php` registers the blocks of the manifest, which `npm run dev`/`npm run build` (or `npm run blocks:manifest`) regenerate from the `block.json` files. Commit `resources/views/blocks/blocks-manifest.php` too.
-2. **Fields**: locally, in _ACF → Field Groups_ create a group named after the block (e.g. _Blocco: Card_) with Italian labels, location _Block is equal to_ the new block (`acf/cards`) and order 0. Spacings and colors come from the shared _Impostazioni blocco_ group: do not add them. For a title, text or buttons use the names `title`, `title_formatting`, `content`, `buttons` (read by `BlockRenderer::data()`). Saving writes `acf-json/group_*.json`: commit it. Never change the key or name of fields already used by saved blocks (see [ACF blocks](#acf-blocks)).
-3. **Block view**: create `resources/views/blocks/cards/cards.blade.php`: `BlockRenderer::data($block)`, read and validate the block fields, sanitize URLs (`sanitize_url()`) and colors (`sanitize_hex_color()`), then `@include('modules.cards', [...])`.
-4. **Assets (optional)**: only if the block needs its own JS or CSS, add `resources/views/blocks/cards/view.js` and/or `style.css` (see [Block assets](#block-assets)), then restart `npm run dev`.
-5. **Module**: create `resources/views/modules/cards.blade.php` with the `@var` header, the `<section id … class="w-full overflow-x-clip …">` and `<div class="container mx-auto px-6 3xl:px-0">` markup, `<x-ui.title :tag>` for the title and `next_heading` for the child headings. Use the [components](#components) for buttons, images and titles.
-6. **Strings**: every visible string in Italian with the `sage` text domain (`{{ __('Leggi di più', 'sage') }}`).
-7. **Logic and tests**: move non-trivial data preparation (queries, mapping) to a class in `app/` (e.g. `App\Queries\…` or a static method in `App\Blocks\`), with a Pest test in `tests/Unit/` that mocks `get_field()` with Brain Monkey (see `tests/Unit/BlockRendererTest.php`). Run `composer test` and `composer analyse`.
-8. **Translations**: `npm run translate` (block.json, Blade and the new ACF group end up in `sage.pot` and in the `.po` files), translate the new entries in `resources/lang/en_US.po`, then `npm run translate:compile`.
-9. **Lint**: `npm run format` (or `npm run format:blade`), then `npm run lint` and `composer lint`.
-10. **Check**: `npm run build` (or `npm run dev`), insert the block in a page: placeholder in the editor, markup, anchor, spacings and heading levels on the frontend; with the site in English (`wp site switch-language en_US`) the labels are translated.
+1. **Metadati**: crea `resources/views/blocks/cards/block.json` con `"name": "acf/cards"`, `title`/`description`/`keywords` in italiano, una `category` del tema, `"textdomain": "sage"`, `"apiVersion": 3`, `supports` con solo `"anchor": true` e `"align": false` (niente `supports.jsx`: i blocchi del tema non usano InnerBlocks e `blockVersion` 3 lo ignora), `acf.blockVersion: 3` e `acf.renderCallback: "App\\Blocks\\BlockRenderer::render"`. Non serve registrarlo in PHP: `app/blocks.php` registra i blocchi del manifest, che `npm run dev`/`npm run build` (o `npm run blocks:manifest`) rigenerano dai `block.json`. Committa anche `resources/views/blocks/blocks-manifest.php`.
+2. **Campi**: in locale, in _ACF → Gruppi di campi_, crea un gruppo con il nome del blocco (es. _Blocco: Card_) con etichette in italiano, posizione _Blocco è uguale a_ il nuovo blocco (`acf/cards`) e ordine 0. Spaziature e colori arrivano dal gruppo condiviso _Impostazioni blocco_: non aggiungerli. Per titolo, testo o pulsanti usa i nomi `title`, `title_formatting`, `content`, `buttons` (letti da `BlockRenderer::data()`). Il salvataggio scrive `acf-json/group_*.json`: committalo. Non cambiare mai chiave o nome dei campi già usati da blocchi salvati (vedi [Blocchi ACF](#blocchi-acf)).
+3. **View del blocco**: crea `resources/views/blocks/cards/cards.blade.php`: `BlockRenderer::data($block)`, lettura e validazione dei campi del blocco, sanificazione di URL (`sanitize_url()`) e colori (`sanitize_hex_color()`), poi `@include('modules.cards', [...])`.
+4. **Asset (facoltativi)**: solo se il blocco ha bisogno di JS o CSS propri, aggiungi `resources/views/blocks/cards/view.js` e/o `style.css` (vedi [Asset dei blocchi](#asset-dei-blocchi)), poi riavvia `npm run dev`.
+5. **Modulo**: crea `resources/views/modules/cards.blade.php` con l'intestazione `@var`, il markup `<section id … class="w-full overflow-x-clip …">` e `<div class="container mx-auto px-6 3xl:px-0">`, `<x-ui.title :tag>` per il titolo e `next_heading` per i titoli figli. Usa i [componenti](#componenti) per pulsanti, immagini e titoli.
+6. **Stringhe**: ogni stringa visibile in italiano con il text domain `sage` (`{{ __('Leggi di più', 'sage') }}`).
+7. **Logica e test**: sposta la preparazione dei dati non banale (query, mappature) in una classe in `app/` (es. `App\Queries\…` o un metodo statico in `App\Blocks\`), con un test Pest in `tests/Unit/` che simula `get_field()` con Brain Monkey (vedi `tests/Unit/BlockRendererTest.php`). Esegui `composer test` e `composer analyse`.
+8. **Traduzioni**: `npm run translate` (block.json, Blade e il nuovo gruppo ACF finiscono in `sage.pot` e nei `.po`), traduci le nuove voci in `resources/lang/en_US.po`, poi `npm run translate:compile`.
+9. **Lint**: `npm run format` (o `npm run format:blade`), poi `npm run lint` e `composer lint`.
+10. **Verifica**: `npm run build` (o `npm run dev`), inserisci il blocco in una pagina: placeholder nell'editor; markup, anchor, spaziature e livelli dei titoli nel frontend; con il sito in inglese (`wp site switch-language en_US`) le etichette sono tradotte.
 
-## Internationalization
+## Internazionalizzazione
 
-- Source language: **Italian**. Every string of the theme (PHP, Blade, `block.json`, `theme.json`, `style.css`, ACF field groups) is written in Italian with the `sage` text domain; English is a translation (`resources/lang/en_US.po`).
-- Use `__()`, `_x()` (with context for short or ambiguous strings), `_n()` and a `/* translators: */` comment for placeholders. In Blade: `{{ __('…', 'sage') }}`.
-- ACF field groups stay in Italian in `acf-json/`: ACF translates them at runtime through `acf/settings/l10n_textdomain` (`sage`, turned off while editing field groups).
-- After adding or changing strings: `npm run translate`, update `en_US.po`, `npm run translate:compile`. Commit `.pot`, `.po`, `.mo` and `.l10n.php` (`acf-json.php` is generated and gitignored). Details in [Translations](README.md#translations).
+- Lingua sorgente: **italiano**. Ogni stringa del tema (PHP, Blade, `block.json`, `theme.json`, `style.css`, field group ACF) è scritta in italiano con il text domain `sage`; l'inglese è una traduzione (`resources/lang/en_US.po`).
+- Usa `__()`, `_x()` (con contesto per le stringhe brevi o ambigue), `_n()` e un commento `/* translators: */` per i segnaposto. In Blade: `{{ __('…', 'sage') }}`.
+- I field group ACF restano in italiano in `acf-json/`: ACF li traduce a runtime tramite `acf/settings/l10n_textdomain` (`sage`, disattivato mentre si modificano i field group).
+- Dopo aver aggiunto o modificato stringhe: `npm run translate`, aggiorna `en_US.po`, `npm run translate:compile`. Committa `.pot`, `.po`, `.mo` e `.l10n.php` (`acf-json.php` è generato e in `.gitignore`). Dettagli in [Traduzioni](README.md#traduzioni).
+- Anche commenti, docblock e descrizioni dei test sono in italiano; restano in inglese i file upstream (core, Bedrock) e i termini tecnici.
 
 ## PHP
 
-- Namespace `App`, PSR-4 autoload from `app/` (`composer.json`). Every file starts with `declare(strict_types=1);`.
-- Classes, one per file:
-  - `App\PostTypes\*`: custom post types, a static `register()` calling `register_post_type()`; listed in `$postTypes` of `App\Providers\ThemeServiceProvider`, which hooks them on `init` (taxonomies: `$taxonomies`, same contract, registered first);
-  - `App\Queries\*`: static query methods returning plain arrays for the views (`Posts::latest()`, `Posts::paginated()`, `Pages::children()`);
-  - `App\Blocks\*`: block rendering and shared block data (`BlockRenderer`), per-block assets (`BlockAssets`);
-  - `App\Navigation\*`: navigation helpers (`Breadcrumbs`);
-  - `App\View\Composers\*`: Acorn view composers. Their public methods reach the views as lazy variables (`InvokableComponentVariable`): printed with `{{ }}` they are computed only when used, but in a condition they are always truthy, so call them (`$customLogo()`) to test the value. `App` (every view) provides `$siteName` (plain text, print it with `{{ }}`), `$customLogo` (`get_custom_logo()` markup or `''`; the header falls back to the site name) and `$isFrontPage` (first page of the front page: `aria-current="page"` on the fallback home link, as core does on the logo link);
-  - `App\Styleguide`: the development-only `/styleguide/` route (see [Styleguide](#styleguide)).
-- Hooks and functions without a class are in the files loaded by `functions.php` (`setup`, `filters`, `blocks`, `helpers`, `svg`, `rewrites`). Helper functions live in `app/helpers.php`, namespace `App`, and are called in Blade with the fully qualified name: `\App\get_next_heading_level()`, `\App\get_trimmed_excerpt()`, `\App\random_string_for_id()`, `\App\get_fallback_image_url()`.
-- Theme filters are prefixed `sage/` (list in the [README](README.md#theme-filters)).
-- Types: native types where WordPress calls with known types, PHPDoc array shapes elsewhere. PHPStan level 6 must pass (`composer analyse`); unit tests with Pest and Brain Monkey (`composer test`). Pint (preset `laravel`) formats `app/` (`composer lint:fix`).
+- Namespace `App`, autoload PSR-4 da `app/` (`composer.json`). Ogni file inizia con `declare(strict_types=1);`.
+- Classi, una per file:
+  - `App\PostTypes\*`: custom post type, con un `register()` statico che chiama `register_post_type()`; elencati in `$postTypes` di `App\Providers\ThemeServiceProvider`, che li aggancia a `init` (tassonomie: `$taxonomies`, stesso contratto, registrate prima);
+  - `App\Queries\*`: metodi statici di query che restituiscono array semplici per le view (`Posts::data()`, `Posts::latest()`, `Posts::paginated()`, `Pages::children()`);
+  - `App\Blocks\*`: rendering dei blocchi e dati comuni (`BlockRenderer`), asset per blocco (`BlockAssets`);
+  - `App\Navigation\*`: helper di navigazione (`Breadcrumbs`);
+  - `App\View\Composers\*`: view composer di Acorn. I loro metodi pubblici arrivano alle view come variabili lazy (`InvokableComponentVariable`): stampati con `{{ }}` vengono calcolati solo quando servono, ma in una condizione sono sempre truthy, quindi vanno chiamati (`$customLogo()`) per testarne il valore. `App` (tutte le view) fornisce `$siteName` (testo semplice, da stampare con `{{ }}`), `$customLogo` (markup di `get_custom_logo()` o `''`; l'header ripiega sul nome del sito) e `$isFrontPage` (prima pagina della front page: `aria-current="page"` sul link di fallback alla home, come fa il core sul link del logo); `Post` fornisce titolo e paginazione a `partials.page-header` e `partials.content*`, `Comments` i dati di `partials.comments`;
+  - `App\Styleguide`: la route `/styleguide/`, solo in development (vedi [Styleguide](#styleguide)).
+- Hook e funzioni senza classe stanno nei file caricati da `functions.php` (`setup`, `filters`, `blocks`, `helpers`, `svg`, `rewrites`). Le funzioni helper stanno in `app/helpers.php`, namespace `App`, e in Blade si chiamano con il nome completo: `\App\get_next_heading_level()`, `\App\get_trimmed_excerpt()`, `\App\random_string_for_id()`, `\App\get_fallback_image_url()`.
+- I filtri del tema hanno il prefisso `sage/` (elenco nel [README](README.md#filtri-del-tema)).
+- Tipi: tipi nativi dove WordPress chiama con tipi noti, array shape in PHPDoc altrove. PHPStan livello 6 deve passare (`composer analyse`); test unitari con Pest e Brain Monkey (`composer test`). Pint (preset `laravel`) formatta `app/` (`composer lint:fix`).
 
-## Security and escaping
+## Sicurezza ed escaping
 
-- Blade `{{ }}` escapes with `htmlspecialchars()`: inside it use `sanitize_url()` for URLs, **not** `esc_url()` (which would encode `&` as `&#038;`, escaped a second time by Blade). `esc_url()`/`esc_attr()` are for PHP that prints directly (`printf` in `app/`).
-- Colors from ACF or props go through `sanitize_hex_color()`; invalid values become `''`/`null` and nothing is printed.
-- Link targets are whitelisted (`_self`/`_blank`); `_blank` adds `rel="noopener noreferrer"` (`<x-ui.button>`).
-- `{!! !!}` only for trusted HTML: the ACF wysiwyg content, already filtered by WordPress, or markup built by the theme.
-- Heading and title tags are whitelisted (`<x-ui.title>`, `BlockRenderer::data()`), never printed from raw input.
-- SVG uploads are sanitized with `enshrined/svg-sanitize` and limited to `sage/svg_upload_capability` (`app/svg.php`).
+- `{{ }}` di Blade fa l'escape con `htmlspecialchars()`: al suo interno usa `sanitize_url()` per gli URL, **non** `esc_url()` (che codificherebbe `&` come `&#038;`, poi codificato una seconda volta da Blade). `esc_url()`/`esc_attr()` servono al PHP che stampa direttamente (`printf` in `app/`).
+- I colori da ACF o dalle props passano da `sanitize_hex_color()`; i valori non validi diventano `''`/`null` e non viene stampato nulla.
+- I target dei link sono limitati a `_self`/`_blank`; `_blank` aggiunge `rel="noopener noreferrer"` (`<x-ui.button>`).
+- `{!! !!}` solo per HTML affidabile: il contenuto wysiwyg di ACF, già filtrato da WordPress, o markup costruito dal tema.
+- I tag dei titoli sono limitati ai valori ammessi (`<x-ui.title>`, `BlockRenderer::data()`), mai stampati da input grezzo.
+- Gli upload SVG vengono sanificati con `enshrined/svg-sanitize` e limitati a `sage/svg_upload_capability` (`app/svg.php`).
 
-## Components
+## Componenti
 
-Anonymous Blade components in `resources/views/components/`, grouped by folder (the folder is the prefix of the tag: `components/ui/button.blade.php` → `<x-ui.button>`); the full prop documentation is in the comment at the top of each file. Extra attributes (`class`, `id`, `data-*`) are merged into the root element.
+Componenti Blade anonimi in `resources/views/components/`, raggruppati per cartella (la cartella è il prefisso del tag: `components/ui/button.blade.php` → `<x-ui.button>`); la documentazione completa delle props è nel commento in testa a ogni file. Gli attributi aggiuntivi (`class`, `id`, `data-*`) vengono uniti all'elemento radice.
 
-| Folder     | Contents                                                     |
-| ---------- | ------------------------------------------------------------ |
-| `ui/`      | Generic building blocks, with no knowledge of the content    |
-| `content/` | Pieces tied to the current content, page or post (or a list) |
-| `acf/`     | ACF block helpers used by `BlockRenderer`                    |
+| Cartella   | Contenuto                                                                |
+| ---------- | ------------------------------------------------------------------------ |
+| `ui/`      | Elementi generici, che non sanno nulla del contenuto                     |
+| `content/` | Elementi legati al contenuto corrente, pagina o articolo (o a un elenco) |
+| `acf/`     | Helper dei blocchi ACF usati da `BlockRenderer`                          |
 
-| Component                         | Use                                                                              | Main props                                                                                                                 |
-| --------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `<x-ui.button>`                   | Link or disabled button; renders nothing if `link` is invalid and not `disabled` | `link`, `target` (`_self`/`_blank`), `type` (`primary`, `secondary`, `white`, `black`), `label`, `disabled`, `customColor` |
-| `<x-ui.title>`                    | Heading with a whitelisted tag                                                   | `tag` (h1–h6, `p`, `span`; default `h2`), `textColor`                                                                      |
-| `<x-ui.alert>`                    | Notice box, nothing without content                                              | `type` (`success`, `caution`, `warning`, default info), `message` (or the slot), `role` (`status`/`alert`)                 |
-| `<x-ui.image>`                    | Attachment image (`wp_get_attachment_image()`)                                   | `id`, `size` (default `large`), `sizes`, `eager`, `alt`, `fallback`, `img-id`                                              |
-| `<x-content.share>`               | Social share links + Web Share API button                                        | `title`, `link` (default: current post), `facebook`, `twitter` (X), `linkedin`, `whatsapp`                                 |
-| `<x-content.breadcrumbs>`         | Breadcrumbs with JSON-LD                                                         | `items` (default `Breadcrumbs::items()`), `jsonld` (default `true`)                                                        |
-| `<x-content.carousel-navigation>` | Previous/next buttons for a carousel                                             | `id` (prefix of the `-prev`/`-next` classes)                                                                               |
-| `<x-acf.placeholder>`             | Editor placeholder of ACF blocks (used by `BlockRenderer`)                       | `block`, `title`, `message`                                                                                                |
+| Componente                        | Uso                                                                                      | Props principali                                                                                                           |
+| --------------------------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `<x-ui.button>`                   | Link o pulsante disabilitato; non stampa nulla se `link` non è valido e non è `disabled` | `link`, `target` (`_self`/`_blank`), `type` (`primary`, `secondary`, `white`, `black`), `label`, `disabled`, `customColor` |
+| `<x-ui.title>`                    | Titolo con tag fra quelli ammessi                                                        | `tag` (h1–h6, `p`, `span`; default `h2`), `textColor`                                                                      |
+| `<x-ui.alert>`                    | Riquadro di avviso, nulla senza contenuto                                                | `type` (`success`, `caution`, `warning`, default informativo), `message` (o lo slot), `role` (`status`/`alert`)            |
+| `<x-ui.image>`                    | Immagine allegata (`wp_get_attachment_image()`)                                          | `id`, `size` (default `large`), `sizes`, `eager`, `alt`, `fallback`, `img-id`                                              |
+| `<x-content.share>`               | Link di condivisione social + pulsante Web Share API                                     | `title`, `link` (default: post corrente), `facebook`, `twitter` (X), `linkedin`, `whatsapp`                                |
+| `<x-content.breadcrumbs>`         | Breadcrumb con JSON-LD                                                                   | `items` (default `Breadcrumbs::items()`), `jsonld` (default `true`)                                                        |
+| `<x-content.carousel-navigation>` | Pulsanti precedente/successivo di un carosello                                           | `id` (prefisso delle classi `-prev`/`-next`)                                                                               |
+| `<x-acf.placeholder>`             | Placeholder dei blocchi ACF nell'editor (usato da `BlockRenderer`)                       | `block`, `title`, `message`                                                                                                |
 
-A new component goes in the folder that matches its role (no components in the root of `components/`), is documented in its header comment and in this table, and gets an example in the [styleguide](#styleguide).
+Un nuovo componente va nella cartella che corrisponde al suo ruolo (nessun componente nella radice di `components/`), è documentato nel suo commento di testa e in questa tabella e ha un esempio nella [styleguide](#styleguide).
 
 ## Styleguide
 
-`/styleguide/` shows the design tokens (colors, font families and sizes, read from `public/build/assets/theme.json`, generated by the build from the `@theme` of `resources/css/theme.css`), the h1–h6 headings, links and focus, and every component with its main variants on static sample data. View: `resources/views/styleguide.blade.php`; logic: `App\Styleguide` (`app/Styleguide.php`), hooked by `ThemeServiceProvider::boot()`.
+`/styleguide/` mostra i design token (colori, famiglie e dimensioni dei font, letti da `public/build/assets/theme.json`, generato dalla build dal `@theme` di `resources/css/theme.css`), i titoli h1–h6, link e focus, e tutti i componenti con le varianti principali su dati di esempio statici. View: `resources/views/styleguide.blade.php`; logica: `App\Styleguide` (`app/Styleguide.php`), agganciata da `ThemeServiceProvider::boot()`.
 
-- **Development only**: the rewrite rule, the `sage_styleguide` query var and the template are registered only with `WP_ENV === 'development'` (no filter to turn it on elsewhere). In every other environment `/styleguide/` is a regular 404 and `?sage_styleguide=1` is ignored.
-- **No database page**: a rewrite rule (`^styleguide/?$`) renders the view with the theme layout; the main query runs no posts query, the page is `noindex, nofollow` (`wp_robots`), titled _Styleguide_ and has the `styleguide` body class. Nothing on the site links to it.
-- **Rewrite rules**: they are stored in the database, so they are not flushed on every request. On `init` the theme compares the stored rules with the environment and flushes once when they disagree: the first request in development adds the rule, the first request (or WP-CLI command) in another environment removes a rule left there, e.g. by a database copied from development. The option `sage_styleguide_rewrite` remembers the last flush, so a rule removed by something else is not flushed on every request. With plain permalinks there are no stored rules: use `/?sage_styleguide=1`. If the page is a 404 in development, run `wp rewrite flush`.
-- **Own stylesheet**: the utilities used only by the view are compiled in `resources/css/styleguide.css` (a Vite entry with `tailwindcss/utilities` and `@source` on the view only), enqueued by `Styleguide::enqueueAssets()` only on the styleguide. `app.css` and `editor.css` exclude the view (`@source not '../views/styleguide.blade.php'`), so its classes never reach the production stylesheets. The components shown keep using the classes compiled in `app.css`. Both also exclude `resources/lang/`: translations are text, and an English word that is also a utility name would add it to the stylesheets.
-- **Headings**: the sample headings (h1–h6 and `<x-ui.title>`) have `role="presentation"`, so the heading structure of the page is one h1 and one h2 per section.
-- **Contrast**: every palette color shows its WCAG 2.2 contrast with white and black and the level met (AA/AAA, normal and large text), from `Styleguide::contrasts()` (hex and the oklch of `theme.json`, converted to sRGB). The page runs no content query: `<x-ui.image>` shows the theme fallback.
-- When adding or changing a component or a token, update the styleguide: it is the quick visual check of the theme (`npm run dev`, then `https://<site>/styleguide/`).
+- **Solo in development**: la regola di rewrite, la query var `sage_styleguide` e il template vengono registrati solo con `WP_ENV === 'development'` (nessun filtro per attivarla altrove). In tutti gli altri ambienti `/styleguide/` è un normale 404 e `?sage_styleguide=1` viene ignorato.
+- **Nessuna pagina nel database**: una regola di rewrite (`^styleguide/?$`) renderizza la view con il layout del tema; la query principale non esegue nessuna query sui post, la pagina è `noindex, nofollow` (`wp_robots`), ha il titolo _Styleguide_ e la classe `styleguide` sul body. Nessun link del sito porta lì.
+- **Regole di rewrite**: sono salvate nel database, quindi non vengono rigenerate a ogni richiesta. Su `init` il tema confronta le regole salvate con l'ambiente e le rigenera una volta quando non corrispondono: la prima richiesta in development aggiunge la regola, la prima richiesta (o il primo comando WP-CLI) in un altro ambiente rimuove una regola rimasta lì, ad esempio da un database copiato dal development. L'opzione `sage_styleguide_rewrite` ricorda l'ultima rigenerazione, così una regola rimossa da qualcos'altro non provoca una rigenerazione a ogni richiesta. Con i permalink semplici non ci sono regole salvate: usa `/?sage_styleguide=1`. Se in development la pagina dà 404, esegui `wp rewrite flush`.
+- **Foglio di stile proprio**: le utility usate solo dalla view sono compilate in `resources/css/styleguide.css` (entry di Vite con `tailwindcss/utilities` e `@source` sulla sola view), caricato da `Styleguide::enqueueAssets()` solo sulla styleguide. `app.css` ed `editor.css` escludono la view (`@source not '../views/styleguide.blade.php'`), così le sue classi non arrivano mai nei fogli di stile di produzione. I componenti mostrati continuano a usare le classi compilate in `app.css`. Entrambi escludono anche `resources/lang/`: le traduzioni sono testo, e una parola inglese che è anche il nome di una utility la aggiungerebbe ai fogli di stile.
+- **Titoli**: i titoli di esempio (h1–h6 e `<x-ui.title>`) hanno `role="presentation"`, così la struttura dei titoli della pagina è un h1 e un h2 per sezione.
+- **Contrasto**: ogni colore della palette mostra il suo contrasto WCAG 2.2 con il bianco e con il nero e il livello raggiunto (AA/AAA, testo normale e grande), calcolato da `Styleguide::contrasts()` (hex e oklch di `theme.json`, convertiti in sRGB). La pagina non esegue query sui contenuti: `<x-ui.image>` mostra il fallback del tema.
+- Quando aggiungi o modifichi un componente o un token, aggiorna la styleguide: è il controllo visivo rapido del tema (`npm run dev`, poi `https://<sito>/styleguide/`).
 
-## Renaming the theme
+## Rinominare il tema
 
-The folder name is the theme slug for WordPress. To rename `sage` to `<new>`:
+Il nome della cartella è lo slug del tema per WordPress. Per rinominare `sage` in `<nuovo>`:
 
-1. Rename `web/app/themes/sage` to `web/app/themes/<new>`. The Vite asset base is derived from the folder name (`vite.config.js`): nothing to change. `VITE_THEME_SLUG` is only for a theme installed as a **symlink** with a different target folder name, and is passed as a shell variable (`VITE_THEME_SLUG=<new> npm run build`), not in `.env`.
-2. Update the paths outside the theme: `--working-dir=web/app/themes/sage` in the root `composer.json` scripts, `working_dir` and `restart_when_changed` in `solo.yml`, `.github/workflows/ci.yml` (working directory, `node-version-file`), `.github/dependabot.yml` (directories), `WP_DEFAULT_THEME` in `config/application.php` and the paths in both READMEs (`grep -rn "themes/sage" --exclude-dir=vendor --exclude-dir=node_modules .`).
-3. Update the theme identity: `Theme Name` in `style.css`, `name` in `composer.json` (`toms15/sage`) and `package.json` (`sage`).
-4. Text domain (optional, it can stay `sage`): replace it in every `__()`/`_x()` call, `"textdomain"` in `block.json`, `Text Domain` in `style.css`, `load_theme_textdomain()` and the `acf/settings/l10n_textdomain` filter in `app/setup.php`, then rebuild the catalogue (`npm run translate`, `npm run translate:compile`). The `sage/` filter prefixes and `sage.pot` are names, not the text domain: they can stay.
-5. `composer dump-autoload`, `npm run build`, `wp theme activate <new>`, `wp acorn optimize:clear`.
+1. Rinomina `web/app/themes/sage` in `web/app/themes/<nuovo>`. La base degli asset di Vite deriva dal nome della cartella (`vite.config.js`): non c'è niente da cambiare. `VITE_THEME_SLUG` serve solo per un tema installato come **symlink** con una cartella di destinazione dal nome diverso, e si passa come variabile di shell (`VITE_THEME_SLUG=<nuovo> npm run build`), non in `.env`.
+2. Aggiorna i percorsi fuori dal tema: `--working-dir=web/app/themes/sage` negli script del `composer.json` della root, `working_dir` e `restart_when_changed` in `solo.yml`, `.github/workflows/ci.yml` (working directory, `node-version-file`, `cache-dependency-path`), `.github/dependabot.yml` (directory), `WP_DEFAULT_THEME` in `config/application.php` e i percorsi nei due README (`grep -rn "themes/sage" --exclude-dir=vendor --exclude-dir=node_modules .`).
+3. Aggiorna l'identità del tema: `Theme Name` in `style.css`, `name` in `composer.json` (`toms15/sage`) e in `package.json` (`sage`).
+4. Text domain (facoltativo, può restare `sage`): sostituiscilo in ogni chiamata `__()`/`_x()`, in `"textdomain"` dei `block.json`, in `Text Domain` di `style.css`, in `load_theme_textdomain()` e nel filtro `acf/settings/l10n_textdomain` di `app/setup.php`, poi ricostruisci il catalogo (`npm run translate`, `npm run translate:compile`). I prefissi dei filtri `sage/` e `sage.pot` sono nomi, non il text domain: possono restare.
+5. `composer dump-autoload`, `npm run build`, `wp theme activate <nuovo>`, `wp acorn optimize:clear`.

@@ -54,7 +54,7 @@
 | M41 | ✅ | URL inesistenti a più segmenti rispondono 200 in locale (Valet/Herd PHP_SELF) | Ambiente | 🟢 | S | – |
 | M42 | ✅ | `composer update` del tema (27 advisory → 0, Acorn 5.1, platform PHP 8.2) | Dipendenze | 🔴 | S | M35 |
 | M43 | ✅ | Commenti e docblock in italiano (tema, config, CI; esclusi i file upstream) | Coerenza | 🟠 | M | – |
-| M44 | ⬜ | README e CONVENTIONS in italiano, descrizione e topics del repo GitHub | Docs | 🟠 | S | M43 |
+| M44 | ✅ | README e CONVENTIONS in italiano, descrizione e topics del repo GitHub | Docs | 🟠 | S | M43 |
 
 **Ordine consigliato.** Fase 0 (M01–M10), poi Fase 1 (M11–M16), Fase 2 (M17–M27), Fase 3 (M28–M34), Fase 4 (M35–M39).
 
@@ -527,7 +527,7 @@
 *Fonte: review di M18 (2026-11-20)*
 - **Problema:** in locale, qualunque URL inesistente con tre o più segmenti (es. `/a/b/c/`) risponde 200 con la home invece di 404. Valet/Herd imposta `$_SERVER['PHP_SELF']` uguale all'URI richiesto (`BasicValetDriver.php:20`), e WordPress per questo annulla il 404 (`class-wp.php:287-290`). Non dipende dal tema e probabilmente non si presenta in produzione con nginx o Apache standard.
 - **Diagnosi (2026-11-24):** Herd usa il driver Bedrock (`Valet\Drivers\Specific\BedrockValetDriver`, che eredita `beforeLoading()` da `BasicValetDriver`). In `WP::parse_request()` l'errore 404 viene tolto se `$requested_file === $self`, cioè se il percorso richiesto coincide con `PHP_SELF`. Il problema emerge solo quando nessuna regola di rewrite corrisponde: con `/%postname%/` e le regole di pagina verbose, gli URL a un segmento o a due segmenti passano per le regole di post o allegato e finiscono comunque in 404. Gli URL con tre o più segmenti (`/a/b/c/`, `/ciao-mondo/a/b/`) restano invece senza query e mostrano la home. In produzione `PHP_SELF` vale `/index.php` (`try_files … /index.php?$args` o il `.htaccess` di WP), quindi il 404 resta.
-- **Soluzione adottata:** `LocalValetDriver.php` nella root. Estende `BedrockValetDriver` e, dopo `frontControllerPath()`, se `SCRIPT_NAME` è `/index.php` imposta `PHP_SELF = /index.php`. I file statici, `wp-admin`, `wp-login.php`, `wp-cron.php`, `xmlrpc.php` e la REST API non cambiano comportamento. Il file sta fuori da `web/`, quindi non è servito, è ignorato fuori da Herd/Valet e passa Pint della root. Herd lo rileva a ogni richiesta senza riavvio. Per rimuoverlo basta cancellare il file. Documentazione nel README, sezione "Site driver".
+- **Soluzione adottata:** `LocalValetDriver.php` nella root. Estende `BedrockValetDriver` e, dopo `frontControllerPath()`, se `SCRIPT_NAME` è `/index.php` imposta `PHP_SELF = /index.php`. I file statici, `wp-admin`, `wp-login.php`, `wp-cron.php`, `xmlrpc.php` e la REST API non cambiano comportamento. Il file sta fuori da `web/`, quindi non è servito, è ignorato fuori da Herd/Valet e passa Pint della root. Herd lo rileva a ogni richiesta senza riavvio. Per rimuoverlo basta cancellare il file. Documentazione nel README, sezione "Driver del sito (`LocalValetDriver.php`)".
 
 ## Già a posto (verificato)
 - I salt vengono da env.

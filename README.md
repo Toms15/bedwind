@@ -1,121 +1,127 @@
-# WordPress Project with Bedrock & Sage
+# bedwind
 
 [![CI](https://github.com/Toms15/bedwind/actions/workflows/ci.yml/badge.svg)](https://github.com/Toms15/bedwind/actions/workflows/ci.yml)
 
-This project uses [Bedrock](https://roots.io/bedrock/) as a WordPress boilerplate and [Sage](https://roots.io/sage/) (with [Acorn](https://roots.io/acorn/)) as a starter theme, with ACF Pro for the blocks.
+Base di partenza per siti WordPress: [Bedrock](https://roots.io/bedrock/) come struttura del progetto e il tema starter [Sage](https://roots.io/sage/) 11 (con [Acorn](https://roots.io/acorn/) 5 e Blade), con Tailwind CSS 4, Vite 8 e blocchi ACF Pro.
 
-This README covers the **project**: requirements, local setup, credentials, environments, WordPress translations, CI and deploy. Theme development (build, lint, PHP quality, theme translations, fonts, components) is in [`web/app/themes/sage/README.md`](web/app/themes/sage/README.md), and the coding conventions with the new block checklist are in [`web/app/themes/sage/CONVENTIONS.md`](web/app/themes/sage/CONVENTIONS.md).
+- **Blocchi ACF**: un render callback unico (`App\Blocks\BlockRenderer`), registrazione da manifest, asset JS/CSS caricati solo dove il blocco compare, field group in `acf-json/`.
+- **Lingua**: le stringhe del tema (PHP, Blade, `block.json`, field group ACF) sono scritte in italiano con il text domain `sage`; `en_US` è una traduzione.
+- **Qualità**: PHPStan (livello 6), Pest e Pint per il PHP; ESLint, Stylelint, Prettier e blade-formatter per il frontend; GitHub Actions su ogni push e pull request, Dependabot settimanale.
+- **Sviluppo locale** con [Laravel Herd](https://herd.laravel.com), styleguide dei componenti su `/styleguide/` in development.
 
-## Contents
+Questo README riguarda il **progetto**: requisiti, setup locale, credenziali, ambienti, traduzioni di WordPress, CI e deploy. Lo sviluppo del tema (build, lint, qualità PHP, traduzioni del tema, font, componenti) è descritto in [`web/app/themes/sage/README.md`](web/app/themes/sage/README.md); le convenzioni di codice e la checklist per un nuovo blocco in [`web/app/themes/sage/CONVENTIONS.md`](web/app/themes/sage/CONVENTIONS.md).
 
-- [Requirements](#requirements)
-- [Local development with Herd](#local-development-with-herd)
-- [Environments](#environments)
-- [WordPress translations](#wordpress-translations)
-- [Commands](#commands)
-- [Continuous integration](#continuous-integration)
-- [Deployment](#deployment)
-- [Project structure](#project-structure)
+## Indice
 
-## Requirements
+- [Requisiti](#requisiti)
+- [Sviluppo locale con Herd](#sviluppo-locale-con-herd)
+- [Ambienti](#ambienti)
+- [Traduzioni di WordPress](#traduzioni-di-wordpress)
+- [Comandi](#comandi)
+- [Integrazione continua (CI)](#integrazione-continua-ci)
+- [Deploy](#deploy)
+- [Struttura del progetto](#struttura-del-progetto)
+- [Licenza](#licenza)
 
-- **PHP >= 8.2** to run the site: the root and theme `composer.json` declare PHP >= 8.2 (the root has no `config.platform`: Pint in `require-dev` needs 8.3, see below). Production installs with `--no-dev`.
-- **PHP >= 8.3** for root development: the root dev tools (Pint 1.32, in `require-dev`) require it, so a full `composer install` in the root fails on 8.2. The theme alone supports PHP >= 8.2 for development too.
+## Requisiti
+
+- **PHP >= 8.2** per far girare il sito: i `composer.json` della root e del tema dichiarano PHP >= 8.2 (la root non ha `config.platform`: Pint in `require-dev` richiede 8.3, vedi sotto). In produzione si installa con `--no-dev`.
+- **PHP >= 8.3** per lo sviluppo nella root: gli strumenti di sviluppo della root (Pint 1.32, in `require-dev`) lo richiedono, quindi un `composer install` completo nella root fallisce su 8.2. Il tema da solo supporta PHP >= 8.2 anche in sviluppo.
 - **Composer 2**.
-- **Node.js** `^22.22.2 || ^24.15.0 || >=26` (`engines` in the theme `package.json`, the minimum required by Stylelint 18) and npm. The theme `.nvmrc` says `22`: see [Node version](web/app/themes/sage/README.md#node-version) in the theme README.
-- **WP-CLI** (`wp`), for installing WordPress, the salts and the theme translation scripts.
-- An **ACF Pro** license (see [ACF Pro credentials](#2-acf-pro-credentials)).
+- **Node.js** `^22.22.2 || ^24.15.0 || >=26` (`engines` nel `package.json` del tema, il minimo richiesto da Stylelint 18) e npm. Il `.nvmrc` del tema indica `22`: vedi [Versione di Node](web/app/themes/sage/README.md#versione-di-node) nel README del tema.
+- **WP-CLI** (`wp`), per installare WordPress, generare i salt ed eseguire gli script di traduzione del tema.
+- Una licenza **ACF Pro** (vedi [Credenziali ACF Pro](#2-credenziali-acf-pro)).
 
-## Local development with Herd
+## Sviluppo locale con Herd
 
-The local environment is [Laravel Herd](https://herd.laravel.com) (macOS/Windows): nginx + PHP, with HTTPS certificates for `*.test` sites. There is no Docker/DDEV/Lando setup. The examples use the site name `project-name`, served at `https://project-name.test`.
+L'ambiente locale è [Laravel Herd](https://herd.laravel.com) (macOS/Windows): nginx + PHP, con certificati HTTPS per i siti `*.test`. Non c'è un setup Docker/DDEV/Lando. Gli esempi usano il nome di sito `project-name`, servito su `https://project-name.test`.
 
-You need:
+Servono:
 
-- **Herd**, which ships PHP and Composer. Use PHP 8.3 or newer for the site (see [Requirements](#requirements)); the site's PHP version can be pinned with `herd isolate 8.3`;
-- **MySQL**: the MySQL service of Herd Pro, [DBngin](https://dbngin.com), or any local MySQL/MariaDB server;
-- **Node.js** via [nvm](https://github.com/nvm-sh/nvm), WP-CLI and an ACF Pro license (see [Requirements](#requirements)).
+- **Herd**, che include PHP e Composer. Per il sito usa PHP 8.3 o successivo (vedi [Requisiti](#requisiti)); la versione di PHP del sito si fissa con `herd isolate 8.3`;
+- **MySQL**: il servizio MySQL di Herd Pro, [DBngin](https://dbngin.com) o un qualunque server MySQL/MariaDB locale;
+- **Node.js** tramite [nvm](https://github.com/nvm-sh/nvm), WP-CLI e una licenza ACF Pro (vedi [Requisiti](#requisiti)).
 
-### 1. Clone and link the site
+### 1. Clonare e collegare il sito
 
 ```bash
 git clone <repository-url> project-name
 cd project-name
 
-# Serve the folder as https://project-name.test (Herd detects Bedrock and uses web/ as docroot)
+# Serve la cartella come https://project-name.test (Herd riconosce Bedrock e usa web/ come docroot)
 herd link project-name
 herd secure project-name
 ```
 
-If the folder is inside a path parked by Herd (e.g. `~/Herd`), `herd link` is not needed: the site is already served as `<folder>.test`. `herd secure` is required anyway: the Vite dev server reuses the Herd certificate of the site to serve the assets over HTTPS.
+Se la cartella si trova in un percorso "parked" da Herd (es. `~/Herd`), `herd link` non serve: il sito è già servito come `<cartella>.test`. `herd secure` è comunque necessario: il dev server di Vite riusa il certificato Herd del sito per servire gli asset in HTTPS.
 
-### 2. ACF Pro credentials
+### 2. Credenziali ACF Pro
 
-ACF Pro (`wpengine/advanced-custom-fields-pro`) is installed from `https://connect.advancedcustomfields.com`, which requires a license. Before running `composer install`, create a local `auth.json` in the project root (gitignored, never commit it):
+ACF Pro (`wpengine/advanced-custom-fields-pro`) si installa da `https://connect.advancedcustomfields.com`, che richiede una licenza. Prima di `composer install` crea un `auth.json` locale nella root del progetto (è in `.gitignore`, non committarlo mai):
 
 ```bash
-# username = ACF Pro license key, password = the site URL the license is activated for
+# username = chiave di licenza ACF Pro, password = URL del sito per cui la licenza è attivata
 composer config --auth http-basic.connect.advancedcustomfields.com <license_key> <site_url>
 ```
 
-The resulting file has this shape:
+Il file risultante ha questa forma:
 
 ```json
 {
-    "http-basic": {
-        "connect.advancedcustomfields.com": {
-            "username": "<license_key>",
-            "password": "<site_url>"
-        }
+  "http-basic": {
+    "connect.advancedcustomfields.com": {
+      "username": "<license_key>",
+      "password": "<site_url>"
     }
+  }
 }
 ```
 
-Where there is no `auth.json` (CI, a build server), pass the same JSON through the `COMPOSER_AUTH` environment variable, stored as a secret: see [Secrets to create on GitHub](#secrets-to-create-on-github).
+Dove non c'è un `auth.json` (CI, server di build), passa lo stesso JSON nella variabile d'ambiente `COMPOSER_AUTH`, salvata come secret: vedi [Secret da creare su GitHub](#secret-da-creare-su-github).
 
-### 3. Configure `.env`
+### 3. Configurare `.env`
 
 ```bash
 cp .env.example .env
 ```
 
-Set at least:
+Imposta almeno:
 
-| Key | Value |
-| --- | --- |
-| `DB_NAME`, `DB_USER`, `DB_PASSWORD` | the local database (create it first, e.g. `mysql -u root -e "CREATE DATABASE project_name"`) |
-| `DB_HOST` | uncomment it only if the server is not on `localhost` (e.g. `127.0.0.1:3307` for a second DBngin instance) |
-| `WP_ENV` | `development` (see [Environments](#environments)) |
-| `WP_HOME` | `https://project-name.test`: it must match the Herd site, the Vite dev server reads it to pick the certificate |
-| `WP_SITEURL` | leave `"${WP_HOME}/wp"` |
-| salts (`AUTH_KEY` … `NONCE_SALT`) | unique random values |
+| Chiave                              | Valore                                                                                                                    |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `DB_NAME`, `DB_USER`, `DB_PASSWORD` | il database locale (crealo prima, es. `mysql -u root -e "CREATE DATABASE project_name"`)                                  |
+| `DB_HOST`                           | da decommentare solo se il server non è su `localhost` (es. `127.0.0.1:3307` per una seconda istanza DBngin)              |
+| `WP_ENV`                            | `development` (vedi [Ambienti](#ambienti))                                                                                |
+| `WP_HOME`                           | `https://project-name.test`: deve corrispondere al sito Herd, il dev server di Vite lo legge per scegliere il certificato |
+| `WP_SITEURL`                        | lascia `"${WP_HOME}/wp"`                                                                                                  |
+| salt (`AUTH_KEY` … `NONCE_SALT`)    | valori casuali unici                                                                                                      |
 
-Generate the salts with the [WP-CLI dotenv command](https://github.com/aaemnnosttv/wp-cli-dotenv-command) or paste them from the [Roots generator](https://roots.io/salts.html):
+Genera i salt con il [comando dotenv di WP-CLI](https://github.com/aaemnnosttv/wp-cli-dotenv-command) oppure copiali dal [generatore di Roots](https://roots.io/salts.html):
 
 ```bash
 wp package install aaemnnosttv/wp-cli-dotenv-command
 wp dotenv salts regenerate
 ```
 
-The optional keys are listed in [Environment variables](#environment-variables). Personal overrides that should not touch the shared `.env` can go in `.env.local` (gitignored, loaded after `.env`).
+Le chiavi opzionali sono elencate in [Variabili d'ambiente](#variabili-dambiente). Gli override personali che non devono toccare il `.env` condiviso vanno in `.env.local` (in `.gitignore`, caricato dopo `.env`).
 
-### 4. Install dependencies
+### 4. Installare le dipendenze
 
 ```bash
-# Root: WordPress, plugins, ACF Pro, WordPress translations
+# Root: WordPress, plugin, ACF Pro, traduzioni di WordPress
 composer install
 
-# Theme: Acorn (PHP) and the Vite/Tailwind toolchain (Node)
+# Tema: Acorn (PHP) e la toolchain Vite/Tailwind (Node)
 cd web/app/themes/sage
 composer install
-nvm install    # reads .nvmrc and uses the latest Node 22.x (see "Node version" in the theme README)
+nvm install    # legge .nvmrc e usa l'ultima Node 22.x (vedi "Versione di Node" nel README del tema)
 npm ci
 cd -
 ```
 
-### 5. Install WordPress (or import a database)
+### 5. Installare WordPress (o importare un database)
 
-Fresh install:
+Installazione da zero:
 
 ```bash
 wp core install --url=https://project-name.test --title="Project name" \
@@ -124,9 +130,9 @@ wp theme activate sage
 wp site switch-language it_IT
 ```
 
-Permalinks: when the theme is activated and no permalink structure is set, the theme sets `/%postname%/` and flushes the rewrite rules (`after_switch_theme` in `app/setup.php`; WordPress fires it on the first request after the switch, e.g. the next `wp` command or page load). An existing structure is never overwritten. Herd uses nginx, which reads no `.htaccess`: nothing to create (the `web/.htaccess` WordPress may write on Apache is gitignored).
+Permalink: quando il tema viene attivato e non c'è una struttura dei permalink, il tema imposta `/%postname%/` e rigenera le regole di rewrite (`after_switch_theme` in `app/setup.php`; WordPress lo esegue alla prima richiesta dopo il cambio di tema, es. il comando `wp` successivo o il caricamento di una pagina). Una struttura già impostata non viene mai sovrascritta. Herd usa nginx, che non legge `.htaccess`: non c'è niente da creare (il `web/.htaccess` che WordPress può scrivere su Apache è in `.gitignore`).
 
-Or import an existing dump and adapt the URLs:
+Oppure importa un dump esistente e adatta gli URL:
 
 ```bash
 wp db import dump.sql
@@ -134,171 +140,173 @@ wp search-replace 'https://www.example.com' 'https://project-name.test' --all-ta
 wp rewrite flush
 ```
 
-ACF field groups are loaded from `web/app/themes/sage/acf-json/`: nothing to import.
+I field group ACF vengono caricati da `web/app/themes/sage/acf-json/`: non c'è niente da importare.
 
-### 6. Start the theme dev server
+### 6. Avviare il dev server del tema
 
 ```bash
 cd web/app/themes/sage
 npm run dev
 ```
 
-Vite serves the assets with hot reload on `https://project-name.test:5173` and writes `public/hot`, which tells the theme to load the assets from the dev server; the file is removed when Vite stops (Ctrl+C), and the site falls back to the build in `public/build` (`npm run build`). Without either, the site has no CSS/JS. Details in [Build](web/app/themes/sage/README.md#build) in the theme README.
+Vite serve gli asset con hot reload su `https://project-name.test:5173` e scrive `public/hot`, che indica al tema di caricare gli asset dal dev server; il file viene rimosso quando Vite si ferma (Ctrl+C) e il sito torna alla build in `public/build` (`npm run build`). Senza nessuno dei due il sito non ha CSS/JS. Dettagli in [Build](web/app/themes/sage/README.md#build) nel README del tema.
 
-### Solo processes
+### Processi Solo
 
-With [Solo](https://soloterm.com), `solo.yml` defines the project processes (approve them once in the Solo UI: new or changed commands need to be trusted):
+Con [Solo](https://soloterm.com), `solo.yml` definisce i processi del progetto (vanno approvati una volta nella UI di Solo: i comandi nuovi o modificati devono essere "trusted"):
 
-| Process | Command | Starts automatically |
-| --- | --- | --- |
-| **Vite** | `npm run dev` in the theme (restarted when `vite.config.js` or `package-lock.json` change) | yes |
-| **Debug log** | `tail -n 0 -F logs/debug.log` (new lines only, waits for the file if it does not exist yet) | yes |
-| **Lint frontend** | `npm run lint` in the theme | no, start it from the sidebar |
-| **Build tema** | `npm run build` in the theme | no |
-| **Check PHP** | `composer check` (root and theme) | no |
+| Processo          | Comando                                                                                   | Avvio automatico           |
+| ----------------- | ----------------------------------------------------------------------------------------- | -------------------------- |
+| **Vite**          | `npm run dev` nel tema (riavviato quando cambiano `vite.config.js` o `package-lock.json`) | sì                         |
+| **Debug log**     | `tail -n 0 -F logs/debug.log` (solo le righe nuove, aspetta il file se non esiste ancora) | sì                         |
+| **Lint frontend** | `npm run lint` nel tema                                                                   | no, si avvia dalla sidebar |
+| **Build tema**    | `npm run build` nel tema                                                                  | no                         |
+| **Check PHP**     | `composer check` (root e tema)                                                            | no                         |
 
-Solo does not run `nvm use`: its processes use the **nvm default** Node. Make sure the default satisfies `engines` (e.g. `nvm alias default 22` after `nvm install 22`), otherwise Vite and the linters run on an older version.
+Solo non esegue `nvm use`: i suoi processi usano la Node **di default di nvm**. Assicurati che il default soddisfi `engines` (es. `nvm alias default 22` dopo `nvm install 22`), altrimenti Vite e i linter girano su una versione più vecchia.
 
-### Access URLs
+### URL di accesso
 
 - **Frontend**: `https://project-name.test`
 - **Admin**: `https://project-name.test/wp/wp-admin`
+- **Styleguide** (solo in development): `https://project-name.test/styleguide/`
 
-In development PHP errors are shown on the page and written to `logs/debug.log` (outside the webroot).
+In development gli errori PHP vengono mostrati nella pagina e scritti in `logs/debug.log` (fuori dalla webroot).
 
-### Site driver (`LocalValetDriver.php`)
+### Driver del sito (`LocalValetDriver.php`)
 
-Herd picks up `LocalValetDriver.php` in the project root before its own drivers, on every request (no restart needed). The file extends Herd's `BedrockValetDriver` and changes one thing: for requests routed to the front controller (`web/index.php`) it sets `$_SERVER['PHP_SELF']` to `/index.php`, as nginx (`try_files … /index.php?$args`) and Apache (WordPress `.htaccess`) do.
+Herd carica `LocalValetDriver.php` dalla root del progetto prima dei propri driver, a ogni richiesta (non serve riavviare). Il file estende il `BedrockValetDriver` di Herd e cambia una sola cosa: per le richieste instradate al front controller (`web/index.php`) imposta `$_SERVER['PHP_SELF']` a `/index.php`, come fanno nginx (`try_files … /index.php?$args`) e Apache (`.htaccess` di WordPress).
 
-Without it Herd sets `PHP_SELF` to the requested URI, and WordPress (`WP::parse_request()`) cancels the 404 when the requested path equals `PHP_SELF`: a non-existent URL that matches no rewrite rule, such as `/a/b/c/`, answers 200 with the home page instead of the theme 404. Static files, `wp-admin`, `wp-login.php`, `wp-cron.php`, `xmlrpc.php` and the other real PHP scripts are not affected.
+Senza il driver Herd imposta `PHP_SELF` all'URI richiesto, e WordPress (`WP::parse_request()`) annulla il 404 quando il percorso richiesto coincide con `PHP_SELF`: un URL inesistente che non corrisponde a nessuna regola di rewrite, come `/a/b/c/`, risponde 200 con la home invece del 404 del tema. I file statici, `wp-admin`, `wp-login.php`, `wp-cron.php`, `xmlrpc.php` e gli altri script PHP reali non sono toccati.
 
-The file is outside the docroot (`web/`), so it is never served, and staging/production ignore it. It needs Herd or Valet 4+ (which ship `Valet\Drivers\Specific\BedrockValetDriver`). To go back to Herd's default behaviour, delete the file.
+Il file sta fuori dalla docroot (`web/`), quindi non viene mai servito, e staging e produzione lo ignorano. Richiede Herd o Valet 4+ (che includono `Valet\Drivers\Specific\BedrockValetDriver`). Per tornare al comportamento predefinito di Herd basta eliminare il file.
 
-If Herd shows a fatal error about `BedrockValetDriver` (for example because a future version renames the class), delete `LocalValetDriver.php`. The driver also takes precedence over Herd's global custom drivers (such as `BedrockMultisiteValetDriver`): if the site becomes a multisite, remove it or adapt it.
+Se Herd mostra un errore fatale su `BedrockValetDriver` (per esempio perché una versione futura rinomina la classe), elimina `LocalValetDriver.php`. Il driver ha anche la precedenza sui driver personalizzati globali di Herd (come `BedrockMultisiteValetDriver`): se il sito diventa un multisite, rimuovilo o adattalo.
 
-## Environments
+## Ambienti
 
-`WP_ENV` selects the environment. `config/application.php` holds the **production** defaults and then loads `config/environments/{WP_ENV}.php`, if it exists, to override them. An empty `WP_ENV` means `production`. `WP_ENVIRONMENT_TYPE` (what `wp_get_environment_type()` returns) defaults to `WP_ENV` when it is `production`, `staging`, `development` or `local`.
+`WP_ENV` sceglie l'ambiente. `config/application.php` contiene i valori di **produzione** e poi carica `config/environments/{WP_ENV}.php`, se esiste, per sovrascriverli. Un `WP_ENV` vuoto vale `production`. `WP_ENVIRONMENT_TYPE` (il valore restituito da `wp_get_environment_type()`) vale di default `WP_ENV` quando questo è `production`, `staging`, `development` o `local`.
 
-| Setting | `production` (`config/application.php`) | `staging` (`environments/staging.php`) | `development` (`environments/development.php`) |
-| --- | --- | --- | --- |
-| `WP_DEBUG`, `WP_DEBUG_DISPLAY`, `SCRIPT_DEBUG` | off | off | on (`WP_DEBUG`/`WP_DEBUG_DISPLAY` overridable from `.env`) |
-| `WP_DEBUG_LOG` | off | off | `logs/debug.log` (`false`/`0` turns it off, a string is used as path) |
-| `SAVEQUERIES`, `WP_DISABLE_FATAL_ERROR_HANDLER` | off | off | on |
-| `DISALLOW_INDEXING` (search engines blocked) | no | yes | yes |
-| `DISALLOW_FILE_MODS` (no plugin/theme installs and updates from the admin) | yes | yes | no |
-| `DISALLOW_FILE_EDIT`, `AUTOMATIC_UPDATER_DISABLED` | yes | yes | yes |
+| Impostazione                                                                          | `production` (`config/application.php`) | `staging` (`environments/staging.php`) | `development` (`environments/development.php`)                                     |
+| ------------------------------------------------------------------------------------- | --------------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------- |
+| `WP_DEBUG`, `WP_DEBUG_DISPLAY`, `SCRIPT_DEBUG`                                        | off                                     | off                                    | on (`WP_DEBUG`/`WP_DEBUG_DISPLAY` sovrascrivibili da `.env`)                       |
+| `WP_DEBUG_LOG`                                                                        | off                                     | off                                    | `logs/debug.log` (`false`/`0` lo disattiva, una stringa viene usata come percorso) |
+| `SAVEQUERIES`, `WP_DISABLE_FATAL_ERROR_HANDLER`                                       | off                                     | off                                    | on                                                                                 |
+| `DISALLOW_INDEXING` (motori di ricerca bloccati)                                      | no                                      | sì                                     | sì                                                                                 |
+| `DISALLOW_FILE_MODS` (niente installazioni e aggiornamenti di plugin/temi dall'admin) | sì                                      | sì                                     | no                                                                                 |
+| `DISALLOW_FILE_EDIT`, `AUTOMATIC_UPDATER_DISABLED`                                    | sì                                      | sì                                     | sì                                                                                 |
 
-In every environment WordPress and the plugins are updated with Composer, never from the admin; staging differs from production only in blocking search engines. There is no `local` file: use `development` locally.
+In ogni ambiente WordPress e i plugin si aggiornano con Composer, mai dall'admin; lo staging differisce dalla produzione solo per il blocco dei motori di ricerca. Non c'è un file `local`: in locale usa `development`.
 
-### Environment variables
+### Variabili d'ambiente
 
-Read by `config/application.php` and `config/environments/` (`.env`, then `.env.local`):
+Lette da `config/application.php` e `config/environments/` (`.env`, poi `.env.local`):
 
-| Variable | Required | Notes |
-| --- | --- | --- |
-| `WP_HOME`, `WP_SITEURL` | yes | site URL and WordPress URL (`"${WP_HOME}/wp"`) |
-| `DB_NAME`, `DB_USER`, `DB_PASSWORD` | yes, unless `DATABASE_URL` is set | |
-| `DATABASE_URL` | no | DSN (`mysql://user:password@host:port/name`) instead of the `DB_*` keys |
-| `DB_HOST` | no | default `localhost` |
-| `DB_PREFIX` | no | table prefix, default `wp_` |
-| `DB_SSL` | no | `true` enables `MYSQLI_CLIENT_SSL` |
-| `WP_ENV` | no | `development`, `staging` or `production` (default) |
-| `WP_ENVIRONMENT_TYPE` | no | default `WP_ENV` when it is `production`, `staging`, `development` or `local` |
-| `DISABLE_WP_CRON` | no | run WP-Cron from a system cron instead of on page loads |
-| `WP_POST_REVISIONS` | no | `true` (default), `false` or the number of revisions to keep |
-| `WP_DEBUG`, `WP_DEBUG_DISPLAY`, `WP_DEBUG_LOG` | no | development only (production and staging force them off) |
-| `AUTH_KEY` … `NONCE_SALT` | yes | eight salts, different per environment |
+| Variabile                                      | Obbligatoria                 | Note                                                                        |
+| ---------------------------------------------- | ---------------------------- | --------------------------------------------------------------------------- |
+| `WP_HOME`, `WP_SITEURL`                        | sì                           | URL del sito e URL di WordPress (`"${WP_HOME}/wp"`)                         |
+| `DB_NAME`, `DB_USER`, `DB_PASSWORD`            | sì, salvo con `DATABASE_URL` |                                                                             |
+| `DATABASE_URL`                                 | no                           | DSN (`mysql://user:password@host:port/name`) al posto delle chiavi `DB_*`   |
+| `DB_HOST`                                      | no                           | default `localhost`                                                         |
+| `DB_PREFIX`                                    | no                           | prefisso delle tabelle, default `wp_`                                       |
+| `DB_SSL`                                       | no                           | `true` attiva `MYSQLI_CLIENT_SSL`                                           |
+| `WP_ENV`                                       | no                           | `development`, `staging` o `production` (default)                           |
+| `WP_ENVIRONMENT_TYPE`                          | no                           | default `WP_ENV` quando è `production`, `staging`, `development` o `local`  |
+| `DISABLE_WP_CRON`                              | no                           | esegue WP-Cron da un cron di sistema invece che al caricamento delle pagine |
+| `WP_POST_REVISIONS`                            | no                           | `true` (default), `false` o il numero di revisioni da conservare            |
+| `WP_DEBUG`, `WP_DEBUG_DISPLAY`, `WP_DEBUG_LOG` | no                           | solo in development (produzione e staging li forzano a off)                 |
+| `AUTH_KEY` … `NONCE_SALT`                      | sì                           | otto salt, diversi per ogni ambiente                                        |
 
-The theme build reads only `WP_HOME` (and `APP_URL`, if set) from the project `.env`. `APP_URL` and `VITE_THEME_SLUG` can also be passed as shell variables to `npm run dev`/`build`: see [Build](web/app/themes/sage/README.md#build).
+La build del tema legge dal `.env` del progetto solo `WP_HOME` (e `APP_URL`, se impostata). `APP_URL` e `VITE_THEME_SLUG` si possono passare anche come variabili di shell a `npm run dev`/`build`: vedi [Build](web/app/themes/sage/README.md#build).
 
-## WordPress translations
+## Traduzioni di WordPress
 
-WordPress translations (core and wordpress.org plugins/themes installed via Composer) are downloaded by [`inpsyde/wp-translation-downloader`](https://github.com/inpsyde/wp-translation-downloader) on every `composer install`/`composer update`, matching the installed versions. The files in `web/app/languages/` and `wp-translation-downloader.lock` are **not versioned**: if they are missing or stale, regenerate them with:
+Le traduzioni di WordPress (core e plugin/temi di wordpress.org installati con Composer) vengono scaricate da [`inpsyde/wp-translation-downloader`](https://github.com/inpsyde/wp-translation-downloader) a ogni `composer install`/`composer update`, in base alle versioni installate. I file in `web/app/languages/` e `wp-translation-downloader.lock` **non sono versionati**: se mancano o non sono aggiornati, rigenerali con:
 
 ```bash
 composer install
-# or, to force the download
+# oppure, per forzare il download
 composer wp-translation-downloader:download
 ```
 
-To add a language, add its locale to `extra.wp-translation-downloader.languages` in `composer.json` (e.g. `["it_IT", "en_GB"]`) and run `composer wp-translation-downloader:download` (`en_US` needs nothing: it is built into WordPress). Packages that ship their own translations (ACF Pro) are listed in `excludes`.
+Per aggiungere una lingua, aggiungi il suo locale a `extra.wp-translation-downloader.languages` in `composer.json` (es. `["it_IT", "en_GB"]`) ed esegui `composer wp-translation-downloader:download` (`en_US` non richiede nulla: è incluso in WordPress). I pacchetti che includono le proprie traduzioni (ACF Pro) sono elencati in `excludes`.
 
-The theme strings are written in Italian and translated in the theme itself: see [Translations](web/app/themes/sage/README.md#translations) in the theme README.
+Le stringhe del tema sono scritte in italiano e tradotte nel tema stesso: vedi [Traduzioni](web/app/themes/sage/README.md#traduzioni) nel README del tema.
 
-## Commands
+## Comandi
 
 ### Bedrock
 
 ```bash
-# Install a plugin or theme from wpackagist
+# Installa un plugin o un tema da wpackagist
 composer require wpackagist-plugin/plugin-name
 composer require wpackagist-theme/theme-name
 
-# Update WordPress and plugins (WordPress stays on ~7.1.0: a new x.y release is a manual change)
+# Aggiorna WordPress e i plugin (WordPress resta su ~7.1.0: una nuova release x.y è una modifica manuale)
 composer update
 ```
 
-### Theme (from `web/app/themes/sage`)
+### Tema (da `web/app/themes/sage`)
 
 ```bash
-npm run dev      # Vite dev server with hot reload
-npm run build    # production build in public/build
+npm run dev      # dev server Vite con hot reload
+npm run build    # build di produzione in public/build
 npm run lint     # ESLint, Stylelint, blade-formatter --check-formatted, prettier --check
-npm run format   # Prettier + blade-formatter (writes)
-npm run translate          # rebuild sage.pot and update the .po files
-npm run translate:compile  # compile .mo, .l10n.php and .json
+npm run format   # Prettier + blade-formatter (scrive i file)
+npm run blocks:manifest    # rigenera il manifest dei blocchi dai block.json
+npm run translate          # rigenera sage.pot e aggiorna i file .po
+npm run translate:compile  # compila .mo, .l10n.php e .json
 ```
 
-The single `lint:*`, `format:*` and `translate:*` scripts are described in the theme README.
+I singoli script `lint:*`, `format:*`, `blocks:*` e `translate:*` sono descritti nel README del tema.
 
-### PHP quality (from the project root)
+### Qualità PHP (dalla root del progetto)
 
 ```bash
-# Pint: root (preset per) + theme (preset laravel, own pint.json)
+# Pint: root (preset per) + tema (preset laravel, con il suo pint.json)
 composer lint
 composer lint:fix
 
-# PHPStan level 6 and Pest tests of the theme
+# PHPStan livello 6 e test Pest del tema
 composer analyse
 composer test
 
-# Everything (CI): root validate --strict, audit and Pint, then `composer check` of the theme
+# Tutto (CI): validate --strict, audit e Pint della root, poi `composer check` del tema
 composer check
 ```
 
-The same scripts exist in the theme (`composer lint`, `analyse`, `test`, `check` from `web/app/themes/sage`, theme only): see [PHP quality](web/app/themes/sage/README.md#php-quality).
+Gli stessi script esistono nel tema (`composer lint`, `analyse`, `test`, `check` da `web/app/themes/sage`, solo per il tema): vedi [Qualità PHP](web/app/themes/sage/README.md#qualità-php).
 
-## Continuous integration
+## Integrazione continua (CI)
 
-`.github/workflows/ci.yml` runs on every push to `main` and on every pull request (a new push to a PR cancels the previous run). The workflow only has `contents: read`. Every action is pinned to a commit SHA (with the version in a comment); Dependabot updates SHA and comment together.
+`.github/workflows/ci.yml` gira a ogni push su `main` e su ogni pull request (una nuova push su una PR annulla il run precedente). Il workflow ha solo il permesso `contents: read`. Ogni action è fissata allo SHA di un commit (con la versione in un commento); Dependabot aggiorna SHA e commento insieme.
 
-| Job | What it runs |
-| --- | --- |
-| **Tema PHP 8.2 / 8.3 / 8.4** | in `web/app/themes/sage`: `composer install` + `composer check` (validate --strict, audit, Pint, PHPStan, Pest). Public packages only, no credentials. |
-| **Root Bedrock** (PHP 8.3: the root lock includes Pint 1.32, which needs PHP 8.3, so a full install with dev tools fails on 8.2) | `composer validate --strict`, `composer install` (ACF Pro via `COMPOSER_AUTH`, WordPress translations via wp-translation-downloader), `composer audit --locked`, `vendor/bin/pint --test`. |
-| **Frontend** (Node from `.nvmrc`, i.e. the latest 22.x) | in `web/app/themes/sage`: `npm ci`, `npm run lint`, `npm run build`. Needs neither `vendor/` nor `.env`. |
+| Job                                                                                                                                                              | Cosa esegue                                                                                                                                                                                         |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Tema PHP 8.2 / 8.3 / 8.4**                                                                                                                                     | in `web/app/themes/sage`: `composer install` + `composer check` (validate --strict, audit, Pint, PHPStan, Pest). Solo pacchetti pubblici, nessuna credenziale.                                      |
+| **Root Bedrock** (PHP 8.3: il lock della root include Pint 1.32, che richiede PHP 8.3, quindi un install completo con gli strumenti di sviluppo fallisce su 8.2) | `composer validate --strict`, `composer install` (ACF Pro tramite `COMPOSER_AUTH`, traduzioni di WordPress tramite wp-translation-downloader), `composer audit --locked`, `vendor/bin/pint --test`. |
+| **Frontend** (Node da `.nvmrc`, cioè l'ultima 22.x)                                                                                                              | in `web/app/themes/sage`: `npm ci`, `npm run lint`, `npm run blocks:manifest:check`, `npm run build`. Non servono né `vendor/` né `.env`.                                                           |
 
-### Secrets to create on GitHub
+### Secret da creare su GitHub
 
-- **Actions** → *Settings → Secrets and variables → Actions → New repository secret*: `COMPOSER_AUTH`, whose value is the whole content of your local `auth.json` (the `http-basic` JSON for `connect.advancedcustomfields.com`, same shape as in [ACF Pro credentials](#2-acf-pro-credentials)). Never paste it anywhere else.
-- **Dependabot** → *Settings → Secrets and variables → Dependabot*:
-  - `COMPOSER_AUTH` again, with the same value: workflow runs triggered by Dependabot PRs only see Dependabot secrets, so without it the root job fails on those PRs;
-  - `ACF_PRO_LICENSE_KEY` (ACF Pro license key) and `ACF_PRO_SITE_URL` (site URL the license is activated for), used by `.github/dependabot.yml` to reach the ACF Pro repository when updating the root `composer.lock`.
+- **Actions** → _Settings → Secrets and variables → Actions → New repository secret_: `COMPOSER_AUTH`, con il contenuto completo del tuo `auth.json` locale (il JSON `http-basic` per `connect.advancedcustomfields.com`, nella stessa forma di [Credenziali ACF Pro](#2-credenziali-acf-pro)). Non incollarlo da nessun'altra parte.
+- **Dependabot** → _Settings → Secrets and variables → Dependabot_:
+  - di nuovo `COMPOSER_AUTH`, con lo stesso valore: i run del workflow avviati dalle PR di Dependabot vedono solo i secret di Dependabot, quindi senza di esso il job della root fallisce su quelle PR;
+  - `ACF_PRO_LICENSE_KEY` (chiave di licenza ACF Pro) e `ACF_PRO_SITE_URL` (URL del sito per cui la licenza è attivata), usati da `.github/dependabot.yml` per raggiungere il repository di ACF Pro quando aggiorna il `composer.lock` della root.
 
-If `COMPOSER_AUTH` is missing the root job fails with an explicit error, except on pull requests from forks: GitHub does not pass secrets to them, so the job warns, skips `composer install` and Pint and still runs `validate` and `audit`.
+Se `COMPOSER_AUTH` manca, il job della root fallisce con un errore esplicito, tranne che nelle pull request da fork: GitHub non passa loro i secret, quindi il job mostra un avviso, salta `composer install` e Pint ed esegue comunque `validate` e `audit`.
 
 ### Dependabot
 
-`.github/dependabot.yml` checks every Monday (Europe/Rome) Composer in `/` and in `web/app/themes/sage`, npm in `web/app/themes/sage` and the GitHub Actions used by the workflow. Minor and patch updates are grouped (dev and production separately for Composer), with at most 5 open PRs per ecosystem. For npm, Stylelint and its config are grouped including majors, since they share major and engines. WordPress core (`roots/wordpress`) only gets patch updates: moving to a new x.y release stays a manual decision. `roave/security-advisories` is ignored.
+`.github/dependabot.yml` controlla ogni lunedì (Europe/Rome) Composer in `/` e in `web/app/themes/sage`, npm in `web/app/themes/sage` e le GitHub Actions usate dal workflow. Gli aggiornamenti minor e patch sono raggruppati (per Composer, dipendenze di sviluppo e di produzione separate), con al massimo 5 PR aperte per ecosistema. Per npm, Stylelint e la sua config sono raggruppati major comprese, perché condividono major ed `engines`. Il core di WordPress (`roots/wordpress`) riceve solo aggiornamenti patch: il passaggio a una nuova release x.y resta una decisione manuale. `roave/security-advisories` è ignorato.
 
-## Deployment
+## Deploy
 
-There is no deploy script: the steps below work for any target (a build on the server, a CI artifact uploaded via rsync/SFTP, etc.). The server needs PHP >= 8.2, MySQL, a web server with the docroot on **`web/`** (not the project root) and HTTPS.
+Non c'è uno script di deploy: i passi seguenti valgono per qualunque destinazione (build sul server, artefatto di CI caricato via rsync/SFTP, ecc.). Il server richiede PHP >= 8.2, MySQL, un web server con la docroot su **`web/`** (non sulla root del progetto) e HTTPS.
 
 ### 1. Build
 
-From the project root (on the server or in CI, with the ACF Pro credentials available, see below):
+Dalla root del progetto (sul server o in CI, con le credenziali ACF Pro disponibili, vedi sotto):
 
 ```bash
 composer install --no-dev --optimize-autoloader --no-interaction
@@ -309,30 +317,30 @@ npm ci
 npm run build
 ```
 
-- `--no-dev` drops Pint, PHPStan, Pest and the other dev tools (production then only needs PHP 8.2).
-- `--optimize-autoloader` (`-o`, already the default in both `composer.json`) generates a classmap. `--classmap-authoritative` also works with Acorn (the theme classes in `app/` and the vendor classes are all in the classmap), but then every new class requires a new `composer install`/`dump-autoload`: use it only if the build always runs on deploy.
-- The theme `composer.json` sets `config.platform.php` to `8.2.0`, so Composer does not check the PHP version of the build machine: the check only happens at runtime, in `vendor/composer/platform_check.php` (plus WordPress, which refuses to activate the theme below `Requires PHP: 8.2` in `style.css`). Make sure the server runs PHP >= 8.2.
-- The root `composer install` also downloads the WordPress translations into `web/app/languages/` and installs ACF Pro, so it needs the ACF credentials where it runs: an `auth.json` on the server (outside the webroot, never in the repository) or `COMPOSER_AUTH` as a CI secret when the build is done in CI.
-- `npm run build` writes `web/app/themes/sage/public/build/` (hashed assets + `manifest.json`). Node is not needed on the server if the build is done elsewhere.
+- `--no-dev` esclude Pint, PHPStan, Pest e gli altri strumenti di sviluppo (in produzione basta quindi PHP 8.2).
+- `--optimize-autoloader` (`-o`, già il default in entrambi i `composer.json`) genera una classmap. Anche `--classmap-authoritative` funziona con Acorn (le classi del tema in `app/` e quelle dei vendor sono tutte nella classmap), ma in quel caso ogni nuova classe richiede un nuovo `composer install`/`dump-autoload`: usalo solo se la build gira sempre a ogni deploy.
+- Il `composer.json` del tema imposta `config.platform.php` a `8.2.0`, quindi Composer non controlla la versione di PHP della macchina di build: il controllo avviene solo a runtime, in `vendor/composer/platform_check.php` (oltre che in WordPress, che rifiuta di attivare il tema sotto `Requires PHP: 8.2` di `style.css`). Assicurati che il server abbia PHP >= 8.2.
+- Il `composer install` della root scarica anche le traduzioni di WordPress in `web/app/languages/` e installa ACF Pro, quindi richiede le credenziali ACF dove gira: un `auth.json` sul server (fuori dalla webroot, mai nel repository) oppure `COMPOSER_AUTH` come secret di CI quando la build si fa in CI.
+- `npm run build` scrive `web/app/themes/sage/public/build/` (asset con hash + `manifest.json`). Node non serve sul server se la build si fa altrove.
 
-### 2. What to upload
+### 2. Cosa caricare
 
-Upload the whole project (root included, not only `web/`): `config/`, `vendor/`, `web/` (with `web/wp`, `web/app/plugins`, `web/app/languages` generated by Composer), `composer.json`/`composer.lock`, `wp-cli.yml`, the theme with `vendor/` and `public/build/`.
+Carica l'intero progetto (root compresa, non solo `web/`): `config/`, `vendor/`, `web/` (con `web/wp`, `web/app/plugins`, `web/app/languages` generati da Composer), `composer.json`/`composer.lock`, `wp-cli.yml`, il tema con `vendor/` e `public/build/`.
 
-Do **not** upload:
+**Non** caricare:
 
-- `.git/`, `.github/`, `.idea/`, `MIGLIORIE.md` and other development files;
-- `web/app/themes/sage/node_modules/` (never used at runtime). Keep `resources/`: Blade views, blocks, `lang/` and the font/image files checked by the theme are read at runtime;
-- `web/app/themes/sage/public/hot` (if it exists the theme tries to load the assets from the Vite dev server);
-- the local `.env`, `.env.local`, `auth.json`;
-- `logs/*.log`, `web/app/uploads/` (synced separately, never overwritten by a deploy), `web/app/cache/`;
-- tests, stubs and tool configs: `web/app/themes/sage/tests/`, `web/app/themes/sage/stubs/` (PHPStan stubs), `phpunit.xml`, `phpstan.neon.dist`, `pint.json` (root and theme), `eslint.config.js`, `.prettierrc.json`, `.prettierignore`, `.stylelintrc.json`, `.bladeformatterrc.json`, `.bladeignore`, `.editorconfig`, `.nvmrc`, `solo.yml`, `CONVENTIONS.md`, `README.md` (root and theme).
+- `.git/`, `.github/`, `.idea/`, `MIGLIORIE.md`, `LocalValetDriver.php` e gli altri file di sviluppo;
+- `web/app/themes/sage/node_modules/` (mai usato a runtime). Mantieni `resources/`: le view Blade, i blocchi, `lang/` e i file di font e immagini controllati dal tema vengono letti a runtime;
+- `web/app/themes/sage/public/hot` (se esiste, il tema prova a caricare gli asset dal dev server di Vite);
+- `.env`, `.env.local` e `auth.json` locali;
+- `logs/*.log`, `web/app/uploads/` (sincronizzata a parte, mai sovrascritta da un deploy), `web/app/cache/`;
+- test, stub e configurazioni degli strumenti: `web/app/themes/sage/tests/`, `web/app/themes/sage/stubs/` (stub di PHPStan), `phpunit.xml`, `phpstan.neon.dist`, `pint.json` (root e tema), `eslint.config.js`, `.prettierrc.json`, `.prettierignore`, `.stylelintrc.json`, `.bladeformatterrc.json`, `.bladeignore`, `.editorconfig`, `.nvmrc`, `solo.yml`, `CONVENTIONS.md`, `README.md` (root e tema).
 
-`wp-translation-downloader.lock` is only useful together with `web/app/languages/`: upload both or neither, otherwise a later `composer install` on the server considers the translations installed and does not download them.
+`wp-translation-downloader.lock` serve solo insieme a `web/app/languages/`: carica entrambi o nessuno dei due, altrimenti un successivo `composer install` sul server considera le traduzioni già installate e non le scarica.
 
-### 3. `.env` on the server
+### 3. `.env` sul server
 
-Create it by hand on the server (never copy the local one):
+Crealo a mano sul server (non copiare quello locale):
 
 ```env
 DB_NAME='...'
@@ -344,60 +352,65 @@ WP_ENV='production'
 WP_HOME='https://www.example.com'
 WP_SITEURL="${WP_HOME}/wp"
 
-# new salts, different from development
+# salt nuovi, diversi da quelli di sviluppo
 AUTH_KEY='...'
 # ... SECURE_AUTH_KEY, LOGGED_IN_KEY, NONCE_KEY, AUTH_SALT, SECURE_AUTH_SALT, LOGGED_IN_SALT, NONCE_SALT
 ```
 
-Use `WP_ENV='staging'` for a staging copy: what changes is described in [Environments](#environments).
+Per una copia di staging usa `WP_ENV='staging'`: le differenze sono descritte in [Ambienti](#ambienti).
 
-### 4. Permissions
+### 4. Permessi
 
-The PHP user must be able to write:
+L'utente PHP deve poter scrivere in:
 
 - `web/app/uploads/` (media);
-- `web/app/cache/` (Acorn: compiled Blade views and bootstrap cache in `web/app/cache/acorn/`);
-- `logs/`, only if `WP_DEBUG_LOG` is enabled on the server.
+- `web/app/cache/` (Acorn: view Blade compilate e cache di bootstrap in `web/app/cache/acorn/`);
+- `logs/`, solo se `WP_DEBUG_LOG` è attivo sul server.
 
-Everything else can be read-only for the PHP user.
+Tutto il resto può essere in sola lettura per l'utente PHP.
 
-### 5. After each deploy
+### 5. Dopo ogni deploy
 
-From the project root on the server:
+Dalla root del progetto sul server:
 
 ```bash
-# Clear the Acorn caches of the previous release, then rebuild them
+# Svuota le cache di Acorn della release precedente, poi ricostruiscile
 wp acorn optimize:clear
-wp acorn optimize        # config, events, routes and compiled Blade views
+wp acorn optimize        # config, eventi, route e view Blade compilate
 
-# Only if rewrite rules changed (new post types/taxonomies, custom rewrites, permalink structure)
+# Solo se sono cambiate le regole di rewrite (nuovi post type/tassonomie, rewrite personalizzate, struttura dei permalink)
 wp rewrite flush
 ```
 
-`wp acorn optimize` caches the configuration too: after changing `.env` run `wp acorn optimize:clear` (and `wp acorn optimize` again). On the first deploy also run `wp core install` or import the database (`wp search-replace` of the URLs) and activate the theme: the permalinks are set on activation as in [step 5](#5-install-wordpress-or-import-a-database) of the local setup. With Apache, WordPress writes the rewrite rules in `web/.htaccess` only if the file is writable; with nginx configure `try_files $uri $uri/ /index.php?$args;`.
+`wp acorn optimize` mette in cache anche la configurazione: dopo una modifica al `.env` esegui `wp acorn optimize:clear` (e di nuovo `wp acorn optimize`). Al primo deploy esegui anche `wp core install` o importa il database (`wp search-replace` degli URL) e attiva il tema: i permalink vengono impostati all'attivazione come al [passo 5](#5-installare-wordpress-o-importare-un-database) del setup locale. Con Apache, WordPress scrive le regole di rewrite in `web/.htaccess` solo se il file è scrivibile; con nginx configura `try_files $uri $uri/ /index.php?$args;`.
 
-## Project structure
+## Struttura del progetto
 
 ```
 project-name/
-├── config/                 # Bedrock configuration (application.php + environments/)
+├── .github/                # Workflow CI e configurazione di Dependabot
+├── config/                 # Configurazione Bedrock (application.php + environments/)
 ├── web/                    # Docroot
 │   ├── app/
-│   │   ├── languages/      # WordPress translations (generated, not versioned)
-│   │   ├── mu-plugins/     # Must-use plugins
-│   │   ├── plugins/        # Plugins (installed by Composer, not versioned)
+│   │   ├── languages/      # Traduzioni di WordPress (generate, non versionate)
+│   │   ├── mu-plugins/     # Plugin must-use
+│   │   ├── plugins/        # Plugin (installati da Composer, non versionati)
 │   │   ├── themes/
-│   │   │   └── sage/       # The theme: see its README and CONVENTIONS.md
-│   │   └── uploads/        # Uploaded files (not versioned)
-│   ├── wp/                 # WordPress core (installed by Composer, never edit it)
-│   ├── wp-config.php       # Loads config/application.php
+│   │   │   └── sage/       # Il tema: vedi il suo README e CONVENTIONS.md
+│   │   └── uploads/        # File caricati (non versionati)
+│   ├── wp/                 # Core di WordPress (installato da Composer, non modificarlo mai)
+│   ├── wp-config.php       # Carica config/application.php
 │   └── index.php           # Entry point
-├── logs/                   # debug.log in development (outside the webroot, not versioned)
-├── vendor/                 # Composer dependencies
-├── .env                    # Environment configuration (never commit it)
-├── auth.json               # ACF Pro credentials (never commit it)
-├── composer.json           # PHP dependencies and quality scripts
-├── LocalValetDriver.php    # Herd site driver, local only (see "Site driver")
-├── solo.yml                # Solo processes
-└── wp-cli.yml              # WP-CLI paths (web/wp, docroot web/)
+├── logs/                   # debug.log in development (fuori dalla webroot, non versionato)
+├── vendor/                 # Dipendenze Composer
+├── .env                    # Configurazione dell'ambiente (non committarlo mai)
+├── auth.json               # Credenziali ACF Pro (non committarlo mai)
+├── composer.json           # Dipendenze PHP e script di qualità
+├── LocalValetDriver.php    # Driver del sito per Herd, solo in locale (vedi "Driver del sito")
+├── solo.yml                # Processi Solo
+└── wp-cli.yml              # Percorsi di WP-CLI (web/wp, docroot web/)
 ```
+
+## Licenza
+
+MIT (vedi [LICENSE.md](LICENSE.md)). Bedrock e Sage sono progetti di [Roots](https://roots.io/), anch'essi con licenza MIT.

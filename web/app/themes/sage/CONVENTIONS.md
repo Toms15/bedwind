@@ -122,7 +122,7 @@ Example slug: `cards`. Copy from `only-text` where possible.
   - `App\Queries\*`: static query methods returning plain arrays for the views (`Posts::latest()`, `Posts::paginated()`, `Pages::children()`);
   - `App\Blocks\*`: block rendering and shared block data (`BlockRenderer`), per-block assets (`BlockAssets`);
   - `App\Navigation\*`: navigation helpers (`Breadcrumbs`);
-  - `App\View\Composers\*`: Acorn view composers;
+  - `App\View\Composers\*`: Acorn view composers. Their public methods reach the views as lazy variables (`InvokableComponentVariable`): printed with `{{ }}` they are computed only when used, but in a condition they are always truthy, so call them (`$customLogo()`) to test the value. `App` (every view) provides `$siteName` (plain text, print it with `{{ }}`), `$customLogo` (`get_custom_logo()` markup or `''`; the header falls back to the site name) and `$isFrontPage` (first page of the front page: `aria-current="page"` on the fallback home link, as core does on the logo link);
   - `App\Styleguide`: the development-only `/styleguide/` route (see [Styleguide](#styleguide)).
 - Hooks and functions without a class are in the files loaded by `functions.php` (`setup`, `filters`, `blocks`, `helpers`, `svg`, `rewrites`). Helper functions live in `app/helpers.php`, namespace `App`, and are called in Blade with the fully qualified name: `\App\get_next_heading_level()`, `\App\get_trimmed_excerpt()`, `\App\random_string_for_id()`, `\App\get_fallback_image_url()`.
 - Theme filters are prefixed `sage/` (list in the [README](README.md#theme-filters)).

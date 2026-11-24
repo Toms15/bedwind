@@ -37,7 +37,7 @@
 | M24 | ✅ | Componenti `x-alert`, `x-share`, `x-title`, placeholder ACF | Frontend | 🟠 | M | M05 |
 | M25 | ✅ | Breadcrumb: Composer + componente + JSON-LD | SEO/A11y | 🟠 | M | M28 |
 | M26 | ✅ | i18n completo (sorgente italiana, en_US, `resources/lang`) | i18n | 🟠 | S | – |
-| M27 | ⬜ | Landmark del layout, skip link, custom logo | A11y | 🟢 | S | M04 |
+| M27 | ✅ | Landmark del layout, skip link, custom logo | A11y | 🟢 | S | M04 |
 | M28 | ✅ | Architettura: Service Provider e classi PSR-4 | Architettura | 🟠 | L | – |
 | M29 | ✅ | Registrazione dei blocchi via manifest, asset JS/CSS per blocco | Blocchi | 🟢 | M | M28, M22 |
 | M30 | ✅ | Separare i field group ACF comuni da quelli specifici | Blocchi | 🟢 | M | M01 |

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-24T08:38:04+00:00\n"
+"POT-Creation-Date: 2026-11-24T08:56:03+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: sage\n"
@@ -159,11 +159,11 @@ msgstr ""
 msgid "Navigazione principale"
 msgstr ""
 
-#: app/setup.php:192
+#: app/setup.php:209
 msgid "Principale"
 msgstr ""
 
-#: app/setup.php:197
+#: app/setup.php:214
 msgid "Piè di pagina"
 msgstr ""
 
@@ -448,6 +448,10 @@ msgstr ""
 msgid "Vai al contenuto"
 msgstr ""
 
+#: resources/views/layouts/app.blade.php:31
+msgid "Barra laterale"
+msgstr ""
+
 #: resources/views/partials/comments.blade.php:15
 msgid "Navigazione commenti"
 msgstr ""
@@ -464,6 +468,10 @@ msgstr ""
 #: resources/views/partials/entry-meta.blade.php:7
 msgctxt "post author"
 msgid "Di"
+msgstr ""
+
+#: resources/views/sections/header.blade.php:18
+msgid "Menu principale"
 msgstr ""
 
 #: resources/views/styleguide.blade.php:19

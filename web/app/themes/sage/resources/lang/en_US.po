@@ -139,11 +139,11 @@ msgstr "Archive %s"
 msgid "Navigazione principale"
 msgstr "Primary Navigation"
 
-#: app/setup.php:192
+#: app/setup.php:209
 msgid "Principale"
 msgstr "Primary"
 
-#: app/setup.php:197
+#: app/setup.php:214
 msgid "Piè di pagina"
 msgstr "Footer"
 
@@ -681,3 +681,11 @@ msgstr "– the underline is in the base layer: without it, the link must be tol
 #: resources/views/styleguide.blade.php:212
 msgid "role=\"status\" è il default. role=\"alert\" (live region assertiva) va passato solo per messaggi inseriti dinamicamente:"
 msgstr "role=\"status\" is the default. role=\"alert\" (assertive live region) should only be passed for dynamically inserted messages:"
+
+#: resources/views/layouts/app.blade.php:31
+msgid "Barra laterale"
+msgstr "Sidebar"
+
+#: resources/views/sections/header.blade.php:18
+msgid "Menu principale"
+msgstr "Main menu"

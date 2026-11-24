@@ -22,12 +22,12 @@
 
       @include('sections.header')
 
-      <main id="main" class="main">
+      <main id="main" class="main focus:outline-none" tabindex="-1">
         @yield('content')
       </main>
 
       @hasSection('sidebar')
-        <aside class="sidebar">
+        <aside class="sidebar" aria-label="{{ __('Barra laterale', 'sage') }}">
           @yield('sidebar')
         </aside>
       @endif

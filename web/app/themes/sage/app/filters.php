@@ -167,3 +167,40 @@ function disable_tinymce_emoji(array $plugins): array
     return array_values(array_diff($plugins, ['wpemoji']));
 }
 add_filter('tiny_mce_plugins', __NAMESPACE__.'\\disable_tinymce_emoji');
+
+/**
+ * Adapt the custom logo image to the header (get_custom_logo()).
+ *
+ * - sizes: the header caps the logo at 80px of height (max-h-20, the
+ *   'height' of the custom-logo support in setup.php) with an automatic
+ *   width, so its rendered width is 80px times the image ratio (240px for
+ *   the recommended 240×80). Core would use the full image width
+ *   (e.g. "(max-width: 480px) 100vw, 480px") and let the browser download
+ *   a larger variant than needed.
+ * - fetchpriority: "auto" (browser default) instead of the "high" core
+ *   gives to the first image over 50000px² it meets. The logo is small and
+ *   rarely the LCP element; images explicitly marked "high" (x-ui.image
+ *   with eager) keep the priority anyway. "auto" rather than removing the
+ *   attribute: without it core would add "high" again
+ *   (wp_maybe_add_fetchpriority_high_attr()). A value already set by
+ *   another filter is left untouched.
+ *
+ * @param  array<string, mixed>  $attr  Image attributes.
+ * @param  int|string  $attachment_id  Logo attachment ID (theme mod).
+ * @return array<string, mixed>
+ */
+function custom_logo_image_attributes(array $attr, int|string $attachment_id): array
+{
+    $max_height = 80;
+    $image = wp_get_attachment_image_src((int) $attachment_id, 'full');
+
+    if ($image && empty($attr['sizes']) && $image[1] > 0 && $image[2] > 0) {
+        $width = (int) min($image[1], ceil($max_height * $image[1] / $image[2]));
+        $attr['sizes'] = sprintf('(max-width: %1$dpx) 100vw, %1$dpx', $width);
+    }
+
+    $attr['fetchpriority'] ??= 'auto';
+
+    return $attr;
+}
+add_filter('get_custom_logo_image_attributes', __NAMESPACE__.'\\custom_logo_image_attributes', 10, 2);

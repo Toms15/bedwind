@@ -10,6 +10,9 @@
     "build": "vite build",
     "blocks:manifest": "node resources/scripts/blocks-manifest.js",
     "blocks:manifest:check": "node resources/scripts/blocks-manifest.js --check",
+    "icons": "node resources/scripts/icons.js",
+    "icons:check": "node resources/scripts/icons.js --check",
+    "test:js": "node --test \"resources/scripts/**/*.test.js\"",
     "lint": "npm run lint:js && npm run lint:css && npm run lint:blade && npm run format:check",
     "lint:js": "eslint .",
     "lint:css": "stylelint \"resources/css/**/*.css\" \"resources/views/blocks/*/*.css\"",
@@ -28,6 +31,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@phosphor-icons/core": "^2.1.1",
     "@roots/vite-plugin": "^2.2.0",
     "@tailwindcss/vite": "^4.3.5",
     "blade-formatter": "^1.44.6",

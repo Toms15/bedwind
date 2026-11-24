@@ -125,4 +125,9 @@ jobs:
       # resources/views/blocks/blocks-manifest.php è versionato: deve
       # corrispondere ai block.json (npm run blocks:manifest).
       - run: npm run blocks:manifest:check
+      # resources/icons/phosphor.php è versionato: deve contenere le icone usate
+      # nelle view e nell'allowlist (npm run icons).
+      - run: npm run icons:check
+      # Test degli script Node (node --test).
+      - run: npm run test:js
       - run: npm run build

@@ -153,6 +153,7 @@ Componenti Blade anonimi in `resources/views/components/`, raggruppati per carte
 | `<x-ui.button>`                   | Link o pulsante disabilitato; non stampa nulla se `link` non è valido e non è `disabled` | `link`, `target` (`_self`/`_blank`), `type` (`primary`, `secondary`, `white`, `black`), `label`, `disabled`, `customColor` |
 | `<x-ui.title>`                    | Titolo con tag fra quelli ammessi                                                        | `tag` (h1–h6, `p`, `span`; default `h2`), `textColor`                                                                      |
 | `<x-ui.alert>`                    | Riquadro di avviso, nulla senza contenuto                                                | `type` (`success`, `caution`, `warning`, default informativo), `message` (o lo slot), `role` (`status`/`alert`)            |
+| `<x-ui.icon>`                     | Icona Phosphor come SVG inline, decorativa salvo `label` ([Icone](#icone))               | `name`, `weight` (`thin`, `light`, `regular` default, `bold`, `fill`, `duotone`), `label`                                  |
 | `<x-ui.image>`                    | Immagine allegata (`wp_get_attachment_image()`)                                          | `id`, `size` (default `large`), `sizes`, `eager`, `alt`, `fallback`, `img-id`                                              |
 | `<x-content.share>`               | Link di condivisione social + pulsante Web Share API                                     | `title`, `link` (default: post corrente), `facebook`, `twitter` (X), `linkedin`, `whatsapp`                                |
 | `<x-content.breadcrumbs>`         | Breadcrumb con JSON-LD                                                                   | `items` (default `Breadcrumbs::items()`), `jsonld` (default `true`)                                                        |
@@ -160,6 +161,40 @@ Componenti Blade anonimi in `resources/views/components/`, raggruppati per carte
 | `<x-acf.placeholder>`             | Placeholder dei blocchi ACF nell'editor (usato da `BlockRenderer`)                       | `block`, `title`, `message`                                                                                                |
 
 Un nuovo componente va nella cartella che corrisponde al suo ruolo (nessun componente nella radice di `components/`), è documentato nel suo commento di testa e in questa tabella e ha un esempio nella [styleguide](#styleguide).
+
+### Icone
+
+Le icone sono quelle di [Phosphor](https://phosphoricons.com) (pacchetto npm `@phosphor-icons/core`, SVG ufficiali; niente web font né sprite), stampate inline da `<x-ui.icon>` tramite `App\Icons\Phosphor`.
+
+```blade
+<x-ui.icon name="arrow-right" />
+<x-ui.icon name="heart" weight="fill" class="size-6 text-primary-500" />
+<x-ui.icon name="warning" weight="bold" :label="__('Attenzione', 'sage')" />
+```
+
+- **Nomi**: gli slug di phosphoricons.com (`magnifying-glass`, `caret-down`): solo minuscole, cifre e trattini, validati con una regex prima di qualsiasi accesso ai file.
+- **Pesi**: `thin`, `light`, `regular` (default), `bold`, `fill`, `duotone` (la parte secondaria del duotone ha `opacity="0.2"` sullo stesso colore).
+- **Dimensione e colore**: `1em` di default, così l'icona segue il `font-size` del testo o del pulsante in cui si trova; `width`/`height` sono attributi di presentazione, quindi qualsiasi classe (`size-5`, `w-5 h-auto`) li sostituisce. L'`<svg>` ha l'attributo `data-icon`, agganciato da una regola di base in `resources/css/app.css` (e `editor.css`): `display: inline-block` con `vertical-align: -0.125em`, così senza classi l'icona resta sulla riga del testo (il preflight di Tailwind rende gli svg `display: block`); `block`, `flex` o `align-*` la sostituiscono. Il colore è `currentColor`: si cambia con `text-*` (o `fill-*`).
+- **Accessibilità**: senza `label` l'icona è decorativa (`aria-hidden="true" focusable="false"`), ed è il caso normale: accanto a un testo, o dentro un link/pulsante che ha già un nome (`aria-label` sul pulsante, come in `<x-content.carousel-navigation>`). Con `label` (un'icona che da sola porta un significato) diventa `role="img"` con `aria-label` e `<title>`.
+- **Attributi**: solo `name` e `weight` vengono validati; gli altri (`class`, `id`, `data-*`, anche `on*`) arrivano all'`<svg>` così come sono, solo escapati, come in ogni componente Blade. Non passare mai a `<x-ui.icon>` attributi o chiavi presi da input utente o da campi ACF.
+- **Solo le icone usate**: in produzione `node_modules` non c'è, quindi le icone arrivano da `resources/icons/phosphor.php`, generato da `npm run icons` (e da Vite in build e in dev) e versionato. Lo script trova da solo i tag `<x-ui.icon>` con `name` e `weight` **statici** nelle view; i commenti Blade (`{{-- --}}`) e HTML (`<!-- -->`) vengono ignorati, i blocchi `@php` no (un tag scritto lì dentro viene contato).
+- **Icone dinamiche**: se il nome o il peso arrivano da una variabile (`:name="$icon"`, `name="{{ $icon }}"`: un valore con `{{` o `{!!` è dinamico e lo scanner lo salta; un campo ACF; una chiamata a `App\Icons\Phosphor::svg()` da PHP), elenca le combinazioni possibili in `resources/icons/allowlist.json`, un array JSON di `"nome"` (peso regular) o `"nome:peso"`, es. `["phone", "envelope-simple:bold"]`, poi `npm run icons`.
+- **Errori**: un nome o un peso inesistente nelle view o nell'allowlist fa fallire `npm run icons` e la build, con il file, la riga e dei suggerimenti. A runtime, un'icona non valida o assente dal manifest non stampa nulla negli ambienti diversi da development; in development il componente la legge da `node_modules` se esiste e segnala il problema senza interrompere la pagina: una riga in `error_log` (`logs/debug.log`), un avviso in Query Monitor (azione `qm/warning`) e un commento HTML `<!-- x-ui.icon: … -->`. Niente `trigger_error`/`wp_trigger_error`: con `WP_DEBUG` il gestore degli errori di Acorn trasforma ogni warning in eccezione e mostrerebbe la pagina d'errore.
+- **SVG fidati**: le icone vengono dal pacchetto e dal manifest versionato, non dagli utenti: non passano dal sanitizer degli upload SVG di `app/svg.php`, i cui filtri riguardano solo i file caricati nella libreria media.
+
+`App\Icons\Phosphor` (PHP) e `resources/scripts/icons.js` (Node) espongono anche il catalogo, per il wizard dei nuovi blocchi (M47) e per l'icona dei `block.json`:
+
+| Operazione                     | PHP (`App\Icons\Phosphor`)                                      | Node (`resources/scripts/icons.js`)                    |
+| ------------------------------ | --------------------------------------------------------------- | ------------------------------------------------------ |
+| Slug disponibili               | `names()` (dal pacchetto; dal manifest se il pacchetto non c'è) | `listIconNames()`, `listIcons()` (con categorie e tag) |
+| Esiste nome + peso             | `exists($name, $weight)`                                        | `iconExists(name, weight)`                             |
+| Stampabile in questo ambiente  | `available($name, $weight)`                                     | —                                                      |
+| SVG del pacchetto (block.json) | `source($name, $weight)`                                        | `getIconSvg(name, weight)`                             |
+| SVG con attributi del tema     | `svg($name, $weight, $attributes, $label)`                      | —                                                      |
+| Suggerimenti per un refuso     | —                                                               | `suggestIcons(query)`                                  |
+| Icona casuale                  | `random($exclude)`                                              | `randomIcon({ exclude, random })`                      |
+
+L'icona di un blocco va nel `block.json` come SVG inline (`"icon": "<svg …>…</svg>"`, formato accettato da ACF), quindi non passa dal manifest delle icone.
 
 ## Styleguide
 

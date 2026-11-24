@@ -16,6 +16,11 @@ declare(strict_types=1);
  *  - rifiutati se scritti tramite wp_upload_bits() (XML-RPC
  *    wp.uploadFile / metaWeblog.newMediaObject), che salta i prefiltri di
  *    caricamento e non permette la sanificazione.
+ *
+ * Riguarda solo i file caricati nella libreria media. Le icone Phosphor del
+ * tema (<x-ui.icon>, App\Icons\Phosphor) sono asset fidati, letti dal manifest
+ * versionato resources/icons/phosphor.php o dal pacchetto npm: non passano da
+ * qui e nessuno di questi filtri le tocca.
  */
 
 namespace App\Svg;

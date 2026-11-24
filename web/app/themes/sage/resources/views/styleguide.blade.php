@@ -24,6 +24,7 @@
     'title' => 'x-ui.title',
     'alert' => 'x-ui.alert',
     'image' => 'x-ui.image',
+    'icon' => 'x-ui.icon',
     'share' => 'x-content.share',
     'breadcrumbs' => 'x-content.breadcrumbs',
     'carousel-navigation' => 'x-content.carousel-navigation',
@@ -212,6 +213,98 @@
           <figcaption class="text-small">{{ __('Senza immagine: fallback del tema.', 'sage') }}</figcaption>
         </figure>
       </div>
+    </section>
+
+    <section id="icon" class="flex flex-col gap-6">
+      <h2 class="text-2xl font-medium"><code>&lt;x-ui.icon&gt;</code></h2>
+      <p class="text-small">
+        {{ __('Icone Phosphor come SVG inline: decorative di default (aria-hidden), dimensione 1em e colore currentColor. Entrano nel tema solo le icone usate (resources/icons/phosphor.php).', 'sage') }}
+      </p>
+
+      <h3 class="text-xl font-medium">{{ __('Pesi', 'sage') }}</h3>
+      <ul class="grid grid-cols-2 md:grid-cols-6 gap-4" role="list">
+        <li class="flex flex-col items-center gap-2">
+          <span class="flex items-center gap-3 text-2xl">
+            <x-ui.icon name="house" weight="thin" />
+            <x-ui.icon name="heart" weight="thin" />
+            <x-ui.icon name="magnifying-glass" weight="thin" />
+          </span>
+          <code class="text-small">thin</code>
+        </li>
+        <li class="flex flex-col items-center gap-2">
+          <span class="flex items-center gap-3 text-2xl">
+            <x-ui.icon name="house" weight="light" />
+            <x-ui.icon name="heart" weight="light" />
+            <x-ui.icon name="magnifying-glass" weight="light" />
+          </span>
+          <code class="text-small">light</code>
+        </li>
+        <li class="flex flex-col items-center gap-2">
+          <span class="flex items-center gap-3 text-2xl">
+            <x-ui.icon name="house" weight="regular" />
+            <x-ui.icon name="heart" weight="regular" />
+            <x-ui.icon name="magnifying-glass" weight="regular" />
+          </span>
+          <code class="text-small">regular</code>
+        </li>
+        <li class="flex flex-col items-center gap-2">
+          <span class="flex items-center gap-3 text-2xl">
+            <x-ui.icon name="house" weight="bold" />
+            <x-ui.icon name="heart" weight="bold" />
+            <x-ui.icon name="magnifying-glass" weight="bold" />
+          </span>
+          <code class="text-small">bold</code>
+        </li>
+        <li class="flex flex-col items-center gap-2">
+          <span class="flex items-center gap-3 text-2xl">
+            <x-ui.icon name="house" weight="fill" />
+            <x-ui.icon name="heart" weight="fill" />
+            <x-ui.icon name="magnifying-glass" weight="fill" />
+          </span>
+          <code class="text-small">fill</code>
+        </li>
+        <li class="flex flex-col items-center gap-2">
+          <span class="flex items-center gap-3 text-2xl">
+            <x-ui.icon name="house" weight="duotone" />
+            <x-ui.icon name="heart" weight="duotone" />
+            <x-ui.icon name="magnifying-glass" weight="duotone" />
+          </span>
+          <code class="text-small">duotone</code>
+        </li>
+      </ul>
+
+      <h3 class="text-xl font-medium">{{ __('Dimensioni', 'sage') }}</h3>
+      <div class="flex flex-wrap items-end gap-6">
+        <x-ui.icon name="heart" class="size-4" />
+        <x-ui.icon name="heart" class="size-6" />
+        <x-ui.icon name="heart" class="size-8" />
+        <x-ui.icon name="heart" class="size-12" />
+        <code class="text-small">size-4, size-6, size-8, size-12</code>
+      </div>
+      <p class="text-xl">
+        {{ __('Senza classi l\'icona è alta 1em e segue il testo', 'sage') }} <x-ui.icon name="arrow-right" />
+      </p>
+
+      <h3 class="text-xl font-medium">{{ __('Colori', 'sage') }}</h3>
+      <div class="flex flex-wrap items-center gap-6 text-4xl">
+        <x-ui.icon name="heart" weight="fill" class="text-primary-500" />
+        <x-ui.icon name="heart" weight="fill" class="text-red-400" />
+        <x-ui.icon name="heart" weight="fill" class="text-green-400" />
+        <x-ui.icon name="heart" weight="duotone" class="text-primary-700" />
+        <code class="text-small">text-primary-500, text-red-400, text-green-400, text-primary-700</code>
+      </div>
+
+      <h3 class="text-xl font-medium">{{ __('Con etichetta e nei pulsanti', 'sage') }}</h3>
+      <div class="flex flex-wrap items-center gap-6">
+        <x-ui.icon name="warning" weight="fill" class="size-8 text-red-400" :label="__('Attenzione', 'sage')" />
+        <x-ui.button link="#icon">
+          {{ __('Avanti', 'sage') }}
+          <x-ui.icon name="arrow-right" weight="bold" />
+        </x-ui.button>
+      </div>
+      <p class="text-small">
+        {{ __('Con label l\'icona diventa role="img" con aria-label e <title>; senza, è decorativa e il nome accessibile va dato al testo vicino o all\'elemento che la contiene.', 'sage') }}
+      </p>
     </section>
 
     <section id="share" class="flex flex-col gap-6">

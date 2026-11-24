@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-24T10:16:53+00:00\n"
+"POT-Creation-Date: 2026-11-24T12:30:26+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: sage\n"
@@ -67,8 +67,23 @@ msgstr ""
 msgid "Continua a leggere"
 msgstr ""
 
+#. translators: 1: nome dell'icona, 2: peso.
+#: app/Icons/Phosphor.php:220
+msgid "L'icona \"%1$s\" (%2$s) non è nel manifest resources/icons/phosphor.php e in produzione non verrà mostrata: usa un name statico in x-ui.icon oppure aggiungila a resources/icons/allowlist.json, poi esegui npm run icons."
+msgstr ""
+
+#. translators: 1: peso indicato, 2: elenco dei pesi validi.
+#: app/Icons/Phosphor.php:223
+msgid "Peso dell'icona \"%1$s\" non valido: usa %2$s."
+msgstr ""
+
+#. translators: 1: nome dell'icona, 2: peso.
+#: app/Icons/Phosphor.php:226
+msgid "Icona Phosphor \"%1$s\" (%2$s) inesistente."
+msgstr ""
+
 #: app/Navigation/Breadcrumbs.php:107
-#: resources/views/styleguide.blade.php:43
+#: resources/views/styleguide.blade.php:44
 msgid "Home"
 msgstr ""
 
@@ -168,27 +183,27 @@ msgid "Piè di pagina"
 msgstr ""
 
 #: app/Styleguide.php:246
-#: resources/views/styleguide.blade.php:55
+#: resources/views/styleguide.blade.php:56
 msgid "Styleguide"
 msgstr ""
 
-#: app/svg.php:101
+#: app/svg.php:106
 msgid "I file SVG compressi (.svgz) non sono consentiti."
 msgstr ""
 
-#: app/svg.php:113
+#: app/svg.php:118
 msgid "Il contenuto SVG è consentito solo nei file con estensione .svg."
 msgstr ""
 
-#: app/svg.php:119
+#: app/svg.php:124
 msgid "Non hai i permessi per caricare file SVG."
 msgstr ""
 
-#: app/svg.php:131
+#: app/svg.php:136
 msgid "Non è stato possibile ripulire questo file SVG, che è stato quindi rifiutato."
 msgstr ""
 
-#: app/svg.php:188
+#: app/svg.php:193
 msgid "I file SVG devono essere caricati dalla libreria media."
 msgstr ""
 
@@ -322,7 +337,7 @@ msgstr ""
 
 #. translators: ACF "Blocco: Solo testo", title (etichetta)
 #: resources/lang/acf-json.php:47
-#: resources/views/styleguide.blade.php:200
+#: resources/views/styleguide.blade.php:201
 msgid "Titolo"
 msgstr ""
 
@@ -415,7 +430,7 @@ msgstr ""
 msgid "Slide precedente"
 msgstr ""
 
-#: resources/views/components/content/carousel-navigation.blade.php:28
+#: resources/views/components/content/carousel-navigation.blade.php:19
 msgid "Slide successiva"
 msgstr ""
 
@@ -484,194 +499,220 @@ msgid "Menu principale"
 msgstr ""
 
 #: resources/views/styleguide.blade.php:19
-#: resources/views/styleguide.blade.php:71
+#: resources/views/styleguide.blade.php:72
+#: resources/views/styleguide.blade.php:300
 msgid "Colori"
 msgstr ""
 
 #: resources/views/styleguide.blade.php:20
-#: resources/views/styleguide.blade.php:111
+#: resources/views/styleguide.blade.php:112
 msgid "Tipografia"
 msgstr ""
 
 #: resources/views/styleguide.blade.php:21
-#: resources/views/styleguide.blade.php:145
+#: resources/views/styleguide.blade.php:146
 msgid "Titoli"
 msgstr ""
 
 #: resources/views/styleguide.blade.php:22
-#: resources/views/styleguide.blade.php:161
+#: resources/views/styleguide.blade.php:162
 msgid "Link e focus"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:33
+#: resources/views/styleguide.blade.php:34
 msgid "Testo di esempio per la styleguide del tema."
 msgstr ""
 
-#: resources/views/styleguide.blade.php:35
+#: resources/views/styleguide.blade.php:36
 msgid "Token non disponibili: esegui npm run build per generare public/build/assets/theme.json."
 msgstr ""
 
-#: resources/views/styleguide.blade.php:38
+#: resources/views/styleguide.blade.php:39
 msgid "Su bianco"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:39
+#: resources/views/styleguide.blade.php:40
 msgid "Su nero"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:44
+#: resources/views/styleguide.blade.php:45
 msgid "Sezione"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:45
+#: resources/views/styleguide.blade.php:46
 msgid "Pagina corrente"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:57
+#: resources/views/styleguide.blade.php:58
 msgid "Token e componenti del tema. Pagina disponibile solo in sviluppo (WP_ENV development), esclusa dai motori di ricerca."
 msgstr ""
 
-#: resources/views/styleguide.blade.php:60
+#: resources/views/styleguide.blade.php:61
 msgid "Sezioni della styleguide"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:73
+#: resources/views/styleguide.blade.php:74
 msgid "Rapporto di contrasto WCAG 2.2 di ogni colore con bianco e nero. Testo normale: AA da 4.5:1, AAA da 7:1; testo grande (da 24px, o 18.66px in grassetto): AA da 3:1, AAA da 4.5:1. I colori oklch sono convertiti in sRGB."
 msgstr ""
 
-#: resources/views/styleguide.blade.php:90
+#: resources/views/styleguide.blade.php:91
 msgid "normale"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:90
 #: resources/views/styleguide.blade.php:91
+#: resources/views/styleguide.blade.php:92
 msgid "no"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:91
+#: resources/views/styleguide.blade.php:92
 msgid "grande"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:97
+#: resources/views/styleguide.blade.php:98
 msgid "Contrasto"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:98
+#: resources/views/styleguide.blade.php:99
 msgid "formato colore non supportato"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:114
+#: resources/views/styleguide.blade.php:115
 msgid "Famiglie"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:125
+#: resources/views/styleguide.blade.php:126
+#: resources/views/styleguide.blade.php:288
 msgid "Dimensioni"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:127
+#: resources/views/styleguide.blade.php:128
 msgid "Alcune dimensioni possono avere lo stesso valore (es. sm e small, 0.875rem): small è il token del tema, sm il default di Tailwind."
 msgstr ""
 
-#: resources/views/styleguide.blade.php:147
+#: resources/views/styleguide.blade.php:148
 msgid "Elementi h1–h6 senza classi, come li stampa il contenuto. Sono esempi con role=\"presentation\": non fanno parte della struttura dei titoli della pagina."
 msgstr ""
 
-#: resources/views/styleguide.blade.php:151
+#: resources/views/styleguide.blade.php:152
 msgid "Titolo h1"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:152
+#: resources/views/styleguide.blade.php:153
 msgid "Titolo h2"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:153
+#: resources/views/styleguide.blade.php:154
 msgid "Titolo h3"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:154
+#: resources/views/styleguide.blade.php:155
 msgid "Titolo h4"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:155
+#: resources/views/styleguide.blade.php:156
 msgid "Titolo h5"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:156
+#: resources/views/styleguide.blade.php:157
 msgid "Titolo h6"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:162
+#: resources/views/styleguide.blade.php:163
 msgid "Premi Tab per vedere il focus visibile su link e pulsanti."
 msgstr ""
 
-#: resources/views/styleguide.blade.php:164
+#: resources/views/styleguide.blade.php:165
 msgid "Link di esempio nel testo"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:167
+#: resources/views/styleguide.blade.php:168
 msgid "Link visitato (questa pagina)"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:168
+#: resources/views/styleguide.blade.php:169
 msgid "– il tema non definisce uno stile :visited."
 msgstr ""
 
-#: resources/views/styleguide.blade.php:171
+#: resources/views/styleguide.blade.php:172
 msgid "Link con no-underline"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:173
+#: resources/views/styleguide.blade.php:174
 msgid "– la sottolineatura è nel layer base: senza, il link va distinto in altro modo (WCAG 1.4.1)."
 msgstr ""
 
-#: resources/views/styleguide.blade.php:181
+#: resources/views/styleguide.blade.php:182
 msgid "Primario"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:182
-#: resources/views/styleguide.blade.php:190
+#: resources/views/styleguide.blade.php:183
+#: resources/views/styleguide.blade.php:191
 msgid "Secondario"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:183
+#: resources/views/styleguide.blade.php:184
 msgid "Nero"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:184
+#: resources/views/styleguide.blade.php:185
 msgid "Nuova scheda"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:185
-#: resources/views/styleguide.blade.php:191
+#: resources/views/styleguide.blade.php:186
+#: resources/views/styleguide.blade.php:192
 msgid "Disabilitato"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:189
+#: resources/views/styleguide.blade.php:190
 msgid "Bianco"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:207
+#: resources/views/styleguide.blade.php:208
 msgid "Informazione (default)."
 msgstr ""
 
-#: resources/views/styleguide.blade.php:208
+#: resources/views/styleguide.blade.php:209
 msgid "Operazione completata."
 msgstr ""
 
-#: resources/views/styleguide.blade.php:209
+#: resources/views/styleguide.blade.php:210
 msgid "Attenzione: controlla i dati."
 msgstr ""
 
-#: resources/views/styleguide.blade.php:210
+#: resources/views/styleguide.blade.php:211
 msgid "Errore: operazione non riuscita."
 msgstr ""
 
-#: resources/views/styleguide.blade.php:212
+#: resources/views/styleguide.blade.php:213
 msgid "role=\"status\" è il default. role=\"alert\" (live region assertiva) va passato solo per messaggi inseriti dinamicamente:"
 msgstr ""
 
-#: resources/views/styleguide.blade.php:223
+#: resources/views/styleguide.blade.php:224
 msgid "Senza immagine: fallback del tema."
+msgstr ""
+
+#: resources/views/styleguide.blade.php:232
+msgid "Icone Phosphor come SVG inline: decorative di default (aria-hidden), dimensione 1em e colore currentColor. Entrano nel tema solo le icone usate (resources/icons/phosphor.php)."
+msgstr ""
+
+#: resources/views/styleguide.blade.php:236
+msgid "Pesi"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:297
+msgid "Senza classi l'icona è alta 1em e segue il testo"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:309
+msgid "Con etichetta e nei pulsanti"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:313
+msgid "Avanti"
+msgstr ""
+
+#: resources/views/styleguide.blade.php:319
+msgid "Con label l'icona diventa role=\"img\" con aria-label e <title>; senza, è decorativa e il nome accessibile va dato al testo vicino o all'elemento che la contiene."
 msgstr ""
 
 #: resources/views/blocks/only-text/block.json

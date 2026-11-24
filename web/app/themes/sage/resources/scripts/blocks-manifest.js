@@ -35,13 +35,13 @@ const indent = (level) => '    '.repeat(level);
 const phpString = (value) => `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
 
 /**
- * Letterale PHP di un valore JSON decodificato.
+ * Letterale PHP di un valore JSON decodificato (riusato da icons.js).
  *
  * @param {unknown} value
  * @param {number} level
  * @returns {string}
  */
-function toPhp(value, level) {
+export function toPhp(value, level) {
   if (value === null) {
     return 'null';
   }

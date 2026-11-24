@@ -31,6 +31,12 @@
   a {
     text-decoration-line: underline;
   }
+
+  /* <x-ui.icon> (data-icon): resta sulla riga del testo, il preflight rende gli svg display: block. Le utility (block, flex, align-middle) la sostituiscono */
+  svg[data-icon] {
+    display: inline-block;
+    vertical-align: -0.125em;
+  }
 }
 
 /**

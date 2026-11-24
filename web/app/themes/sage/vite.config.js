@@ -7,6 +7,7 @@ import tailwindcss from '@tailwindcss/vite';
 import laravel from 'laravel-vite-plugin';
 import { wordpressPlugin, wordpressThemeJson } from '@roots/vite-plugin';
 import { blocksDir, writeBlocksManifest } from './resources/scripts/blocks-manifest.js';
+import { allowlistPath, viewsDir, writeIconsManifest } from './resources/scripts/icons.js';
 
 const themeDir = path.dirname(fileURLToPath(import.meta.url));
 
@@ -100,6 +101,40 @@ function blocksManifest() {
   };
 }
 
+// Tiene resources/icons/phosphor.php allineato alle icone usate: scritto
+// all'avvio della build (un'icona inesistente la fa fallire) e, in dev, ogni volta
+// che cambia una view Blade o resources/icons/allowlist.json. In dev un errore
+// (es. un nome scritto a metà) viene solo stampato, senza fermare il server.
+function iconsManifest() {
+  const isSource = (file) =>
+    file === allowlistPath || (file.startsWith(viewsDir + path.sep) && file.endsWith('.blade.php'));
+
+  const regenerate = (file) => {
+    if (!isSource(path.resolve(file))) {
+      return;
+    }
+
+    try {
+      writeIconsManifest();
+    } catch (error) {
+      console.error(`[icons] ${error.message}`);
+    }
+  };
+
+  return {
+    name: 'sage-icons-manifest',
+    buildStart() {
+      writeIconsManifest();
+    },
+    configureServer(server) {
+      server.watcher.add([path.join(viewsDir, '**/*.blade.php'), allowlistPath]);
+      server.watcher.on('add', regenerate);
+      server.watcher.on('change', regenerate);
+      server.watcher.on('unlink', regenerate);
+    },
+  };
+}
+
 export default defineConfig(({ mode }) => {
   // laravel-vite-plugin legge APP_URL (anche da process.env) per la allowlist
   // CORS del dev server, l'host TLS con VITE_DEV_SERVER_KEY/CERT, la sua pagina
@@ -113,6 +148,7 @@ export default defineConfig(({ mode }) => {
     base: `/app/themes/${themeSlug}/public/build/`,
     plugins: [
       blocksManifest(),
+      iconsManifest(),
       tailwindcss(),
       laravel({
         input: [

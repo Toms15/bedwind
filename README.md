@@ -254,11 +254,12 @@ npm run build    # build di produzione in public/build
 npm run lint     # ESLint, Stylelint, blade-formatter --check-formatted, prettier --check
 npm run format   # Prettier + blade-formatter (scrive i file)
 npm run blocks:manifest    # rigenera il manifest dei blocchi dai block.json
+npm run icons              # rigenera il manifest delle icone Phosphor usate
 npm run translate          # rigenera sage.pot e aggiorna i file .po
 npm run translate:compile  # compila .mo, .l10n.php e .json
 ```
 
-I singoli script `lint:*`, `format:*`, `blocks:*` e `translate:*` sono descritti nel README del tema.
+I singoli script `lint:*`, `format:*`, `blocks:*`, `icons:*`, `test:js` e `translate:*` sono descritti nel README del tema.
 
 ### Qualità PHP (dalla root del progetto)
 
@@ -285,7 +286,7 @@ Gli stessi script esistono nel tema (`composer lint`, `analyse`, `test`, `check`
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Tema PHP 8.2 / 8.3 / 8.4**                                                                                                                                     | in `web/app/themes/sage`: `composer install` + `composer check` (validate --strict, audit, Pint, PHPStan, Pest). Solo pacchetti pubblici, nessuna credenziale.                                      |
 | **Root Bedrock** (PHP 8.3: il lock della root include Pint 1.32, che richiede PHP 8.3, quindi un install completo con gli strumenti di sviluppo fallisce su 8.2) | `composer validate --strict`, `composer install` (ACF Pro tramite `COMPOSER_AUTH`, traduzioni di WordPress tramite wp-translation-downloader), `composer audit --locked`, `vendor/bin/pint --test`. |
-| **Frontend** (Node da `.nvmrc`, cioè l'ultima 22.x)                                                                                                              | in `web/app/themes/sage`: `npm ci`, `npm run lint`, `npm run blocks:manifest:check`, `npm run build`. Non servono né `vendor/` né `.env`.                                                           |
+| **Frontend** (Node da `.nvmrc`, cioè l'ultima 22.x)                                                                                                              | in `web/app/themes/sage`: `npm ci`, `npm run lint`, `npm run blocks:manifest:check`, `npm run icons:check`, `npm run test:js`, `npm run build`. Non servono né `vendor/` né `.env`.                 |
 
 ### Secret da creare su GitHub
 
@@ -330,7 +331,7 @@ Carica l'intero progetto (root compresa, non solo `web/`): `config/`, `vendor/`,
 **Non** caricare:
 
 - `.git/`, `.github/`, `.idea/`, `MIGLIORIE.md`, `LocalValetDriver.php` e gli altri file di sviluppo;
-- `web/app/themes/sage/node_modules/` (mai usato a runtime). Mantieni `resources/`: le view Blade, i blocchi, `lang/` e i file di font e immagini controllati dal tema vengono letti a runtime;
+- `web/app/themes/sage/node_modules/` (mai usato a runtime: le icone Phosphor usate sono già in `resources/icons/phosphor.php`). Mantieni `resources/`: le view Blade, i blocchi, `lang/` e i file di font e immagini controllati dal tema vengono letti a runtime;
 - `web/app/themes/sage/public/hot` (se esiste, il tema prova a caricare gli asset dal dev server di Vite);
 - `.env`, `.env.local` e `auth.json` locali;
 - `logs/*.log`, `web/app/uploads/` (sincronizzata a parte, mai sovrascritta da un deploy), `web/app/cache/`;

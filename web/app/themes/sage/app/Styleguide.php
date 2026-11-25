@@ -21,9 +21,13 @@ use WP_Query;
  * presente altrove, es. dopo una copia del database), si fa il flush una volta.
  * Funziona anche `wp rewrite flush`.
  *
- * Le utility usate solo dalla view sono compilate in una entry dedicata
- * (resources/css/styleguide.css, esclusa da app.css ed editor.css), caricata
- * solo sulla styleguide, così non finiscono mai nei fogli di stile di produzione.
+ * La view è esclusa da app.css ed editor.css, così le sue classi non finiscono
+ * mai nei fogli di stile di produzione: le sue utility sono compilate in una
+ * entry dedicata (resources/css/styleguide.css), caricata solo sulla styleguide.
+ * Quella entry compila nel layer styleguide, dopo utilities, le utility di tutta
+ * la pagina (sorgenti di app.css più la view): due fogli con classi in comune
+ * nello stesso layer, o con le sole classi della view in un layer successivo,
+ * farebbero perdere varianti responsive e di stato (dettagli nel file CSS).
  */
 final class Styleguide
 {
@@ -39,7 +43,7 @@ final class Styleguide
     /** Ambiente ('on'/'off') dell'ultimo flush fatto dal tema. */
     public const FLUSH_OPTION = 'sage_styleguide_rewrite';
 
-    /** Entry Vite con le utility della view, caricata solo qui. */
+    /** Entry Vite con le utility della pagina (layer styleguide), caricata solo qui. */
     public const STYLE = 'resources/css/styleguide.css';
 
     /** Handle del foglio di stile di STYLE. */

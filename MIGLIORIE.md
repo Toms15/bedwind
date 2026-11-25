@@ -60,6 +60,7 @@
 | M47 | ✅ | Wizard per nuovi blocchi ACF (`npm run make:block`) | DX | 🟠 | M | M29, M30, M46 |
 | M48 | ⬜ | Setup guidato del progetto (`php bin/setup.php`) | DX | 🟠 | M | M47 |
 | M49 | ✅ | Campo gallery nel wizard e `<x-ui.image>` tollerante (ID, array ACF, WP_Post) | Blocchi | 🟠 | S | M47 |
+| M50 | ✅ | Styleguide: utility in un layer dedicato (varianti responsive sovrascritte da app.css) | Frontend | 🔴 | S | — |
 
 **Ordine consigliato.** Fase 0 (M01–M10), poi Fase 1 (M11–M16), Fase 2 (M17–M27), Fase 3 (M28–M34), Fase 4 (M35–M39).
 

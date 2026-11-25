@@ -6,8 +6,10 @@
   con dati di esempio statici (nessuna query sui contenuti). Non è collegata da nessuna
   parte del sito ed è noindex.
 
-  Le utility usate solo qui stanno in resources/css/styleguide.css (esclusa da app.css
-  ed editor.css), accodato solo su questa pagina da App\Styleguide::enqueueAssets().
+  Le utility della pagina (questa view compresa) stanno in resources/css/styleguide.css,
+  nel layer styleguide, accodato solo qui da App\Styleguide::enqueueAssets(); la view è
+  esclusa da app.css ed editor.css. Così le varianti (md:, hover:…) vincono sulle classi
+  base anche quando queste sono pure in app.css.
   I titoli dimostrativi hanno role="presentation": lo stile resta, ma la struttura
   reale della pagina è un solo h1 e un h2 per sezione.
 --}}

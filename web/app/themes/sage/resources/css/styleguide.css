@@ -1,22 +1,49 @@
 /**
  * Styleguide di sviluppo (/styleguide/, solo WP_ENV development): vedi App\Styleguide.
  *
- * Solo le utility usate da resources/views/styleguide.blade.php, esclusa da app.css
- * ed editor.css (@source not) così le sue classi non finiscono in produzione.
- * Variabili e stili base arrivano da app.css (theme(static)), caricato prima;
- * i componenti mostrati usano classi già compilate in app.css.
+ * resources/views/styleguide.blade.php è esclusa da app.css ed editor.css
+ * (@source not), così le sue classi non finiscono in produzione: le sue utility
+ * si compilano qui. Variabili e stili base arrivano da app.css (theme(static)).
  *
  * Accodato con wp_enqueue_style, quindi stampato in wp_head() prima di app.css:
- * l'ordine dei layer è dichiarato qui, altrimenti utilities verrebbe prima di
- * base e components di app.css e perderebbe contro di loro.
+ * l'ordine dei layer lo fissa la dichiarazione qui sotto, che il browser incontra
+ * per prima. Le utility stanno nel layer dedicato styleguide, dopo utilities,
+ * e vincono su quelle di app.css.
+ *
+ * Il layer contiene le utility di tutta la pagina, non solo quelle della view:
+ * stesse sorgenti di app.css più la view. Due fogli compilati a parte, con classi
+ * in comune, si danno torto a vicenda:
+ * - nello stesso layer vincerebbe la copia di app.css (caricato dopo), quindi
+ *   una variante presente solo qui (md:grid-cols-4) perderebbe contro la classe
+ *   base di app.css (grid-cols-2) a qualsiasi larghezza;
+ * - con le sole classi della view in un layer successivo, la loro copia di una
+ *   classe base (flex-col) batterebbe le varianti dei componenti in app.css
+ *   (md:flex-row di x-content.share).
+ * Con tutte le utility in un solo layer, Tailwind le ordina come in app.css e le
+ * varianti vincono sulle classi base sia nella view sia nei componenti.
+ *
+ * Rilevamento automatico e @source vanno tenuti allineati a quelli di app.css:
+ * lo verifica resources/scripts/styleguide-sources.test.js (npm run test:js).
+ *
+ * Limiti noti:
+ * - con !important l'ordine dei layer si inverte: una utility foo! di app.css
+ *   (layer utilities) batterebbe una variante md:bar! di questo foglio;
+ * - Lightning CSS toglie styleguide dalla dichiarazione @layer compilata
+ *   (resta "theme,base,components,utilities"), ma l'ordine non cambia: il layer
+ *   viene registrato al primo @layer styleguide {…}, dopo gli altri.
  */
-@layer theme, base, components, utilities;
+@layer theme, base, components, utilities, styleguide;
 
 @import 'tailwindcss/theme' theme(reference);
 @import './theme.css' theme(reference);
-@import 'tailwindcss/utilities' layer(utilities) source(none);
+@import 'tailwindcss/utilities' layer(styleguide);
 
-@source '../views/styleguide.blade.php';
+/* Sorgenti di app.css, senza escludere la view della styleguide (resta in '../views/') */
+@source '../views/';
+@source '../../app/';
+@source not '../../tests/';
+@source not '../../stubs/';
+@source not '../lang/';
 
 /* Documentazione del tema (README, CONVENTIONS, LICENSE): testo, non classi */
 @source not '../../*.md';
